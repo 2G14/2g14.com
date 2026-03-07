@@ -10,10 +10,13 @@
     "build": "astro build",
     "preview": "astro preview",
     "astro": "astro",
+    "typecheck": "tsc --noEmit",
     "lint": "biome check .",
     "lint:fix": "biome check --write .",
     "lint:unsafe": "biome check --write --unsafe .",
-    "format": "biome format --write ."
+    "format": "biome format --write .",
+    "test": "vitest",
+    "coverage": "vitest run --coverage"
   },
   "dependencies": {
     "@astrojs/react": "^4.4.2",
@@ -35,6 +38,10 @@
   },
   "devDependencies": {
     "@biomejs/biome": "^2.4.6",
-    "typescript": "^5.9.3"
+    "@tsconfig/node24": "^24.0.4",
+    "@tsconfig/strictest": "^2.0.8",
+    "@vitest/coverage-v8": "^4.0.18",
+    "typescript": "^5.9.3",
+    "vitest": "^4.0.18"
   }
 }
