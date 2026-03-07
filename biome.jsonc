@@ -10,6 +10,11 @@
       "quoteStyle": "single" // デフォルトは `double`
     }
   },
+  "css": {
+    "parser": {
+      "tailwindDirectives": true
+    }
+  },
   "linter": {
     "enabled": true
   },
