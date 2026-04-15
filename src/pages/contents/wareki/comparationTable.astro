@@ -17,6 +17,7 @@
 
 // セクションはページ内リンクでアクセスできるようにする
 // クエリパラメータで元号を指定することもでき、指定した場合はその元号のセクションのみを表示する（例：?era=令和）
+// TODO: SSGなのでクエリパラメータでの制御は難しい
 import { Card, CardContent } from "@/components/ui/card";
 import {
   Table,
@@ -27,7 +28,7 @@ import {
   TableCell,
 } from "@/components/ui/table";
 import { ERAS } from "@/domain/wareki/era.js";
-import TocFab from "@/components/toc/TocSheet";
+import TocSheet from "@/components/toc/TocSheet";
 import "@/styles/global.css";
 import Toc from "@/components/toc/Toc";
 
@@ -48,30 +49,25 @@ function yearsForEra(startYear: number, endSeirekiYear: number) {
 }
 
 const eras = eraParam ? ERAS.filter((e) => e.name === eraParam) : ERAS;
+const tocItems = eras.map((e) => e.name);
 ---
 
 <html lang="ja">
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width,initial-scale=1" />
-    <title>和暦／西暦 対比表</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>和暦/西暦 対比表</title>
   </head>
   <body class="antialiased">
-    <header>
-      <h1 class="text-2xl font-bold">和暦／西暦 対比表</h1>
-      <p class="text-sm text-muted-foreground">
-        現在の年から降順で表示します。クエリで元号を指定するとその元号のみ表示されます（例:
-        <a class="underline" href="?era=令和">?era=令和</a>）。
-      </p>
+    <header class="sticky top-0 z-30 h-[3rem] bg-white border-b grid grid-cols-[1fr_auto] items-center justify-between px-4">
+      <h1 class="text-2xl font-bold truncate">和暦/西暦 対比表</h1>
+      <div class="md:hidden">
+        <TocSheet client:load items={tocItems} />
+      </div>
     </header>
-    <aside class="block lg:hidden sticky top-0 z-30 bg-white border-b">
-      <TocFab client:load items={ERAS.map((e) => e.name)} />
-    </aside>
-    <div class="prose mx-auto my-8 px-4 max-w-5xl">
-      <div
-        class="page-layout grid grid-cols-1 lg:grid-cols-[1fr_200px] gap-6 items-start"
-      >
-        <main class="min-w-0">
+    <div class="my-8 mx-auto px-4 max-w-5xl">
+      <div class="grid grid-cols-1 md:grid-cols-[1fr_200px] gap-6 items-start">
+        <main class="min-w-0 grid grid-cols-1 gap-8 items-start">
           {
             eras.map((era) => {
               const eraEndSeirekiYear = era.end?.year ?? currentYear;
@@ -80,60 +76,55 @@ const eras = eraParam ? ERAS.filter((e) => e.name === eraParam) : ERAS;
               return (
                 <section
                   id={anchorId(era.name)}
-                  class="my-8"
-                  style={`scroll-margin-top: 6rem`}
+                  style={`scroll-margin-top: 3rem`}
                 >
-                  <h2 class="sticky top-8 z-20 bg-white text-xl font-semibold px-3 py-2">
+                  <h2 class="sticky top-[3rem] z-20 bg-white/70 backdrop-blur-md text-xl font-semibold px-2 py-2 rounded-xl">
                     {era.name}
                   </h2>
-                  <div class="mt-12">
-                    <Card className="p-0">
-                      <CardContent className="p-0">
-                        <Table>
-                          <TableHeader>
-                            <tr class="bg-slate-50">
-                              <TableHead className="text-left px-3 py-2 border">
-                                和暦
-                              </TableHead>
-                              <TableHead className="text-left px-3 py-2 border">
-                                西暦
-                              </TableHead>
-                            </tr>
-                          </TableHeader>
-                          <TableBody>
-                            {yearsForEra(era.start.year, eraEndSeirekiYear).map(
-                              (wy) => {
-                                const sy = era.start.year - 1 + wy;
-                                return (
-                                  <TableRow
-                                    className="hover:bg-slate-50"
-                                    key={`${era.name}-${wy}`}
-                                  >
-                                    <TableCell className="px-3 py-2 border">
-                                      {wy}年
-                                    </TableCell>
-                                    <TableCell className="px-3 py-2 border">
-                                      {sy}年
-                                    </TableCell>
-                                  </TableRow>
-                                );
-                              },
-                            )}
-                          </TableBody>
-                        </Table>
-                      </CardContent>
-                    </Card>
-                  </div>
+                  <Card className="mt-2 p-0">
+                    <CardContent className="p-0">
+                      <Table>
+                        <TableHeader>
+                          <tr class="bg-slate-50">
+                            <TableHead className="text-left px-3 py-2">
+                              和暦
+                            </TableHead>
+                            <TableHead className="text-left px-3 py-2 border-l">
+                              西暦
+                            </TableHead>
+                          </tr>
+                        </TableHeader>
+                        <TableBody>
+                          {yearsForEra(era.start.year, eraEndSeirekiYear).map(
+                            (wy) => {
+                              const sy = era.start.year - 1 + wy;
+                              return (
+                                <TableRow
+                                  className="hover:bg-slate-50"
+                                  key={`${era.name}-${wy}`}
+                                >
+                                  <TableCell className="px-3 py-2">
+                                    {wy}年
+                                  </TableCell>
+                                  <TableCell className="px-3 py-2 border-l">
+                                    {sy}年
+                                  </TableCell>
+                                </TableRow>
+                              );
+                            },
+                          )}
+                        </TableBody>
+                      </Table>
+                    </CardContent>
+                  </Card>
                 </section>
               );
             })
           }
         </main>
 
-        <aside
-          class="hidden lg:block lg:sticky lg:top-24 w-48 max-h-[calc(100vh-4rem)] overflow-auto self-start"
-        >
-          <Toc items={ERAS.map((e) => e.name)} />
+        <aside class="hidden md:block md:sticky md:top-24 w-48 max-h-[calc(100vh-4rem)] overflow-auto self-start">
+          <Toc items={tocItems} />
         </aside>
       </div>
     </div>
