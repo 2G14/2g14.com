@@ -18,7 +18,7 @@
 // セクションはページ内リンクでアクセスできるようにする
 // クエリパラメータで元号を指定することもでき、指定した場合はその元号のセクションのみを表示する（例：?era=令和）
 // TODO: SSGなのでクエリパラメータでの制御は難しい
-import { Card, CardContent } from "@/components/ui/card";
+import { Card, CardContent } from '@/components/ui/card';
 import {
   Table,
   TableHeader,
@@ -26,19 +26,19 @@ import {
   TableRow,
   TableHead,
   TableCell,
-} from "@/components/ui/table";
-import { ERAS } from "@/domain/wareki/era.js";
-import TocSheet from "@/components/toc/TocSheet";
-import "@/styles/global.css";
-import Toc from "@/components/toc/Toc";
+} from '@/components/ui/table';
+import { ERAS } from '@/domain/wareki/era.js';
+import TocSheet from '@/components/toc/TocSheet';
+import '@/styles/global.css';
+import Toc from '@/components/toc/Toc';
 
 const url = new URL(Astro.request.url);
-const eraParam = url.searchParams.get("era") ?? null;
+const eraParam = url.searchParams.get('era') ?? null;
 const now = new Date();
 const currentYear = now.getFullYear();
 
 function anchorId(name: string) {
-  return name.replace(/\s+/g, "-");
+  return name.replace(/\s+/g, '-');
 }
 
 function yearsForEra(startYear: number, endSeirekiYear: number) {
@@ -50,13 +50,47 @@ function yearsForEra(startYear: number, endSeirekiYear: number) {
 
 const eras = eraParam ? ERAS.filter((e) => e.name === eraParam) : ERAS;
 const tocItems = eras.map((e) => e.name);
+
+const jsonLd = {
+  '@context': 'https://schema.org',
+  '@graph': [
+    {
+      '@type': 'WebPage',
+      '@id': url.href,
+      url: url.href,
+      name: '和暦/西暦 対比表 - 元号別の年号一覧',
+      description:
+        '明治以降の日本の元号（令和、平成など）と西暦を対比させた一覧表。元号ごとにセクション分けされており、各年の和暦と西暦を簡単に確認できます。',
+    },
+  ],
+} as const;
 ---
 
 <html lang="ja">
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>和暦/西暦 対比表</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>和暦/西暦 対比表 - 元号別の年号一覧</title>
+    {/* Primary Meta Tags */}
+    <meta name="title" content="和暦/西暦 対比表 - 元号別の年号一覧" />
+    <meta name="description" content="明治以降の日本の元号（令和、平成など）と西暦を対比させた一覧表。元号ごとにセクション分けされており、各年の和暦と西暦を簡単に確認できます。" />
+    {/* Open Graph / Facebook */}
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content={url.href} />
+    <meta property="og:title" content="和暦/西暦 対比表" />
+    <meta property="og:description" content="明治以降の日本の元号と西暦を対比させた一覧表。元号ごとの年号変換に便利です。" />
+    {/* TODO: og:image を指定 */}
+    {/* Twitter */}
+    <meta property="twitter:card" content="summary" />
+    <meta property="twitter:url" content={url.href} />
+    <meta property="twitter:title" content="和暦/西暦 対比表" />
+    <meta property="twitter:description" content="明治以降の日本の元号と西暦を対比させた一覧表。元号ごとの年号変換に便利です。" />
+    {/* TODO: twitter:image を指定 */}
+    {/* Canonical URL */}
+    <link rel="canonical" href={url.href} />
+    {/* TODO: JSON-LD 構造化データ (BreadcrumbList, FAQSchema など) を追加 */}
+    <script type="application/ld+json" set:html={JSON.stringify(jsonLd)}></script>
+    {/* TODO: サイトマップとrobots.txtの設定確認 */}
   </head>
   <body class="antialiased">
     <header class="sticky top-0 z-30 h-[3rem] bg-white border-b grid grid-cols-[1fr_auto] items-center justify-between px-4">
