@@ -32,8 +32,9 @@ import TocSheet from '@/components/toc/TocSheet';
 import '@/styles/global.css';
 import Toc from '@/components/toc/Toc';
 
+const { era: eraParam } = Astro.params;
+
 const url = new URL(Astro.request.url);
-const eraParam = url.searchParams.get('era') ?? null;
 const now = new Date();
 const currentYear = now.getFullYear();
 
