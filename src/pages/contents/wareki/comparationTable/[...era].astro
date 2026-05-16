@@ -49,7 +49,24 @@ function yearsForEra(startYear: number, endSeirekiYear: number) {
   return res;
 }
 
-const eras = eraParam ? ERAS.filter((e) => e.name === eraParam) : ERAS;
+let eras = ERAS;
+
+if (eraParam) {
+  const found = ERAS.find((e) => {
+    return e.name === eraParam
+      || e.nameKana === eraParam
+      || e.nameEn === eraParam
+      || e.abbreviation === eraParam;
+  });
+
+  // クエリパラメータで指定された元号が見つからない場合は、全ての元号を表示する
+  if (!found) {
+    return Astro.redirect('/contents/wareki/comparationTable');
+  }
+
+  eras = [found];
+}
+
 const tocItems = eras.map((e) => e.name);
 
 const jsonLd = {
