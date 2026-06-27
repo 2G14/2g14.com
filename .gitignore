@@ -1,8 +1,10 @@
 # build output
 dist/
 
-# generated types
-.astro/
+# honox / wrangler
+.hono/
+.wrangler/
+.dev.vars
 
 # dependencies
 node_modules/

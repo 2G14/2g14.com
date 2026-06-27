@@ -8,15 +8,15 @@ describe('wareki', () => {
   });
 
   it('createWareki: 元号年が1未満はエラー', () => {
-    expect(() =>
-      createWareki({ era: '令和', year: 0, month: 1, day: 1 }),
-    ).toThrow(InvalidWarekiError);
+    expect(() => createWareki({ era: '令和', year: 0, month: 1, day: 1 })).toThrow(
+      InvalidWarekiError,
+    );
   });
 
   it('createWareki: 元号開始日より前はエラーになる', () => {
     // 令和1年4月30日は存在しない
-    expect(() =>
-      createWareki({ era: '令和', year: 1, month: 4, day: 30 }),
-    ).toThrow(InvalidWarekiError);
+    expect(() => createWareki({ era: '令和', year: 1, month: 4, day: 30 })).toThrow(
+      InvalidWarekiError,
+    );
   });
 });

@@ -11,21 +11,15 @@ describe('seireki', () => {
   });
 
   it('createSeireki: 無効な月はエラー', () => {
-    expect(() => createSeireki({ year: 2020, month: 13, day: 1 })).toThrow(
-      InvalidSeirekiError,
-    );
+    expect(() => createSeireki({ year: 2020, month: 13, day: 1 })).toThrow(InvalidSeirekiError);
   });
 
   it('createSeireki: 月の日数を超える日はエラー', () => {
-    expect(() => createSeireki({ year: 2021, month: 4, day: 31 })).toThrow(
-      InvalidSeirekiError,
-    );
+    expect(() => createSeireki({ year: 2021, month: 4, day: 31 })).toThrow(InvalidSeirekiError);
   });
 
   it('createSeireki: 閏年でない年の2月29日はエラー', () => {
-    expect(() => createSeireki({ year: 2019, month: 2, day: 29 })).toThrow(
-      InvalidSeirekiError,
-    );
+    expect(() => createSeireki({ year: 2019, month: 2, day: 29 })).toThrow(InvalidSeirekiError);
   });
 
   it('compareSeirekis: 正しい順序を返す', () => {

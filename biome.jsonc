@@ -2,12 +2,12 @@
   "$schema": "./node_modules/@biomejs/biome/configuration_schema.json",
   "formatter": {
     "enabled": true,
-    "indentStyle": "space", // デフォルトは `tab`
-    "lineWidth": 100 // デフォルトは `80`
+    "indentStyle": "space",
+    "lineWidth": 100
   },
   "javascript": {
     "formatter": {
-      "quoteStyle": "single" // デフォルトは `double`
+      "quoteStyle": "single"
     }
   },
   "css": {
@@ -22,18 +22,12 @@
     "enabled": true
   },
   "overrides": [
-    // See: https://biomejs.dev/internals/language-support/#html-super-languages-support
     {
-      "includes": ["**/*.svelte", "**/*.astro", "**/*.vue"],
+      "includes": ["app/routes/_renderer.tsx"],
       "linter": {
         "rules": {
           "style": {
-            "useConst": "off",
-            "useImportType": "off"
-          },
-          "correctness": {
-            "noUnusedVariables": "off",
-            "noUnusedImports": "off"
+            "useShorthandFunctionType": "off"
           }
         }
       }

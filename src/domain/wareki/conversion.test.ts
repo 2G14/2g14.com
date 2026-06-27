@@ -40,12 +40,9 @@ describe('conversion (warekiToSeireki / seirekiToWareki)', () => {
         y = y - 1;
         m = 12;
       }
-      const isLeap = (yr: number) =>
-        (yr % 4 === 0 && yr % 100 !== 0) || yr % 400 === 0;
+      const isLeap = (yr: number) => (yr % 4 === 0 && yr % 100 !== 0) || yr % 400 === 0;
       const daysInMonth = (yr: number, mo: number) =>
-        [31, isLeap(yr) ? 29 : 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31][
-          mo - 1
-        ] ?? 31;
+        [31, isLeap(yr) ? 29 : 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31][mo - 1] ?? 31;
       d = daysInMonth(y, m);
       return { year: y, month: m, day: d };
     };

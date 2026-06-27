@@ -1,4 +1,4 @@
-import { ERAS, InvalidEraError, type EraName } from './era.js';
+import { ERAS, type EraName, InvalidEraError } from './era.js';
 import { InvalidSeirekiError, isValidDate } from './seireki.js';
 
 const brand = Symbol();
