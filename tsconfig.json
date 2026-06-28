@@ -9,7 +9,7 @@
     "jsx": "react-jsx",
     "jsxImportSource": "hono/jsx",
     "lib": ["ESNext"],
-    "types": ["@cloudflare/workers-types", "vite/client"],
+    "types": ["./worker-configuration.d.ts", "vite/client"],
     "verbatimModuleSyntax": true,
     "paths": {
       "@/*": ["./src/*"]

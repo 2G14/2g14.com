@@ -13,7 +13,8 @@
     "format": "oxfmt --write .",
     "format:check": "oxfmt --check .",
     "test": "vitest",
-    "coverage": "vitest run --coverage"
+    "coverage": "vitest run --coverage",
+    "generate-types": "wrangler types"
   },
   "dependencies": {
     "@fontsource-variable/inter": "^5.2.8",
@@ -21,11 +22,11 @@
     "honox": "^0.1.56"
   },
   "devDependencies": {
-    "@cloudflare/workers-types": "^4.20260628.1",
     "@hono/vite-build": "^1.11.1",
     "@hono/vite-dev-server": "^0.26.0",
     "@tailwindcss/vite": "^4.3.1",
     "@tsconfig/strictest": "^2.0.8",
+    "@types/node": "^26.0.1",
     "@vitest/coverage-v8": "^4.1.9",
     "oxfmt": "^0.56.0",
     "oxlint": "^1.71.0",
