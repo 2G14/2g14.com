@@ -1,5 +1,5 @@
-@import "tailwindcss" source("../app");
-@import "@fontsource-variable/inter";
+@import 'tailwindcss' source('../app');
+@import '@fontsource-variable/inter';
 
 :root {
   --background: oklch(1 0 0);
@@ -43,7 +43,7 @@
 @custom-variant dark (&:is(.dark *));
 
 @theme inline {
-  --font-sans: "Inter Variable", sans-serif;
+  --font-sans: 'Inter Variable', sans-serif;
   --color-ring: var(--ring);
   --color-input: var(--input);
   --color-border: var(--border);

@@ -14,8 +14,10 @@ npm run build        # プロダクションビルド (client → server の2段
 npm run preview      # wrangler dev でビルド済みアセットをプレビュー
 npm run deploy       # build + wrangler deploy
 npm run typecheck    # tsc --noEmit
-npm run lint         # biome check .
-npm run lint:fix     # biome check --write .
+npm run lint         # oxlint
+npm run lint:fix     # oxlint --fix
+npm run format       # oxfmt --write .
+npm run format:check # oxfmt --check .
 npm run test         # vitest (watch mode)
 npx vitest run       # テスト1回実行
 npx vitest run src/domain/wareki/era.test.ts  # 単一ファイルテスト
@@ -24,14 +26,16 @@ npx vitest run src/domain/wareki/era.test.ts  # 単一ファイルテスト
 ## Architecture
 
 ### Tech Stack
+
 - **Framework**: HonoX (Hono SSR framework) + Vite
 - **Runtime**: Cloudflare Workers
 - **Styling**: Tailwind CSS v4 + shadcn/ui 風のCSS変数テーマ
-- **Linter/Formatter**: Biome (スペースインデント、シングルクォート、行幅100)
+- **Linter/Formatter**: oxlint + oxfmt (スペースインデント、シングルクォート、行幅100)
 - **Testing**: Vitest
 - **JSX**: Hono JSX (`jsxImportSource: "hono/jsx"`)
 
 ### Directory Structure
+
 - `app/` — HonoX アプリケーション層（ルーティング・レンダリング）
   - `routes/` — ファイルベースルーティング（HonoX 規約）
   - `server.ts` — Hono アプリエントリポイント

@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'vitest';
+
 import { createWareki, InvalidWarekiError } from './wareki.js';
 
 describe('wareki', () => {

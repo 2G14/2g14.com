@@ -1,4 +1,5 @@
 import { assert, describe, expect, it } from 'vitest';
+
 import { seirekiToWareki, warekiToSeireki } from './conversion.js';
 import type { EraName } from './era.js';
 import { createSeireki, type SeirekiInput } from './seireki.js';

@@ -1,4 +1,5 @@
 import { createRoute } from 'honox/factory';
+
 import { ERAS } from '@/domain/wareki/era.js';
 
 function anchorId(name: string) {
@@ -82,11 +83,11 @@ export default createRoute((c) => {
 
   return c.render(
     <>
-      <header class="sticky top-0 z-30 h-12 bg-white border-b grid grid-cols-[1fr_auto] items-center px-4">
-        <h1 class="text-2xl font-bold truncate">和暦/西暦 対比表</h1>
+      <header class="sticky top-0 z-30 grid h-12 grid-cols-[1fr_auto] items-center border-b bg-white px-4">
+        <h1 class="truncate text-2xl font-bold">和暦/西暦 対比表</h1>
         <button
           id="toc-open"
-          class="md:hidden px-3 py-1 text-sm rounded-md hover:bg-slate-100"
+          class="rounded-md px-3 py-1 text-sm hover:bg-slate-100 md:hidden"
           type="button"
         >
           目次
@@ -95,7 +96,7 @@ export default createRoute((c) => {
 
       <dialog
         id="toc-dialog"
-        class="backdrop:bg-black/50 m-0 ml-auto h-full max-h-full w-64 bg-white p-0 open:flex open:flex-col"
+        class="m-0 ml-auto h-full max-h-full w-64 bg-white p-0 backdrop:bg-black/50 open:flex open:flex-col"
       >
         <div class="flex items-center justify-between border-b px-4 py-3">
           <h2 class="text-lg font-semibold">目次</h2>
@@ -103,10 +104,10 @@ export default createRoute((c) => {
             &times;
           </button>
         </div>
-        <nav class="flex flex-col gap-1 p-2 overflow-auto">
+        <nav class="flex flex-col gap-1 overflow-auto p-2">
           {tocItems.map((item) => (
             <a
-              class="toc-link block px-3 py-1 rounded-md text-sm text-slate-700 hover:bg-slate-100"
+              class="toc-link block rounded-md px-3 py-1 text-sm text-slate-700 hover:bg-slate-100"
               href={`#${anchorId(item)}`}
             >
               {item}
@@ -115,24 +116,24 @@ export default createRoute((c) => {
         </nav>
       </dialog>
 
-      <div class="my-8 mx-auto px-4 max-w-5xl">
-        <div class="grid grid-cols-1 md:grid-cols-[1fr_200px] gap-6 items-start">
-          <main class="min-w-0 grid grid-cols-1 gap-8 items-start">
+      <div class="mx-auto my-8 max-w-5xl px-4">
+        <div class="grid grid-cols-1 items-start gap-6 md:grid-cols-[1fr_200px]">
+          <main class="grid min-w-0 grid-cols-1 items-start gap-8">
             {eras.map((era) => {
               const eraEndSeirekiYear = era.end?.year ?? currentYear;
               const maxYear = eraEndSeirekiYear - (era.start.year - 1);
               if (maxYear < 1) return null;
               return (
                 <section id={anchorId(era.name)} style="scroll-margin-top: 3rem">
-                  <h2 class="sticky top-12 z-20 bg-white/70 backdrop-blur-md text-xl font-semibold px-2 py-2 rounded-xl">
+                  <h2 class="sticky top-12 z-20 rounded-xl bg-white/70 px-2 py-2 text-xl font-semibold backdrop-blur-md">
                     {era.name}
                   </h2>
-                  <div class="mt-2 rounded-xl border bg-card text-card-foreground overflow-hidden">
+                  <div class="mt-2 overflow-hidden rounded-xl border bg-card text-card-foreground">
                     <table class="w-full text-sm">
                       <thead>
                         <tr class="bg-slate-50">
-                          <th class="text-left px-3 py-2 font-medium">和暦</th>
-                          <th class="text-left px-3 py-2 font-medium border-l">西暦</th>
+                          <th class="px-3 py-2 text-left font-medium">和暦</th>
+                          <th class="border-l px-3 py-2 text-left font-medium">西暦</th>
                         </tr>
                       </thead>
                       <tbody>
@@ -141,7 +142,7 @@ export default createRoute((c) => {
                           return (
                             <tr class="border-t hover:bg-slate-50">
                               <td class="px-3 py-2">{wy}年</td>
-                              <td class="px-3 py-2 border-l">{sy}年</td>
+                              <td class="border-l px-3 py-2">{sy}年</td>
                             </tr>
                           );
                         })}
@@ -153,11 +154,11 @@ export default createRoute((c) => {
             })}
           </main>
 
-          <aside class="hidden md:block md:sticky md:top-24 w-48 max-h-[calc(100vh-4rem)] overflow-auto self-start">
+          <aside class="hidden max-h-[calc(100vh-4rem)] w-48 self-start overflow-auto md:sticky md:top-24 md:block">
             <nav class="flex flex-col gap-1 p-2">
               {tocItems.map((item) => (
                 <a
-                  class="block px-3 py-1 rounded-md text-sm text-slate-700 hover:bg-slate-100"
+                  class="block rounded-md px-3 py-1 text-sm text-slate-700 hover:bg-slate-100"
                   href={`#${anchorId(item)}`}
                 >
                   {item}
