@@ -13,7 +13,7 @@ declare module 'hono' {
 
 export default jsxRenderer(({ children, title, head }) => {
   return (
-    <html lang="ja">
+    <html lang="ja" data-theme="light">
       <head>
         <meta charset="utf-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
