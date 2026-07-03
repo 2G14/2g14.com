@@ -1,9 +1,68 @@
 import { createRoute } from 'honox/factory';
 
-// 西暦から和暦への変換ページ
-// 年月日の入力に対して、対応する和暦を表示する。
-// クエリパラメータ: ?year=2024&month=6&day=1
+import SeirekiToWarekiConverter from '../../../islands/seireki-to-wareki-converter.js';
+
+const PAGE_TITLE = '西暦→和暦 変換 - 西暦の日付を和暦に変換';
+const META_DESCRIPTION =
+  '西暦の年月日を入力すると、対応する和暦（令和・平成・昭和・大正・明治）に変換します。日付の和暦変換に便利なツールです。';
+const OG_DESCRIPTION =
+  '西暦の日付を和暦に変換するツール。年月日を入力するだけで簡単に変換できます。';
 
 export default createRoute((c) => {
-  return c.render(<div />, { title: '西暦→和暦 変換' });
+  const yearParam = c.req.query('year');
+  const monthParam = c.req.query('month');
+  const dayParam = c.req.query('day');
+  const url = new URL(c.req.url);
+
+  const jsonLd = {
+    '@context': 'https://schema.org',
+    '@graph': [
+      {
+        '@type': 'WebPage',
+        '@id': url.href,
+        url: url.href,
+        name: PAGE_TITLE,
+        description: META_DESCRIPTION,
+      },
+    ],
+  };
+
+  const head = (
+    <>
+      <meta name="title" content={PAGE_TITLE} />
+      <meta name="description" content={META_DESCRIPTION} />
+      <meta property="og:type" content="website" />
+      <meta property="og:url" content={url.href} />
+      <meta property="og:title" content="西暦→和暦 変換" />
+      <meta property="og:description" content={OG_DESCRIPTION} />
+      <meta property="twitter:card" content="summary" />
+      <meta property="twitter:url" content={url.href} />
+      <meta property="twitter:title" content="西暦→和暦 変換" />
+      <meta property="twitter:description" content={OG_DESCRIPTION} />
+      <link rel="canonical" href={url.href} />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+      />
+    </>
+  );
+
+  return c.render(
+    <div>
+      <header class="navbar sticky top-0 z-30 min-h-12 bg-base-100 shadow-sm">
+        <div class="flex-1">
+          <h1 class="text-xl font-bold">西暦→和暦 変換</h1>
+        </div>
+      </header>
+
+      <div class="mx-auto my-8 max-w-5xl px-4">
+        <SeirekiToWarekiConverter
+          initialYear={yearParam}
+          initialMonth={monthParam}
+          initialDay={dayParam}
+        />
+      </div>
+    </div>,
+    { title: PAGE_TITLE, head },
+  );
 });
