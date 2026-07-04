@@ -1,8 +1,8 @@
 import { createRoute } from 'honox/factory';
 
-import PageHead from '../../../components/page-head.js';
+import PageHead from '#app/components/page-head.js';
 
-import { ERAS } from '@/domain/wareki/era.js';
+import { ERAS } from '#src/domain/wareki/era.js';
 
 const PAGE_TITLE = '和暦/西暦 対比表 - 元号別の年号一覧';
 const META_DESCRIPTION =

@@ -10,9 +10,6 @@
     "jsxImportSource": "hono/jsx",
     "lib": ["ESNext", "DOM"],
     "types": ["./worker-configuration.d.ts", "vite/client"],
-    "verbatimModuleSyntax": true,
-    "paths": {
-      "@/*": ["./src/*"]
-    }
+    "verbatimModuleSyntax": true
   }
 }

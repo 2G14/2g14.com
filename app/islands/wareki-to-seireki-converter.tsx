@@ -1,11 +1,11 @@
 import { useEffect, useState } from 'hono/jsx';
 
-import { seirekiToWareki, warekiToSeireki } from '@/domain/wareki/conversion.js';
-import { ERAS } from '@/domain/wareki/era.js';
-import { createSeireki, type Seireki } from '@/domain/wareki/seireki.js';
-import { createWareki } from '@/domain/wareki/wareki.js';
+import { seirekiToWareki, warekiToSeireki } from '#src/domain/wareki/conversion.js';
+import { ERAS } from '#src/domain/wareki/era.js';
+import { createSeireki, type Seireki } from '#src/domain/wareki/seireki.js';
+import { createWareki } from '#src/domain/wareki/wareki.js';
 
-import WarekiCalendar from '../components/wareki-calendar.js';
+import WarekiCalendar from '#app/components/wareki-calendar.js';
 
 function tryConvert(
   era: string,

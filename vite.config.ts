@@ -13,5 +13,4 @@ export default defineConfig({
     tailwindcss(),
     build(),
   ],
-  resolve: { alias: { '@': '/src' } },
 });

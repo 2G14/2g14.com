@@ -1,6 +1,6 @@
 import { createRoute } from 'honox/factory';
 
-import PageHead from '../../../components/page-head.js';
+import PageHead from '#app/components/page-head.js';
 
 const PAGE_TITLE = '和暦ツール';
 const META_DESCRIPTION =

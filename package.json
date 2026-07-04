@@ -2,6 +2,10 @@
   "name": "2g14.com",
   "version": "0.0.1",
   "type": "module",
+  "imports": {
+    "#app/*": "./app/*",
+    "#src/*": "./src/*"
+  },
   "scripts": {
     "dev": "vite",
     "build": "vite build --mode client && vite build",

@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'hono/jsx';
 
-import { ERAS, type Era } from '@/domain/wareki/era.js';
+import { ERAS, type Era } from '#src/domain/wareki/era.js';
 
 import CalendarGrid from './calendar-grid.js';
 
