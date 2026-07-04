@@ -1,6 +1,9 @@
 import { createRoute } from 'honox/factory';
-import { createSeireki } from '@/domain/wareki/seireki.js';
+
+import PageHead from '../../../components/page-head.js';
+
 import { seirekiToWareki } from '@/domain/wareki/conversion.js';
+import { createSeireki } from '@/domain/wareki/seireki.js';
 
 const PAGE_TITLE = '本日の和暦 - 今日の日付を和暦で表示';
 const META_DESCRIPTION =
@@ -18,37 +21,14 @@ export default createRoute((c) => {
 
   const url = new URL(c.req.url);
 
-  const jsonLd = {
-    '@context': 'https://schema.org',
-    '@graph': [
-      {
-        '@type': 'WebPage',
-        '@id': url.href,
-        url: url.href,
-        name: PAGE_TITLE,
-        description: META_DESCRIPTION,
-      },
-    ],
-  };
-
   const head = (
-    <>
-      <meta name="title" content={PAGE_TITLE} />
-      <meta name="description" content={META_DESCRIPTION} />
-      <meta property="og:type" content="website" />
-      <meta property="og:url" content={url.href} />
-      <meta property="og:title" content="本日の和暦" />
-      <meta property="og:description" content={OG_DESCRIPTION} />
-      <meta property="twitter:card" content="summary" />
-      <meta property="twitter:url" content={url.href} />
-      <meta property="twitter:title" content="本日の和暦" />
-      <meta property="twitter:description" content={OG_DESCRIPTION} />
-      <link rel="canonical" href={url.href} />
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
-      />
-    </>
+    <PageHead
+      url={url.href}
+      title={PAGE_TITLE}
+      description={META_DESCRIPTION}
+      ogTitle="本日の和暦"
+      ogDescription={OG_DESCRIPTION}
+    />
   );
 
   const displayYear = wareki ? `${wareki.era}${wareki.year}年` : `${seireki.year}年`;

@@ -1,5 +1,7 @@
 import { createRoute } from 'honox/factory';
 
+import PageHead from '../../../components/page-head.js';
+
 import { ERAS } from '@/domain/wareki/era.js';
 
 const PAGE_TITLE = '和暦/西暦 対比表 - 元号別の年号一覧';
@@ -45,37 +47,14 @@ export default createRoute((c) => {
 
   const tocItems = eras.map((e) => e.name);
 
-  const jsonLd = {
-    '@context': 'https://schema.org',
-    '@graph': [
-      {
-        '@type': 'WebPage',
-        '@id': url.href,
-        url: url.href,
-        name: PAGE_TITLE,
-        description: META_DESCRIPTION,
-      },
-    ],
-  };
-
   const head = (
-    <>
-      <meta name="title" content={PAGE_TITLE} />
-      <meta name="description" content={META_DESCRIPTION} />
-      <meta property="og:type" content="website" />
-      <meta property="og:url" content={url.href} />
-      <meta property="og:title" content="和暦/西暦 対比表" />
-      <meta property="og:description" content={OG_DESCRIPTION} />
-      <meta property="twitter:card" content="summary" />
-      <meta property="twitter:url" content={url.href} />
-      <meta property="twitter:title" content="和暦/西暦 対比表" />
-      <meta property="twitter:description" content={OG_DESCRIPTION} />
-      <link rel="canonical" href={url.href} />
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
-      />
-    </>
+    <PageHead
+      url={url.href}
+      title={PAGE_TITLE}
+      description={META_DESCRIPTION}
+      ogTitle="和暦/西暦 対比表"
+      ogDescription={OG_DESCRIPTION}
+    />
   );
 
   return c.render(
