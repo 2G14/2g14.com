@@ -29,7 +29,7 @@ npx vitest run src/domain/wareki/era.test.ts  # 単一ファイルテスト
 
 - **Framework**: HonoX (Hono SSR framework) + Vite
 - **Runtime**: Cloudflare Workers
-- **Styling**: Tailwind CSS v4 + shadcn/ui 風のCSS変数テーマ
+- **Styling**: Tailwind CSS v4 + daisyUI
 - **Linter/Formatter**: oxlint + oxfmt (スペースインデント、シングルクォート、行幅100)
 - **Testing**: Vitest
 - **JSX**: Hono JSX (`jsxImportSource: "hono/jsx"`)
@@ -42,7 +42,7 @@ npx vitest run src/domain/wareki/era.test.ts  # 単一ファイルテスト
   - `client.ts` — クライアントサイド hydration
   - `style.css` — Tailwind エントリポイント + テーマ変数
 - `src/` — ドメインロジック（フレームワーク非依存）
-- パスエイリアス: `@/` → `./src/`
+- パスエイリアス: `package.json` の `imports` フィールドで定義（`#src/` → `./src/`, `#app/` → `./app/`）
 
 ## Conventions
 
