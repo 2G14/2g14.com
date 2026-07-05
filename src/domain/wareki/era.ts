@@ -59,7 +59,6 @@ export const ERAS = RAW_ERAS.map((e, i) => ({
   nameEn: e.nameEn,
   abbreviation: e.abbreviation,
   start: createSeireki(e.start),
-  // biome-ignore lint/style/noNonNullAssertion: 最初の要素以外は必ず前の要素が存在するため、non-null assertionを使用
   end: i > 0 ? createSeireki(RAW_ERAS[i - 1]!.start) : null,
 })) satisfies readonly Era[];
 
