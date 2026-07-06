@@ -1,0 +1,8 @@
+{
+  "singleQuote": true,
+  "sortImports": true,
+  "sortTailwindcss": {
+    "stylesheet": "./app/style.css"
+  },
+  "ignorePatterns": [".claude"]
+}
