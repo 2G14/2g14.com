@@ -1,0 +1,17 @@
+@import 'tailwindcss' source('../app');
+@import '@fontsource-variable/inter';
+@plugin 'daisyui' {
+  themes:
+    light --default,
+    dark --prefersdark;
+}
+
+@theme inline {
+  --font-sans: 'Inter Variable', sans-serif;
+}
+
+@layer base {
+  html {
+    @apply scroll-smooth font-sans;
+  }
+}

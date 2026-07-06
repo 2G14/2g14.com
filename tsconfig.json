@@ -1,0 +1,15 @@
+{
+  "extends": "@tsconfig/strictest/tsconfig",
+  "include": ["app/**/*.ts", "app/**/*.tsx", "src/**/*.ts"],
+  "exclude": ["dist", "node_modules"],
+  "compilerOptions": {
+    "target": "ESNext",
+    "module": "ESNext",
+    "moduleResolution": "Bundler",
+    "jsx": "react-jsx",
+    "jsxImportSource": "hono/jsx",
+    "lib": ["ESNext", "DOM"],
+    "types": ["./worker-configuration.d.ts", "vite/client"],
+    "verbatimModuleSyntax": true
+  }
+}

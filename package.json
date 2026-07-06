@@ -1,0 +1,54 @@
+{
+  "name": "2g14.com",
+  "version": "0.0.1",
+  "type": "module",
+  "imports": {
+    "#app/*": "./app/*",
+    "#src/*": "./src/*"
+  },
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build --mode client && vite build",
+    "preview": "wrangler dev",
+    "deploy": "npm run build && wrangler deploy",
+    "typecheck": "tsc --noEmit",
+    "lint": "oxlint",
+    "lint:fix": "oxlint --fix",
+    "format": "oxfmt --write .",
+    "format:check": "oxfmt --check .",
+    "test": "vitest",
+    "coverage": "vitest run --coverage",
+    "generate-types": "wrangler types"
+  },
+  "dependencies": {
+    "@fontsource-variable/inter": "^5.2.8",
+    "hono": "^4.12.27",
+    "honox": "^0.1.56"
+  },
+  "devDependencies": {
+    "@hono/vite-build": "^1.11.1",
+    "@hono/vite-dev-server": "^0.26.0",
+    "@tailwindcss/vite": "^4.3.1",
+    "@tsconfig/strictest": "^2.0.8",
+    "@types/node": "^26.0.1",
+    "@vitest/coverage-v8": "^4.1.9",
+    "daisyui": "^5.6.3",
+    "oxfmt": "^0.56.0",
+    "oxlint": "^1.71.0",
+    "tailwindcss": "^4.3.1",
+    "typescript": "^6.0.3",
+    "vite": "^8.1.0",
+    "vitest": "^4.1.9",
+    "wrangler": "^4.105.0"
+  },
+  "engines": {
+    "node": ">=24.18.0",
+    "npm": ">=11.17.0"
+  },
+  "allowScripts": {
+    "esbuild@0.28.1": true,
+    "fsevents@2.3.3": true,
+    "sharp@0.34.5": true,
+    "workerd@1.20260625.1": true
+  }
+}
