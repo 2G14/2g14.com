@@ -99,7 +99,7 @@ export default function SeirekiCalendar({ year, month, day, onDateSelect }: Seir
           ) : (
             <button
               type="button"
-              class="btn btn-ghost btn-sm text-base"
+              class="btn btn-ghost text-base btn-sm"
               onClick={() => setEditingYear(true)}
               title="年を直接入力"
             >

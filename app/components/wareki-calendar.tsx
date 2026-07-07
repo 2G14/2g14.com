@@ -176,10 +176,7 @@ export default function WarekiCalendar({
                     if (v === 1 && viewMonth < viewEra.start.month) {
                       setViewMonth(viewEra.start.month);
                     }
-                    if (
-                      seireki === lastMonth.seirekiYear &&
-                      viewMonth > lastMonth.month
-                    ) {
+                    if (seireki === lastMonth.seirekiYear && viewMonth > lastMonth.month) {
                       setViewMonth(lastMonth.month);
                     }
                   }
@@ -194,7 +191,7 @@ export default function WarekiCalendar({
           ) : (
             <button
               type="button"
-              class="btn btn-ghost btn-sm text-base"
+              class="btn btn-ghost text-base btn-sm"
               onClick={() => setEditingYear(true)}
               title="年を直接入力"
             >

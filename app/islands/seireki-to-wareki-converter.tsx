@@ -1,10 +1,9 @@
 import { useEffect, useState } from 'hono/jsx';
 
+import SeirekiCalendar from '#app/components/seireki-calendar.js';
 import { seirekiToWareki } from '#src/domain/wareki/conversion.js';
 import { createSeireki } from '#src/domain/wareki/seireki.js';
 import type { Wareki } from '#src/domain/wareki/wareki.js';
-
-import SeirekiCalendar from '#app/components/seireki-calendar.js';
 
 function tryConvert(
   yearStr: string,
