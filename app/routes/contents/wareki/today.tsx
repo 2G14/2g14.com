@@ -1,7 +1,6 @@
 import { createRoute } from 'honox/factory';
 
 import PageHead from '#app/components/page-head.js';
-
 import { seirekiToWareki } from '#src/domain/wareki/conversion.js';
 import { createSeireki } from '#src/domain/wareki/seireki.js';
 
