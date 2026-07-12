@@ -3,6 +3,7 @@ import { createRoute } from 'honox/factory';
 import PageHead from '#app/components/page-head.js';
 import { seirekiToWareki } from '#src/domain/wareki/conversion.js';
 import { createSeireki } from '#src/domain/wareki/seireki.js';
+import { todayInJST } from '#src/lib/date.js';
 
 const PAGE_TITLE = '本日の和暦 - 今日の日付を和暦で表示';
 const META_DESCRIPTION =
@@ -10,12 +11,8 @@ const META_DESCRIPTION =
 const OG_DESCRIPTION = '今日の日付を和暦で表示するページ。';
 
 export default createRoute((c) => {
-  const now = new Date();
-  const seireki = createSeireki({
-    year: now.getFullYear(),
-    month: now.getMonth() + 1,
-    day: now.getDate(),
-  });
+  const today = todayInJST();
+  const seireki = createSeireki(today);
   const wareki = seirekiToWareki(seireki);
 
   const url = new URL(c.req.url);
