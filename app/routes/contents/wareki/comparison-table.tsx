@@ -2,6 +2,7 @@ import { createRoute } from 'honox/factory';
 
 import PageHead from '#app/components/page-head.js';
 import { ERAS } from '#src/domain/wareki/era.js';
+import { todayInJST } from '#src/lib/date.js';
 
 const PAGE_TITLE = '和暦/西暦 対比表 - 元号別の年号一覧';
 const META_DESCRIPTION =
@@ -24,7 +25,7 @@ function eraYearPairs(startYear: number, endSeirekiYear: number) {
 export default createRoute((c) => {
   const eraParam = c.req.query('era');
   const url = new URL(c.req.url);
-  const currentYear = new Date().getFullYear();
+  const currentYear = todayInJST().year;
 
   let eras = ERAS;
 
