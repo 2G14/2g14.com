@@ -1,0 +1,31 @@
+min_version: 2.1.10
+
+pre-commit:
+  skip:
+    - merge
+    - rebase
+  jobs:
+    - name: lint:fix
+      glob: '*.{js,jsx,ts,tsx,mjs,cjs,mts,cts}'
+      run: npx --no -- oxlint --fix {staged_files}
+      stage_fixed: true
+    - name: format
+      run: npx --no -- oxfmt --no-error-on-unmatched-pattern {staged_files}
+      stage_fixed: true
+    - name: checks
+      glob:
+        - 'app/**'
+        - 'src/**'
+        - 'package.json'
+        - 'package-lock.json'
+        - 'tsconfig.json'
+        - 'vite.config.ts'
+      group:
+        parallel: true
+        jobs:
+          - name: typecheck
+            run: npm run typecheck
+          - name: test
+            run: npx --no -- vitest run
+          - name: build
+            run: npm run build
