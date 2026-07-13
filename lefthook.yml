@@ -20,11 +20,14 @@ pre-commit:
         - 'package-lock.json'
         - 'tsconfig.json'
         - 'vite.config.ts'
+        - '.jscpd.json'
       group:
         parallel: true
         jobs:
           - name: typecheck
             run: npm run typecheck
+          - name: jscpd
+            run: npm run jscpd
           - name: test
             run: npx --no -- vitest run
           - name: build
