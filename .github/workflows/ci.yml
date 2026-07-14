@@ -11,6 +11,7 @@ on:
       - 'package-lock.json'
       - 'tsconfig.json'
       - 'vite.config.ts'
+      - '.jscpd.json'
       - 'knip.ts'
       - '.oxlintrc.json'
       - '.oxfmtrc.json'
@@ -25,6 +26,7 @@ on:
       - 'package-lock.json'
       - 'tsconfig.json'
       - 'vite.config.ts'
+      - '.jscpd.json'
       - 'knip.ts'
       - '.oxlintrc.json'
       - '.oxfmtrc.json'
@@ -51,6 +53,7 @@ jobs:
       - run: npm ci
       - parallel:
           - run: npm run typecheck
+          - run: npm run jscpd
           - run: npm run knip
           - run: npm run lint
           - run: npm run format:check

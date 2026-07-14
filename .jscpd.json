@@ -1,0 +1,6 @@
+{
+  "pattern": "{app,src}/**/*.{ts,tsx}",
+  "threshold": 12,
+  "gitignore": true,
+  "reporters": ["consoleFull"]
+}
