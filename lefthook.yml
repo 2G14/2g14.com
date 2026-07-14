@@ -21,6 +21,7 @@ pre-commit:
         - 'tsconfig.json'
         - 'vite.config.ts'
         - '.jscpd.json'
+        - 'knip.ts'
       group:
         parallel: true
         jobs:
@@ -28,6 +29,8 @@ pre-commit:
             run: npm run typecheck
           - name: jscpd
             run: npm run jscpd
+          - name: knip
+            run: npm run knip
           - name: test
             run: npx --no -- vitest run
           - name: build
