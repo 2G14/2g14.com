@@ -2,5 +2,25 @@
   "env": {
     "browser": true,
     "es2024": true
+  },
+  "categories": {
+    "correctness": "error",
+    "suspicious": "error",
+    "pedantic": "error",
+    "perf": "error"
+  },
+  "rules": {
+    "unicorn/consistent-function-scoping": "off",
+    "unicorn/require-module-specifiers": "off",
+    "unicorn/no-array-sort": "off",
+    "unicorn/no-array-reverse": "off",
+    "unicorn/prefer-string-replace-all": "off",
+    "max-lines-per-function": "off",
+    "symbol-description": "off",
+    "require-unicode-regexp": "off",
+    "no-inline-comments": "off",
+    "typescript/no-explicit-any": "error",
+    "typescript/consistent-type-definitions": "error",
+    "typescript/no-non-null-assertion": "warn"
   }
 }
