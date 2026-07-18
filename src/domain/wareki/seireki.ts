@@ -1,4 +1,4 @@
-const brand = Symbol();
+const brand = Symbol('Seireki');
 
 export interface Seireki {
   readonly [brand]: unknown;

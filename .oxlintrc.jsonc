@@ -1,0 +1,35 @@
+{
+  "env": {
+    "browser": true,
+    "es2024": true,
+  },
+  "categories": {
+    "correctness": "error",
+    "suspicious": "error",
+    "pedantic": "error",
+    "perf": "error",
+  },
+  "rules": {
+    // JSX コンポーネントやテーブル駆動テストはマークアップ・データで行数が膨らみ、
+    // 行数が複雑さの指標にならないため
+    "max-lines-per-function": "off",
+    // any は禁止(unknown + 型ガードで絞り込む)。暗黙の any は tsconfig(strictest)が
+    // 止めるため、ここでは明示的な any の混入をブロックする
+    "typescript/no-explicit-any": "error",
+    // オブジェクトの形状定義は interface に統一する(union・導出型は type のまま対象外)
+    "typescript/consistent-type-definitions": "error",
+    // ! は「型ガードで回避できない場合のみ」の限定許可。off だと新規使用に気付けず、
+    // error だと noUncheckedIndexedAccess 由来の正当な使用が書けないため warn で可視化する
+    "typescript/no-non-null-assertion": "warn",
+  },
+  "overrides": [
+    {
+      "files": ["**/*.test.ts", "**/*.test.tsx"],
+      "rules": {
+        // テストでは使う場所の近くにヘルパー関数を書く方が読みやすいため、
+        // トップレベルへの移動要求はテストファイルのみ無効化する
+        "unicorn/consistent-function-scoping": "off",
+      },
+    },
+  ],
+}

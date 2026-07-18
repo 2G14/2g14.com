@@ -11,7 +11,7 @@ const OG_DESCRIPTION =
   '明治以降の日本の元号と西暦を対比させた一覧表。元号ごとの年号変換に便利です。';
 
 function anchorId(name: string) {
-  return name.replace(/\s+/g, '-');
+  return name.replaceAll(/\s+/gu, '-');
 }
 
 function eraYearPairs(startYear: number, endSeirekiYear: number) {

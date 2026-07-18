@@ -4,7 +4,7 @@ import { ERAS, type Era } from '#src/domain/wareki/era.js';
 
 import CalendarGrid from './calendar-grid.js';
 
-const ERAS_DISPLAY = [...ERAS].reverse();
+const ERAS_DISPLAY = ERAS.toReversed();
 
 function findEra(name: string): Era | undefined {
   return ERAS.find((e) => e.name === name);
