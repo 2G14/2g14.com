@@ -6,7 +6,7 @@ export default {
   compilers: {
     // CSS の @import / @plugin は knip が解釈できないため import 文へ変換する
     css: (text: string) =>
-      [...text.matchAll(/@(?:import|plugin)\s+['"]([^'"]+)['"]/g)]
+      [...text.matchAll(/@(?:import|plugin)\s+['"]([^'"]+)['"]/gu)]
         .map(([, id]) => `import '${id}';`)
         .join('\n'),
   },

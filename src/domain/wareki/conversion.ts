@@ -29,5 +29,6 @@ export function seirekiToWareki(date: Seireki): Wareki | null {
       });
     }
   }
-  return null; // 明治以前はnull
+  // 明治以前はnull
+  return null;
 }
