@@ -1,0 +1,18 @@
+schemaVersion: '1'
+kind: mixin
+name: 2g14-project
+displayName: 2g14.com project mixin
+description: 2g14.com リポジトリ固有のセットアップと環境情報を注入する。
+
+caps:
+  network:
+    allow:
+      # balanced ポリシーでは mise バイナリの配布元だけが default deny のため
+      - mise.jdx.dev
+
+agentContext: |
+  この環境は Docker Sandbox (clone mode) 上で動いている。
+  - node 24 / npm / gh / git は導入済み(node と gh は mise 管理、PATH 設定済み)。
+  - node_modules は無いので、作業開始前にまず npm install を実行すること。
+  - gh はホスト側 proxy が認証を代理付与するため、gh auth login は不要。
+  - コミットはホスト側の sandbox-<name> リモート経由で取り込まれる。
