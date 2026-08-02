@@ -11,7 +11,7 @@ import { dateQueryString, parseQueryNumber } from '#app/lib/wareki/date-query.js
 import { seirekiToWareki, warekiToSeireki } from '#src/domain/wareki/conversion.js';
 import { ERAS } from '#src/domain/wareki/era.js';
 import { formatSeireki } from '#src/domain/wareki/format.js';
-import { createSeireki } from '#src/domain/wareki/seireki.js';
+import { createSeireki } from '#src/domain/date/seireki.js';
 import { createWareki } from '#src/domain/wareki/wareki.js';
 import { todayInJST } from '#src/lib/date.js';
 

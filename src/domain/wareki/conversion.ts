@@ -1,5 +1,5 @@
+import { compareSeirekis, createSeireki, type Seireki } from '../date/seireki.js';
 import { ERAS, InvalidEraError } from './era.js';
-import { compareSeirekis, createSeireki, type Seireki } from './seireki.js';
 import { createWareki, type Wareki } from './wareki.js';
 
 /**

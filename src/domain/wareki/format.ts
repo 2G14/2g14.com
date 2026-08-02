@@ -1,4 +1,4 @@
-import type { Seireki } from './seireki.js';
+import type { Seireki } from '../date/seireki.js';
 import type { Wareki } from './wareki.js';
 
 export function formatWarekiYear(year: number): string {

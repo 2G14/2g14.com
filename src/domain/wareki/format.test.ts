@@ -8,7 +8,7 @@ import {
   formatWarekiEraYear,
   formatWarekiYear,
 } from './format.js';
-import { createSeireki } from './seireki.js';
+import { createSeireki } from '../date/seireki.js';
 import { createWareki } from './wareki.js';
 
 describe('formatWarekiYear', () => {

@@ -9,7 +9,7 @@ import { type ConvertResult, reverseToolUrl } from '#app/lib/wareki/convert-resu
 import { dateQueryString, parseQueryNumber } from '#app/lib/wareki/date-query.js';
 import { seirekiToWareki } from '#src/domain/wareki/conversion.js';
 import { formatWareki } from '#src/domain/wareki/format.js';
-import { createSeireki } from '#src/domain/wareki/seireki.js';
+import { createSeireki } from '#src/domain/date/seireki.js';
 import { todayInJST } from '#src/lib/date.js';
 
 function tryConvert(year: number | null, month: number | null, day: number | null): ConvertResult {
