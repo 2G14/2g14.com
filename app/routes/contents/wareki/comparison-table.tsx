@@ -1,6 +1,7 @@
 import { createRoute } from 'honox/factory';
 
 import PageHead from '#app/components/page-head.js';
+import ToolPageLayout from '#app/components/tool-page-layout.js';
 import { ERAS } from '#src/domain/wareki/era.js';
 import { todayInJST } from '#src/lib/date.js';
 
@@ -62,18 +63,16 @@ export default createRoute((c) => {
       <input id="toc-drawer" type="checkbox" class="drawer-toggle" />
 
       <div class="drawer-content">
-        <header class="navbar sticky top-0 z-30 min-h-12 bg-base-100 shadow-sm">
-          <div class="flex-1">
-            <h1 class="text-xl font-bold">和暦/西暦 対比表</h1>
-          </div>
-          <div class="flex-none md:hidden">
-            <label for="toc-drawer" class="btn btn-ghost btn-sm">
-              目次
-            </label>
-          </div>
-        </header>
-
-        <div class="mx-auto my-8 max-w-5xl px-4">
+        <ToolPageLayout
+          title="和暦/西暦 対比表"
+          headerExtra={
+            <div class="flex-none md:hidden">
+              <label for="toc-drawer" class="btn btn-ghost btn-sm">
+                目次
+              </label>
+            </div>
+          }
+        >
           <div class="grid grid-cols-1 items-start gap-6 md:grid-cols-[1fr_200px]">
             <main class="grid min-w-0 grid-cols-1 items-start gap-8">
               {eras.map((era) => {
@@ -123,7 +122,7 @@ export default createRoute((c) => {
               </ul>
             </aside>
           </div>
-        </div>
+        </ToolPageLayout>
       </div>
 
       <div class="drawer-side z-40">

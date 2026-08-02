@@ -1,6 +1,7 @@
 import { createRoute } from 'honox/factory';
 
 import PageHead from '#app/components/page-head.js';
+import ToolPageLayout from '#app/components/tool-page-layout.js';
 import WarekiToSeirekiConverter from '#app/islands/wareki-to-seireki-converter.js';
 
 const PAGE_TITLE = '和暦→西暦 変換 - 和暦の日付を西暦に変換';
@@ -27,22 +28,14 @@ export default createRoute((c) => {
   );
 
   return c.render(
-    <div>
-      <header class="navbar sticky top-0 z-30 min-h-12 bg-base-100 shadow-sm">
-        <div class="flex-1">
-          <h1 class="text-xl font-bold">和暦→西暦 変換</h1>
-        </div>
-      </header>
-
-      <div class="mx-auto my-8 max-w-5xl px-4">
-        <WarekiToSeirekiConverter
-          initialEra={eraParam}
-          initialYear={yearParam}
-          initialMonth={monthParam}
-          initialDay={dayParam}
-        />
-      </div>
-    </div>,
+    <ToolPageLayout title="和暦→西暦 変換">
+      <WarekiToSeirekiConverter
+        initialEra={eraParam}
+        initialYear={yearParam}
+        initialMonth={monthParam}
+        initialDay={dayParam}
+      />
+    </ToolPageLayout>,
     { title: PAGE_TITLE, head },
   );
 });

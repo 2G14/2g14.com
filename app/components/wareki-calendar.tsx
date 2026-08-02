@@ -2,7 +2,8 @@ import { useEffect, useState } from 'hono/jsx';
 
 import { ERAS, type Era } from '#src/domain/wareki/era.js';
 
-import CalendarGrid from './calendar-grid.js';
+import CalendarFrame from './calendar-frame.js';
+import EditableYear from './editable-year.js';
 
 const ERAS_DISPLAY = ERAS.toReversed();
 
@@ -67,7 +68,6 @@ export default function WarekiCalendar({
     const m = Number(month);
     return Number.isInteger(m) && m >= 1 && m <= 12 ? m : viewEra.start.month;
   });
-  const [editingYear, setEditingYear] = useState(false);
 
   useEffect(() => {
     const eraEntry = findEra(era);
@@ -119,6 +119,18 @@ export default function WarekiCalendar({
     setViewMonth(eraEntry.start.month);
   };
 
+  const handleYearInput = (v: number) => {
+    const seireki = warekiToSeirekiYear(viewEra, v);
+    if (seireki > lastMonth.seirekiYear) return;
+    setViewWarekiYear(v);
+    if (v === 1 && viewMonth < viewEra.start.month) {
+      setViewMonth(viewEra.start.month);
+    }
+    if (seireki === lastMonth.seirekiYear && viewMonth > lastMonth.month) {
+      setViewMonth(lastMonth.month);
+    }
+  };
+
   const disabledDays = getDisabledDays(viewSeirekiYear, viewMonth, viewEra);
 
   const selectedDate = (() => {
@@ -143,7 +155,30 @@ export default function WarekiCalendar({
   const yearLabel = viewWarekiYear === 1 ? '元' : String(viewWarekiYear);
 
   return (
-    <div class="mt-3 rounded-lg border border-base-300 p-3">
+    <CalendarFrame
+      heading={
+        <>
+          {viewEra.name}
+          <EditableYear
+            value={viewWarekiYear}
+            min={1}
+            widthClass="w-16"
+            label={yearLabel}
+            onYearInput={handleYearInput}
+          />
+          {viewMonth}月
+        </>
+      }
+      canGoPrevMonth={canGoPrevMonth}
+      canGoNextMonth={canGoNextMonth}
+      onPrevMonth={goPrevMonth}
+      onNextMonth={goNextMonth}
+      seirekiYear={viewSeirekiYear}
+      month={viewMonth}
+      selectedDate={selectedDate}
+      onDayClick={handleDayClick}
+      disabledDays={disabledDays}
+    >
       <div role="tablist" class="tabs-boxed mb-3 tabs">
         {ERAS_DISPLAY.map((e) => (
           <button
@@ -157,79 +192,6 @@ export default function WarekiCalendar({
           </button>
         ))}
       </div>
-
-      <div class="mb-2 flex items-center justify-between">
-        <span class="text-base font-bold">
-          {viewEra.name}
-          {editingYear ? (
-            <input
-              type="number"
-              class="input-bordered input w-16 text-center input-sm"
-              value={viewWarekiYear}
-              min={1}
-              onInput={(e) => {
-                const v = Number((e.target as HTMLInputElement).value);
-                if (Number.isInteger(v) && v >= 1) {
-                  const seireki = warekiToSeirekiYear(viewEra, v);
-                  if (seireki <= lastMonth.seirekiYear) {
-                    setViewWarekiYear(v);
-                    if (v === 1 && viewMonth < viewEra.start.month) {
-                      setViewMonth(viewEra.start.month);
-                    }
-                    if (seireki === lastMonth.seirekiYear && viewMonth > lastMonth.month) {
-                      setViewMonth(lastMonth.month);
-                    }
-                  }
-                }
-              }}
-              onBlur={() => setEditingYear(false)}
-              onKeyDown={(e) => {
-                if ((e as KeyboardEvent).key === 'Enter') setEditingYear(false);
-              }}
-              autoFocus
-            />
-          ) : (
-            <button
-              type="button"
-              class="btn btn-ghost text-base btn-sm"
-              onClick={() => setEditingYear(true)}
-              title="年を直接入力"
-            >
-              {yearLabel}年
-            </button>
-          )}
-          {viewMonth}月
-        </span>
-
-        <div class="flex gap-0.5">
-          <button
-            type="button"
-            class="btn btn-circle btn-ghost btn-sm"
-            disabled={!canGoPrevMonth}
-            aria-label="前月"
-            onClick={goPrevMonth}
-          >
-            ◀
-          </button>
-          <button
-            type="button"
-            class="btn btn-circle btn-ghost btn-sm"
-            disabled={!canGoNextMonth}
-            aria-label="次月"
-            onClick={goNextMonth}
-          >
-            ▶
-          </button>
-        </div>
-      </div>
-
-      <CalendarGrid
-        seirekiYear={viewSeirekiYear}
-        month={viewMonth}
-        selectedDate={selectedDate}
-        onDayClick={handleDayClick}
-        disabledDays={disabledDays}
-      />
-    </div>
+    </CalendarFrame>
   );
 }
