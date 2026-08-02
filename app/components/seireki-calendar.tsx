@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'hono/jsx';
 
-import CalendarGrid from './calendar-grid.js';
+import CalendarFrame from './calendar-frame.js';
+import EditableYear from './editable-year.js';
 
 const MIN_YEAR = 1868;
 const MIN_MONTH = 9;
@@ -26,7 +27,6 @@ export default function SeirekiCalendar({ year, month, day, onDateSelect }: Seir
     const m = Number(month);
     return Number.isInteger(m) && m >= 1 && m <= 12 ? m : defaultMonth;
   });
-  const [editingYear, setEditingYear] = useState(false);
 
   useEffect(() => {
     const y = Number(year);
@@ -77,66 +77,26 @@ export default function SeirekiCalendar({ year, month, day, onDateSelect }: Seir
   };
 
   return (
-    <div class="mt-3 rounded-lg border border-base-300 p-3">
-      <div class="mb-2 flex items-center justify-between">
-        <span class="text-base font-bold">
-          {editingYear ? (
-            <input
-              type="number"
-              class="input-bordered input w-20 text-center input-sm"
-              value={viewYear}
-              min={MIN_YEAR}
-              onInput={(e) => {
-                const v = Number((e.target as HTMLInputElement).value);
-                if (Number.isInteger(v) && v >= MIN_YEAR) setViewYear(v);
-              }}
-              onBlur={() => setEditingYear(false)}
-              onKeyDown={(e) => {
-                if ((e as KeyboardEvent).key === 'Enter') setEditingYear(false);
-              }}
-              autoFocus
-            />
-          ) : (
-            <button
-              type="button"
-              class="btn btn-ghost text-base btn-sm"
-              onClick={() => setEditingYear(true)}
-              title="年を直接入力"
-            >
-              {viewYear}年
-            </button>
-          )}
+    <CalendarFrame
+      heading={
+        <>
+          <EditableYear
+            value={viewYear}
+            min={MIN_YEAR}
+            widthClass="w-20"
+            onYearInput={setViewYear}
+          />
           {viewMonth}月
-        </span>
-
-        <div class="flex gap-0.5">
-          <button
-            type="button"
-            class="btn btn-circle btn-ghost btn-sm"
-            disabled={!canGoPrevMonth}
-            aria-label="前月"
-            onClick={goPrevMonth}
-          >
-            ◀
-          </button>
-          <button
-            type="button"
-            class="btn btn-circle btn-ghost btn-sm"
-            aria-label="次月"
-            onClick={goNextMonth}
-          >
-            ▶
-          </button>
-        </div>
-      </div>
-
-      <CalendarGrid
-        seirekiYear={viewYear}
-        month={viewMonth}
-        selectedDate={selectedDate}
-        onDayClick={handleDayClick}
-        disabledDays={disabledDays}
-      />
-    </div>
+        </>
+      }
+      canGoPrevMonth={canGoPrevMonth}
+      onPrevMonth={goPrevMonth}
+      onNextMonth={goNextMonth}
+      seirekiYear={viewYear}
+      month={viewMonth}
+      selectedDate={selectedDate}
+      onDayClick={handleDayClick}
+      disabledDays={disabledDays}
+    />
   );
 }
