@@ -1,4 +1,4 @@
-import { createSeireki, type Seireki, type SeirekiInput } from './seireki.js';
+import { createSeireki, type Seireki, type SeirekiInput } from '../date/seireki.js';
 
 const RAW_ERAS = [
   {
