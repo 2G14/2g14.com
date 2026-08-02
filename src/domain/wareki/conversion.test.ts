@@ -1,8 +1,8 @@
 import { assert, describe, expect, it } from 'vitest';
 
+import { createSeireki, type SeirekiInput } from '../date/seireki.js';
 import { seirekiToWareki, warekiToSeireki } from './conversion.js';
 import type { EraName } from './era.js';
-import { createSeireki, type SeirekiInput } from './seireki.js';
 import { createWareki, InvalidWarekiError } from './wareki.js';
 
 const ERAS: ReadonlyArray<{

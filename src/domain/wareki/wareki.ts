@@ -1,5 +1,5 @@
+import { InvalidSeirekiError, isValidDate } from '../date/seireki.js';
 import { ERAS, type EraName, InvalidEraError } from './era.js';
-import { InvalidSeirekiError, isValidDate } from './seireki.js';
 
 const brand = Symbol('Wareki');
 
