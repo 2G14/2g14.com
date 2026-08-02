@@ -37,8 +37,8 @@ sbx secret set -g anthropic
 sbx は claude を `--dangerously-skip-permissions`(YOLO)付きで起動する。
 現状これを宣言的に無効化する手段はない:
 
-- 公式手段は custom sandbox kit(`agent-kit/` がそれ)だが、v0.35 の
-  デーモンは built-in エージェントのみ受け付ける(v0.36.0-rc 以降で解禁)
+- 公式手段は custom sandbox kit(`agent-kit/` がそれ)だが、デーモンが
+  built-in エージェントのみ受け付けるため使えない(v0.37.1 時点でも拒否を確認)
 - さらに sandbox kit は OAuth credential 注入が効かない既知バグがある
   ([sbx-releases#242](https://github.com/docker/sbx-releases/issues/242)、
   経緯は [#47](https://github.com/docker/sbx-releases/issues/47))

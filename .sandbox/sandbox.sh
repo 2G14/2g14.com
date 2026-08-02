@@ -26,8 +26,8 @@ cmd_build() {
   sbx template load "$tar"
 }
 
-# agent-kit(YOLO 無効化)は v0.35 のデーモンが custom agent kit を拒否するため未使用。
-# sbx-releases issue #47 / #242 の解消後に組み込む。
+# agent-kit(YOLO 無効化)はデーモンが custom agent kit を拒否するため未使用
+# (v0.37.1 時点でも拒否を確認)。sbx-releases issue #47 / #242 の解消後に組み込む。
 cmd_run() {
   cd "$REPO_ROOT"
   sbx run --clone \
