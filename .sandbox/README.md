@@ -15,10 +15,10 @@ Claude Code を Docker Sandbox (clone mode) で動かすための template + kit
 
 ```bash
 # GitHub トークンを登録(proxy が代理認証。実トークンはサンドボックスに入らない)
-sbx secret set -g github
+sbx secret set github
 
 # Anthropic 認証が未登録なら
-sbx secret set -g anthropic
+sbx secret set anthropic
 ```
 
 ## 使い方
