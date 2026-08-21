@@ -1,0 +1,14 @@
+schemaVersion: '1'
+kind: sandbox
+name: 2g14-claude
+displayName: Claude Code (no YOLO, mise toolchain)
+description: >-
+  mise 経由で node/gh/git を導入した template 上で Claude Code を
+  --dangerously-skip-permissions なしで起動する汎用エージェント定義。
+
+sandbox:
+  image: 2g14-sandbox:latest
+  aiFilename: CLAUDE.md
+  entrypoint:
+    # sbx 標準の claude 起動は YOLO 付きのため、フラグなしで上書きする
+    run: [claude]
