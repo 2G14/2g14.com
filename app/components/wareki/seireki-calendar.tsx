@@ -36,6 +36,9 @@ export default function SeirekiCalendar({ year, month, day, onDateSelect }: Seir
   }, [year, month]);
 
   const canGoPrevMonth = viewYear > MIN_YEAR || (viewYear === MIN_YEAR && viewMonth > MIN_MONTH);
+  // 和暦カレンダーと違い元号の終わりに縛られないため、次月に上限は設けていない
+  const canGoNextMonth: boolean = true;
+
   const goPrevMonth = () => {
     if (!canGoPrevMonth) return;
     if (viewMonth === 1) {
@@ -47,6 +50,7 @@ export default function SeirekiCalendar({ year, month, day, onDateSelect }: Seir
   };
 
   const goNextMonth = () => {
+    if (!canGoNextMonth) return;
     if (viewMonth === 12) {
       setViewYear(viewYear + 1);
       setViewMonth(1);
@@ -81,7 +85,7 @@ export default function SeirekiCalendar({ year, month, day, onDateSelect }: Seir
         </>
       }
       canGoPrevMonth={canGoPrevMonth}
-      canGoNextMonth
+      canGoNextMonth={canGoNextMonth}
       onPrevMonth={goPrevMonth}
       onNextMonth={goNextMonth}
     >
