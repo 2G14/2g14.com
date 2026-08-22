@@ -5,9 +5,6 @@
 # 生成したものだけを基準とする。ホストで wrangler dev を立て、Playwright 公式イメージの
 # コンテナからそこへ接続して撮影する。
 set -euo pipefail
-# バックグラウンドのサーバーを独立したプロセスグループにして、まとめて落とせるようにする。
-# 通常の SIGTERM では wrangler が workerd まで片付けるが、SIGKILL やハング時の保険
-set -m
 
 cd "$(dirname "$0")/.."
 
@@ -33,9 +30,11 @@ fi
 
 npm run build
 
-npx wrangler dev --port "$PORT" &
+# ホットキー(b/d/x)用の raw mode に入らせない。この用途では使えないうえ、
+# 端末の状態を壊す・docker と入力を取り合う元になる
+npx wrangler dev --port "$PORT" < /dev/null &
 SERVER_PID=$!
-trap 'kill -- -"$SERVER_PID" 2>/dev/null || true' EXIT
+trap 'kill "$SERVER_PID" 2>/dev/null || true' EXIT
 
 echo "waiting for http://localhost:${PORT} ..."
 ready=false
