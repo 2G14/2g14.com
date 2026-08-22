@@ -1,13 +1,15 @@
 import type { Child } from 'hono/jsx';
 import { useState } from 'hono/jsx';
 
+import type { ConvertResult } from '#app/lib/convert-result.js';
+
 interface ConverterLayoutProps {
   inputTitle: string;
   fields: Child;
   calendar: Child;
   reverseUrl: string;
   resultTitle: string;
-  result: { text: string } | { error: string } | null;
+  result: ConvertResult;
   placeholder: string;
 }
 

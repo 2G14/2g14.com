@@ -3,22 +3,14 @@ import { useEffect, useState } from 'hono/jsx';
 import ConverterLayout from '#app/components/converter-layout.js';
 import DateField from '#app/components/date-field.js';
 import SeirekiCalendar from '#app/components/seireki-calendar.js';
+import { type ConvertResult, reverseToolUrl } from '#app/lib/convert-result.js';
 import { parseDateInput } from '#app/lib/date-input.js';
-import { type DateQueryValues, dateQueryString, dateToolUrl } from '#app/lib/date-query.js';
+import { dateQueryString } from '#app/lib/date-query.js';
 import { replaceUrlQuery } from '#app/lib/url.js';
 import { seirekiToWareki } from '#src/domain/wareki/conversion.js';
 import { createSeireki } from '#src/domain/wareki/seireki.js';
 
-interface ConvertResult {
-  text: string;
-  reverseQuery: DateQueryValues;
-}
-
-function tryConvert(
-  yearStr: string,
-  monthStr: string,
-  dayStr: string,
-): ConvertResult | { error: string } | null {
+function tryConvert(yearStr: string, monthStr: string, dayStr: string): ConvertResult {
   const parsed = parseDateInput(yearStr, monthStr, dayStr);
   if (!parsed || 'error' in parsed) return parsed;
 
@@ -61,10 +53,7 @@ export default function SeirekiToWarekiConverter({ initialYear, initialMonth, in
 
   const result = tryConvert(year, month, day);
 
-  const reverseUrl = dateToolUrl(
-    '/contents/wareki/convert-to-seireki',
-    result && 'reverseQuery' in result ? result.reverseQuery : null,
-  );
+  const reverseUrl = reverseToolUrl('/contents/wareki/convert-to-seireki', result);
 
   return (
     <ConverterLayout

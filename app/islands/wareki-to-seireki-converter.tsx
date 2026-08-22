@@ -4,25 +4,16 @@ import ConverterLayout from '#app/components/converter-layout.js';
 import DateField from '#app/components/date-field.js';
 import Field from '#app/components/field.js';
 import WarekiCalendar from '#app/components/wareki-calendar.js';
+import { type ConvertResult, reverseToolUrl } from '#app/lib/convert-result.js';
 import { parseDateInput } from '#app/lib/date-input.js';
-import { type DateQueryValues, dateQueryString, dateToolUrl } from '#app/lib/date-query.js';
+import { dateQueryString } from '#app/lib/date-query.js';
 import { replaceUrlQuery } from '#app/lib/url.js';
 import { seirekiToWareki, warekiToSeireki } from '#src/domain/wareki/conversion.js';
 import { ERAS } from '#src/domain/wareki/era.js';
 import { createSeireki } from '#src/domain/wareki/seireki.js';
 import { createWareki } from '#src/domain/wareki/wareki.js';
 
-interface ConvertResult {
-  text: string;
-  reverseQuery: DateQueryValues;
-}
-
-function tryConvert(
-  era: string,
-  yearStr: string,
-  monthStr: string,
-  dayStr: string,
-): ConvertResult | { error: string } | null {
+function tryConvert(era: string, yearStr: string, monthStr: string, dayStr: string): ConvertResult {
   const parsed = parseDateInput(yearStr, monthStr, dayStr);
   if (!parsed || 'error' in parsed) return parsed;
 
@@ -80,10 +71,7 @@ export default function WarekiToSeirekiConverter({
 
   const result = tryConvert(era, year, month, day);
 
-  const reverseUrl = dateToolUrl(
-    '/contents/wareki/convert-from-seireki',
-    result && 'reverseQuery' in result ? result.reverseQuery : null,
-  );
+  const reverseUrl = reverseToolUrl('/contents/wareki/convert-from-seireki', result);
 
   return (
     <ConverterLayout
