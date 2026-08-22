@@ -72,8 +72,8 @@ export default function SeirekiToWarekiConverter({ initialYear, initialMonth, in
       fields={
         <>
           <DateField label="年" value={year} max={9999} widthClass="w-20" onInput={setYear} />
-          <DateField label="月" value={month} max={12} onInput={setMonth} />
-          <DateField label="日" value={day} max={31} onInput={setDay} />
+          <DateField label="月" value={month} max={12} widthClass="w-14" onInput={setMonth} />
+          <DateField label="日" value={day} max={31} widthClass="w-14" onInput={setDay} />
         </>
       }
       calendar={
