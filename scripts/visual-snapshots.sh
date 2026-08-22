@@ -5,6 +5,9 @@
 # 生成したものだけを基準とする。ホストで wrangler dev を立て、Playwright 公式イメージの
 # コンテナからそこへ接続して撮影する。
 set -euo pipefail
+# バックグラウンドのサーバーを独立したプロセスグループにして、まとめて落とせるようにする。
+# 通常の SIGTERM では wrangler が workerd まで片付けるが、SIGKILL やハング時の保険
+set -m
 
 cd "$(dirname "$0")/.."
 
@@ -32,7 +35,7 @@ npm run build
 
 npx wrangler dev --port "$PORT" &
 SERVER_PID=$!
-trap 'kill "$SERVER_PID" 2>/dev/null || true' EXIT
+trap 'kill -- -"$SERVER_PID" 2>/dev/null || true' EXIT
 
 echo "waiting for http://localhost:${PORT} ..."
 ready=false
@@ -58,6 +61,9 @@ if [ "$MODE" != "--check" ]; then
   PW_ARGS+=(--update-snapshots)
 fi
 
+# node_modules をそのままマウントしている。コンテナ内で動かすのは pure JS の
+# Playwright だけで、esbuild や workerd のような macOS 向け native binary には触れない。
+# コンテナ側で npm run build までやりたくなったらこの前提が崩れる
 docker run --rm \
   -v "$PWD:/work" -w /work \
   --add-host=host.docker.internal:host-gateway \

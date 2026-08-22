@@ -33,7 +33,7 @@ const PAGES = [
 ] as const;
 
 async function settle(page: Page) {
-  await page.waitForLoadState('networkidle');
+  // toHaveScreenshot 自体が連続フレームの安定まで待つため、フォントの読み込みだけ待てばよい
   await page.evaluate(() => document.fonts.ready);
 }
 
@@ -46,18 +46,22 @@ function screenshotOptions(page: Page, maskSelector: string | undefined) {
   };
 }
 
-test.describe('デスクトップ', () => {
+function definePageSnapshots(suffix: 'desktop' | 'mobile') {
   for (const entry of PAGES) {
     test(`${entry.name} の外観`, async ({ page }) => {
       await page.goto(entry.path);
       await settle(page);
 
       await expect(page).toHaveScreenshot(
-        `${entry.name}-desktop.png`,
+        `${entry.name}-${suffix}.png`,
         screenshotOptions(page, 'maskSelector' in entry ? entry.maskSelector : undefined),
       );
     });
   }
+}
+
+test.describe('デスクトップ', () => {
+  definePageSnapshots('desktop');
 });
 
 test.describe('モバイル', () => {
@@ -65,15 +69,5 @@ test.describe('モバイル', () => {
   // ビジュアル比較で意味を持つビューポートだけを指定する(Pixel 5 相当)
   test.use({ viewport: { width: 393, height: 851 } });
 
-  for (const entry of PAGES) {
-    test(`${entry.name} の外観`, async ({ page }) => {
-      await page.goto(entry.path);
-      await settle(page);
-
-      await expect(page).toHaveScreenshot(
-        `${entry.name}-mobile.png`,
-        screenshotOptions(page, 'maskSelector' in entry ? entry.maskSelector : undefined),
-      );
-    });
-  }
+  definePageSnapshots('mobile');
 });

@@ -46,6 +46,8 @@ test('未知の元号を指定すると絞り込みなしのページへリダ�
 test('目次のリンクから元号セクションへアンカー移動できる', async ({ page }) => {
   await page.goto(PATH);
 
+  // サイドバーとドロワーに同名の目次があり、どちらもアクセシブルネームを持たないため
+  // DOM 順で撃ち分けている(https://github.com/2G14/2g14.com/issues/26)
   await page.getByRole('link', { name: '昭和' }).first().click();
 
   // ハッシュは percent-encoding されるため、デコードして比較する
