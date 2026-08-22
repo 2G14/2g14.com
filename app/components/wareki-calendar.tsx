@@ -158,7 +158,7 @@ export default function WarekiCalendar({
             value={viewWarekiYear}
             min={1}
             widthClass="w-16"
-            label={yearLabel}
+            displayLabel={yearLabel}
             onYearInput={handleYearInput}
           />
           {viewMonth}月

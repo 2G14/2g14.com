@@ -4,7 +4,7 @@ interface EditableYearProps {
   value: number;
   min: number;
   widthClass: string;
-  label?: string;
+  displayLabel?: string;
   onYearInput: (year: number) => void;
 }
 
@@ -12,7 +12,7 @@ export default function EditableYear({
   value,
   min,
   widthClass,
-  label = String(value),
+  displayLabel = String(value),
   onYearInput,
 }: EditableYearProps) {
   const [editing, setEditing] = useState(false);
@@ -25,7 +25,7 @@ export default function EditableYear({
         onClick={() => setEditing(true)}
         title="年を直接入力"
       >
-        {label}年
+        {displayLabel}年
       </button>
     );
   }
