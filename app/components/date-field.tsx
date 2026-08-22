@@ -1,3 +1,5 @@
+import Field from './field.js';
+
 interface DateFieldProps {
   label: string;
   value: string;
@@ -14,10 +16,7 @@ export default function DateField({
   onInput,
 }: DateFieldProps) {
   return (
-    <label class={`form-control ${widthClass}`}>
-      <div class="label">
-        <span class="label-text">{label}</span>
-      </div>
+    <Field label={label} widthClass={widthClass}>
       <input
         type="number"
         value={value}
@@ -26,6 +25,6 @@ export default function DateField({
         class="input-bordered input w-full"
         onInput={(e) => onInput((e.target as HTMLInputElement).value)}
       />
-    </label>
+    </Field>
   );
 }

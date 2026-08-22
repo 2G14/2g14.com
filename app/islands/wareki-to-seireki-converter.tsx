@@ -2,6 +2,7 @@ import { useEffect, useState } from 'hono/jsx';
 
 import ConverterLayout from '#app/components/converter-layout.js';
 import DateField from '#app/components/date-field.js';
+import Field from '#app/components/field.js';
 import WarekiCalendar from '#app/components/wareki-calendar.js';
 import { parseDateInput } from '#app/lib/date-input.js';
 import {
@@ -93,10 +94,7 @@ export default function WarekiToSeirekiConverter({
       inputTitle="和暦"
       fields={
         <>
-          <label class="form-control w-20">
-            <div class="label">
-              <span class="label-text">元号</span>
-            </div>
+          <Field label="元号" widthClass="w-20">
             <select
               class="select-bordered select w-full"
               onInput={(e) => setEra((e.target as HTMLSelectElement).value)}
@@ -107,7 +105,7 @@ export default function WarekiToSeirekiConverter({
                 </option>
               ))}
             </select>
-          </label>
+          </Field>
           <DateField label="年" value={year} max={999} widthClass="w-16" onInput={setYear} />
           <DateField label="月" value={month} max={12} onInput={setMonth} />
           <DateField label="日" value={day} max={31} onInput={setDay} />
