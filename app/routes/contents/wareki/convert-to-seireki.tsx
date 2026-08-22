@@ -2,7 +2,7 @@ import { createRoute } from 'honox/factory';
 
 import PageHead from '#app/components/page-head.js';
 import ToolPageLayout from '#app/components/tool-page-layout.js';
-import WarekiToSeirekiConverter from '#app/islands/wareki-to-seireki-converter.js';
+import WarekiToSeirekiConverter from '#app/islands/wareki/wareki-to-seireki-converter.js';
 
 const PAGE_TITLE = '和暦→西暦 変換 - 和暦の日付を西暦に変換';
 const META_DESCRIPTION =

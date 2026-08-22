@@ -1,12 +1,12 @@
 import { useEffect, useState } from 'hono/jsx';
 
-import ConverterLayout from '#app/components/converter-layout.js';
 import DateField from '#app/components/date-field.js';
-import SeirekiCalendar from '#app/components/seireki-calendar.js';
-import { type ConvertResult, reverseToolUrl } from '#app/lib/convert-result.js';
+import ConverterView from '#app/components/wareki/converter-view.js';
+import SeirekiCalendar from '#app/components/wareki/seireki-calendar.js';
 import { parseDateInput } from '#app/lib/date-input.js';
-import { dateQueryString, parseQueryNumber } from '#app/lib/date-query.js';
 import { replaceUrlQuery } from '#app/lib/url.js';
+import { type ConvertResult, reverseToolUrl } from '#app/lib/wareki/convert-result.js';
+import { dateQueryString, parseQueryNumber } from '#app/lib/wareki/date-query.js';
 import { seirekiToWareki } from '#src/domain/wareki/conversion.js';
 import { createSeireki } from '#src/domain/wareki/seireki.js';
 
@@ -60,7 +60,7 @@ export default function SeirekiToWarekiConverter({ initialYear, initialMonth, in
   const reverseUrl = reverseToolUrl('/contents/wareki/convert-to-seireki', result);
 
   return (
-    <ConverterLayout
+    <ConverterView
       inputTitle="西暦"
       fields={
         <>

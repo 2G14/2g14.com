@@ -1,11 +1,10 @@
 import { useEffect, useState } from 'hono/jsx';
 
+import CalendarFrame from '#app/components/calendar-frame.js';
+import CalendarGrid from '#app/components/calendar-grid.js';
+import EditableYear from '#app/components/editable-year.js';
 import { isInteger } from '#app/lib/date-input.js';
 import { ERAS, type Era } from '#src/domain/wareki/era.js';
-
-import CalendarFrame from './calendar-frame.js';
-import CalendarGrid from './calendar-grid.js';
-import EditableYear from './editable-year.js';
 
 const ERAS_DISPLAY = ERAS.toReversed();
 

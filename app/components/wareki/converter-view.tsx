@@ -1,9 +1,9 @@
 import type { Child } from 'hono/jsx';
 import { useState } from 'hono/jsx';
 
-import type { ConvertResult } from '#app/lib/convert-result.js';
+import type { ConvertResult } from '#app/lib/wareki/convert-result.js';
 
-interface ConverterLayoutProps {
+interface ConverterViewProps {
   inputTitle: string;
   fields: Child;
   calendar: Child;
@@ -13,7 +13,7 @@ interface ConverterLayoutProps {
   placeholder: string;
 }
 
-export default function ConverterLayout({
+export default function ConverterView({
   inputTitle,
   fields,
   calendar,
@@ -21,7 +21,7 @@ export default function ConverterLayout({
   resultTitle,
   result,
   placeholder,
-}: ConverterLayoutProps) {
+}: ConverterViewProps) {
   const [calendarOpen, setCalendarOpen] = useState(false);
 
   return (
