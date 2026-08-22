@@ -18,7 +18,20 @@ export default defineConfig({
     trace: 'on-first-retry',
     screenshot: 'only-on-failure',
   },
-  projects: [{ name: 'chromium', use: { ...devices['Desktop Chrome'] } }],
+  projects: [
+    {
+      name: 'chromium',
+      use: { ...devices['Desktop Chrome'] },
+      testIgnore: /visual\.spec\.ts/u,
+    },
+    {
+      // ビジュアル比較はフォントのレンダリング差を避けるため Playwright 公式イメージ上で
+      // 実行する。スナップショットの更新は scripts/visual-snapshots.sh
+      name: 'visual',
+      use: { ...devices['Desktop Chrome'] },
+      testMatch: /visual\.spec\.ts/u,
+    },
+  ],
   // exactOptionalPropertyTypes 下では webServer に undefined を代入できないため、
   // キー自体を生やさない形で分岐する
   ...(externalBaseURL === undefined

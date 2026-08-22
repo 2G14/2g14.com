@@ -11,14 +11,17 @@ test('クエリなしで全元号のセクションが表示される', async ({
   }
 });
 
-test('元号を漢字・かな・英語・略称のいずれで指定しても同じ元号に絞り込まれる', async ({ page }) => {
-  for (const param of ['平成', 'へいせい', 'Heisei', 'H']) {
-    await page.goto(`${PATH}?era=${encodeURIComponent(param)}`);
+// era.ts が受け付ける 4 表記(漢字・かな・英語・略称)
+const HEISEI_ALIASES = ['平成', 'へいせい', 'Heisei', 'H'] as const;
+
+for (const alias of HEISEI_ALIASES) {
+  test(`元号を「${alias}」で指定すると平成だけに絞り込まれる`, async ({ page }) => {
+    await page.goto(`${PATH}?era=${encodeURIComponent(alias)}`);
 
     await expect(page.getByRole('heading', { level: 2, name: '平成' })).toBeVisible();
     await expect(page.getByRole('heading', { level: 2, name: '令和' })).toHaveCount(0);
-  }
-});
+  });
+}
 
 test('絞り込んだ元号の対比表に開始年と終了年の行が並ぶ', async ({ page }) => {
   await page.goto(`${PATH}?era=${encodeURIComponent('平成')}`);
