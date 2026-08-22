@@ -27,6 +27,7 @@ for (const path of PATHS) {
 
 // ドロワーの開閉は daisyUI 流に <label for> + checkbox で組まれており、
 // label は button role を持たないためテキストで取る
+// (https://github.com/2G14/2g14.com/issues/26)
 const tocToggle = (page: Page) => page.getByRole('banner').getByText('目次');
 
 test('対比表の目次がドロワーに収まり、サイドバーは表示されない', async ({ page }) => {
@@ -49,6 +50,8 @@ test('対比表のドロワーを開いて元号セクションへ移動でき�
 
   await expect(drawer).toBeVisible();
 
+  // 目次を意味で指定できないため DOM 順で後ろ(ドロワー側)を選ぶ
+  // (https://github.com/2G14/2g14.com/issues/26)
   await page.getByRole('link', { name: '昭和' }).last().click();
 
   await expect.poll(() => decodeURIComponent(page.url())).toContain('#昭和');

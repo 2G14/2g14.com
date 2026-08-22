@@ -41,10 +41,15 @@ permissions:
 jobs:
   visual:
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        # container.image では env コンテキストが使えないため、バージョンは
+        # matrix で一箇所に置く。@playwright/test を更新したらここだけ直す
+        playwright: ['1.62.1']
     # 日本語フォントのレンダリングを揃えるため、スナップショット生成に使うのと同じ
-    # Playwright 公式イメージ上で実行する(@playwright/test の更新時はタグも合わせる)
+    # Playwright 公式イメージ上で実行する
     container:
-      image: mcr.microsoft.com/playwright:v1.62.1-noble
+      image: mcr.microsoft.com/playwright:v${{ matrix.playwright }}-noble
     steps:
       - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
         with:
@@ -61,11 +66,12 @@ jobs:
       # "Executable doesn't exist at /ms-playwright/..." という原因の分かりにくい
       # エラーで落ちるため、先に検出して直し方を示す
       - name: container イメージと @playwright/test のバージョン整合を確認
+        env:
+          EXPECTED: ${{ matrix.playwright }}
         run: |
-          expected=1.62.1
           installed="$(npx playwright --version | sed 's/^Version //')"
-          if [ "$installed" != "$expected" ]; then
-            echo "::error::@playwright/test が $installed に更新されています。このワークフローの container.image を mcr.microsoft.com/playwright:v${installed}-noble に、この step の expected も $installed に更新してください。"
+          if [ "$installed" != "$EXPECTED" ]; then
+            echo "::error::@playwright/test が $installed に更新されています。このワークフローの matrix.playwright を $installed に更新してください。"
             exit 1
           fi
       - run: npm run build

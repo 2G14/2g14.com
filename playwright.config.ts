@@ -40,7 +40,9 @@ export default defineConfig({
           // ビルド成果物を配信するため、事前に npm run build が済んでいる必要がある
           command: 'npm run preview -- --port 8787',
           url: LOCAL_URL,
-          reuseExistingServer: !isCI,
+          // 直前の npm run build の成果物ではなく、立てっぱなしの別プロセスに対して
+          // テストしてしまうのを防ぐ(scripts/visual-snapshots.sh と方針を揃える)
+          reuseExistingServer: false,
           timeout: 120_000,
           env: { WRANGLER_SEND_METRICS: 'false' },
         },
