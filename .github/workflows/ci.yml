@@ -89,6 +89,9 @@ jobs:
         with:
           node-version: '24'
           cache: npm
+      # container 内ではワークスペースの所有者が git のチェックに引っかかり、
+      # npm ci の prepare(lefthook install)が失敗する
+      - run: git config --global --add safe.directory "$GITHUB_WORKSPACE"
       - run: npm ci
       - run: npm run build
       - run: npx playwright test --project=visual
