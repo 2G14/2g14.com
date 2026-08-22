@@ -1,16 +1,22 @@
 export interface DateQueryValues {
   era?: string;
-  year: string;
-  month: string;
-  day: string;
+  year: number | null;
+  month: number | null;
+  day: number | null;
+}
+
+export function parseQueryNumber(raw?: string): number | null {
+  if (!raw) return null;
+  const value = Number(raw);
+  return Number.isInteger(value) ? value : null;
 }
 
 export function dateQueryString(values: DateQueryValues): string {
   const params = new URLSearchParams();
   if (values.era) params.set('era', values.era);
-  if (values.year) params.set('year', values.year);
-  if (values.month && values.month !== '1') params.set('month', values.month);
-  if (values.day && values.day !== '1') params.set('day', values.day);
+  if (values.year !== null) params.set('year', String(values.year));
+  if (values.month !== null && values.month !== 1) params.set('month', String(values.month));
+  if (values.day !== null && values.day !== 1) params.set('day', String(values.day));
   return params.toString();
 }
 

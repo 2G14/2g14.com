@@ -1,5 +1,7 @@
 import { useEffect, useState } from 'hono/jsx';
 
+import { isInteger } from '#app/lib/date-input.js';
+
 import CalendarFrame from './calendar-frame.js';
 import CalendarGrid from './calendar-grid.js';
 import EditableYear from './editable-year.js';
@@ -9,10 +11,10 @@ const MIN_MONTH = 9;
 const MIN_DAY = 8;
 
 interface SeirekiCalendarProps {
-  year: string;
-  month: string;
-  day: string;
-  onDateSelect: (year: string, month: string, day: string) => void;
+  year: number | null;
+  month: number | null;
+  day: number | null;
+  onDateSelect: (year: number, month: number, day: number) => void;
 }
 
 export default function SeirekiCalendar({ year, month, day, onDateSelect }: SeirekiCalendarProps) {
@@ -20,21 +22,17 @@ export default function SeirekiCalendar({ year, month, day, onDateSelect }: Seir
   const defaultYear = now.getFullYear();
   const defaultMonth = now.getMonth() + 1;
 
-  const [viewYear, setViewYear] = useState(() => {
-    const y = Number(year);
-    return Number.isInteger(y) && y >= MIN_YEAR ? y : defaultYear;
-  });
-  const [viewMonth, setViewMonth] = useState(() => {
-    const m = Number(month);
-    return Number.isInteger(m) && m >= 1 && m <= 12 ? m : defaultMonth;
-  });
+  const [viewYear, setViewYear] = useState(() =>
+    isInteger(year) && year >= MIN_YEAR ? year : defaultYear,
+  );
+  const [viewMonth, setViewMonth] = useState(() =>
+    isInteger(month) && month >= 1 && month <= 12 ? month : defaultMonth,
+  );
 
   useEffect(() => {
-    const y = Number(year);
-    const m = Number(month);
-    if (Number.isInteger(y) && y >= MIN_YEAR && Number.isInteger(m) && m >= 1 && m <= 12) {
-      setViewYear(y);
-      setViewMonth(m);
+    if (isInteger(year) && year >= MIN_YEAR && isInteger(month) && month >= 1 && month <= 12) {
+      setViewYear(year);
+      setViewMonth(month);
     }
   }, [year, month]);
 
@@ -63,18 +61,11 @@ export default function SeirekiCalendar({ year, month, day, onDateSelect }: Seir
     for (let d = 1; d < MIN_DAY; d++) disabledDays.add(d);
   }
 
-  const selectedDate = (() => {
-    const y = Number(year);
-    const m = Number(month);
-    const d = Number(day);
-    if (Number.isInteger(y) && Number.isInteger(m) && Number.isInteger(d)) {
-      return { year: y, month: m, day: d };
-    }
-    return null;
-  })();
+  const selectedDate =
+    isInteger(year) && isInteger(month) && isInteger(day) ? { year, month, day } : null;
 
   const handleDayClick = (d: number) => {
-    onDateSelect(String(viewYear), String(viewMonth), String(d));
+    onDateSelect(viewYear, viewMonth, d);
   };
 
   return (

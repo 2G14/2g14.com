@@ -2,10 +2,10 @@ import Field from './field.js';
 
 interface DateFieldProps {
   label: string;
-  value: string;
+  value: number | null;
   max: number;
   widthClass: string;
-  onInput: (value: string) => void;
+  onInput: (value: number | null) => void;
 }
 
 export default function DateField({ label, value, max, widthClass, onInput }: DateFieldProps) {
@@ -13,11 +13,15 @@ export default function DateField({ label, value, max, widthClass, onInput }: Da
     <Field label={label} widthClass={widthClass}>
       <input
         type="number"
-        value={value}
+        value={value === null ? '' : value}
         min={1}
         max={max}
         class="input-bordered input w-full"
-        onInput={(e) => onInput((e.target as HTMLInputElement).value)}
+        onInput={(e) => {
+          const raw = (e.target as HTMLInputElement).value;
+          const parsed = Number(raw);
+          onInput(raw === '' || Number.isNaN(parsed) ? null : parsed);
+        }}
       />
     </Field>
   );

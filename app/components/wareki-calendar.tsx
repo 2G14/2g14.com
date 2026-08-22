@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'hono/jsx';
 
+import { isInteger } from '#app/lib/date-input.js';
 import { ERAS, type Era } from '#src/domain/wareki/era.js';
 
 import CalendarFrame from './calendar-frame.js';
@@ -45,10 +46,10 @@ function getDisabledDays(seirekiYear: number, month: number, era: Era): Set<numb
 
 interface WarekiCalendarProps {
   era: string;
-  year: string;
-  month: string;
-  day: string;
-  onDateSelect: (era: string, year: string, month: string, day: string) => void;
+  year: number | null;
+  month: number | null;
+  day: number | null;
+  onDateSelect: (era: string, year: number, month: number, day: number) => void;
 }
 
 export default function WarekiCalendar({
@@ -61,23 +62,19 @@ export default function WarekiCalendar({
   const defaultEra = ERAS[0]!;
 
   const [viewEra, setViewEra] = useState(() => findEra(era) ?? defaultEra);
-  const [viewWarekiYear, setViewWarekiYear] = useState(() => {
-    const y = Number(year);
-    return Number.isInteger(y) && y >= 1 ? y : 1;
-  });
-  const [viewMonth, setViewMonth] = useState(() => {
-    const m = Number(month);
-    return Number.isInteger(m) && m >= 1 && m <= 12 ? m : viewEra.start.month;
-  });
+  const [viewWarekiYear, setViewWarekiYear] = useState(() =>
+    isInteger(year) && year >= 1 ? year : 1,
+  );
+  const [viewMonth, setViewMonth] = useState(() =>
+    isInteger(month) && month >= 1 && month <= 12 ? month : viewEra.start.month,
+  );
 
   useEffect(() => {
     const eraEntry = findEra(era);
-    const y = Number(year);
-    const m = Number(month);
-    if (eraEntry && Number.isInteger(y) && y >= 1 && Number.isInteger(m) && m >= 1 && m <= 12) {
+    if (eraEntry && isInteger(year) && year >= 1 && isInteger(month) && month >= 1 && month <= 12) {
       setViewEra(eraEntry);
-      setViewWarekiYear(y);
-      setViewMonth(m);
+      setViewWarekiYear(year);
+      setViewMonth(month);
     }
   }, [era, year, month]);
 
@@ -136,21 +133,18 @@ export default function WarekiCalendar({
 
   const selectedDate = (() => {
     const eraEntry = findEra(era);
-    const y = Number(year);
-    const m = Number(month);
-    const d = Number(day);
-    if (eraEntry && Number.isInteger(y) && Number.isInteger(m) && Number.isInteger(d) && y >= 1) {
+    if (eraEntry && isInteger(year) && year >= 1 && isInteger(month) && isInteger(day)) {
       return {
-        year: warekiToSeirekiYear(eraEntry, y),
-        month: m,
-        day: d,
+        year: warekiToSeirekiYear(eraEntry, year),
+        month,
+        day,
       };
     }
     return null;
   })();
 
   const handleDayClick = (d: number) => {
-    onDateSelect(viewEra.name, String(viewWarekiYear), String(viewMonth), String(d));
+    onDateSelect(viewEra.name, viewWarekiYear, viewMonth, d);
   };
 
   const yearLabel = viewWarekiYear === 1 ? '元' : String(viewWarekiYear);

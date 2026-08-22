@@ -5,13 +5,13 @@ import DateField from '#app/components/date-field.js';
 import SeirekiCalendar from '#app/components/seireki-calendar.js';
 import { type ConvertResult, reverseToolUrl } from '#app/lib/convert-result.js';
 import { parseDateInput } from '#app/lib/date-input.js';
-import { dateQueryString } from '#app/lib/date-query.js';
+import { dateQueryString, parseQueryNumber } from '#app/lib/date-query.js';
 import { replaceUrlQuery } from '#app/lib/url.js';
 import { seirekiToWareki } from '#src/domain/wareki/conversion.js';
 import { createSeireki } from '#src/domain/wareki/seireki.js';
 
-function tryConvert(yearStr: string, monthStr: string, dayStr: string): ConvertResult {
-  const parsed = parseDateInput(yearStr, monthStr, dayStr);
+function tryConvert(year: number | null, month: number | null, day: number | null): ConvertResult {
+  const parsed = parseDateInput(year, month, day);
   if (!parsed || 'error' in parsed) return parsed;
 
   try {
@@ -24,9 +24,9 @@ function tryConvert(yearStr: string, monthStr: string, dayStr: string): ConvertR
       text: `${wareki.era}${wareki.year}年${wareki.month}月${wareki.day}日`,
       reverseQuery: {
         era: wareki.era,
-        year: String(wareki.year),
-        month: String(wareki.month),
-        day: String(wareki.day),
+        year: wareki.year,
+        month: wareki.month,
+        day: wareki.day,
       },
     };
   } catch (e) {
@@ -43,9 +43,13 @@ interface Props {
 
 export default function SeirekiToWarekiConverter({ initialYear, initialMonth, initialDay }: Props) {
   const now = new Date();
-  const [year, setYear] = useState(initialYear ?? String(now.getFullYear()));
-  const [month, setMonth] = useState(initialMonth ?? String(now.getMonth() + 1));
-  const [day, setDay] = useState(initialDay ?? String(now.getDate()));
+  const [year, setYear] = useState<number | null>(
+    parseQueryNumber(initialYear) ?? now.getFullYear(),
+  );
+  const [month, setMonth] = useState<number | null>(
+    parseQueryNumber(initialMonth) ?? now.getMonth() + 1,
+  );
+  const [day, setDay] = useState<number | null>(parseQueryNumber(initialDay) ?? now.getDate());
 
   useEffect(() => {
     replaceUrlQuery(dateQueryString({ year, month, day }));

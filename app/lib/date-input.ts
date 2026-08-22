@@ -4,18 +4,18 @@ export interface DateInput {
   day: number;
 }
 
+export function isInteger(value: number | null): value is number {
+  return value !== null && Number.isInteger(value);
+}
+
 export function parseDateInput(
-  yearStr: string,
-  monthStr: string,
-  dayStr: string,
+  year: number | null,
+  month: number | null,
+  day: number | null,
 ): DateInput | { error: string } | null {
-  if (!yearStr) return null;
+  if (year === null) return null;
 
-  const year = Number(yearStr);
-  const month = Number(monthStr);
-  const day = Number(dayStr);
-
-  if (!Number.isInteger(year) || !Number.isInteger(month) || !Number.isInteger(day)) {
+  if (!isInteger(year) || !isInteger(month) || !isInteger(day)) {
     return { error: '年・月・日は整数で入力してください。' };
   }
 
