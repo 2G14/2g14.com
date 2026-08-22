@@ -3,6 +3,7 @@ import { useEffect, useState } from 'hono/jsx';
 import { ERAS, type Era } from '#src/domain/wareki/era.js';
 
 import CalendarFrame from './calendar-frame.js';
+import CalendarGrid from './calendar-grid.js';
 import EditableYear from './editable-year.js';
 
 const ERAS_DISPLAY = ERAS.toReversed();
@@ -169,29 +170,33 @@ export default function WarekiCalendar({
           {viewMonth}月
         </>
       }
+      headerExtra={
+        <div role="tablist" class="tabs-boxed mb-3 tabs">
+          {ERAS_DISPLAY.map((e) => (
+            <button
+              type="button"
+              role="tab"
+              class={`tab-sm tab flex-1 ${e.name === viewEra.name ? 'tab-active bg-primary font-bold text-primary-content' : ''}`}
+              aria-selected={e.name === viewEra.name}
+              onClick={() => handleEraChange(e.name)}
+            >
+              {e.name}
+            </button>
+          ))}
+        </div>
+      }
       canGoPrevMonth={canGoPrevMonth}
       canGoNextMonth={canGoNextMonth}
       onPrevMonth={goPrevMonth}
       onNextMonth={goNextMonth}
-      seirekiYear={viewSeirekiYear}
-      month={viewMonth}
-      selectedDate={selectedDate}
-      onDayClick={handleDayClick}
-      disabledDays={disabledDays}
     >
-      <div role="tablist" class="tabs-boxed mb-3 tabs">
-        {ERAS_DISPLAY.map((e) => (
-          <button
-            type="button"
-            role="tab"
-            class={`tab-sm tab flex-1 ${e.name === viewEra.name ? 'tab-active bg-primary font-bold text-primary-content' : ''}`}
-            aria-selected={e.name === viewEra.name}
-            onClick={() => handleEraChange(e.name)}
-          >
-            {e.name}
-          </button>
-        ))}
-      </div>
+      <CalendarGrid
+        seirekiYear={viewSeirekiYear}
+        month={viewMonth}
+        selectedDate={selectedDate}
+        onDayClick={handleDayClick}
+        disabledDays={disabledDays}
+      />
     </CalendarFrame>
   );
 }

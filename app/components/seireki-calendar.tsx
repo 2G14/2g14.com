@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'hono/jsx';
 
 import CalendarFrame from './calendar-frame.js';
+import CalendarGrid from './calendar-grid.js';
 import EditableYear from './editable-year.js';
 
 const MIN_YEAR = 1868;
@@ -92,11 +93,14 @@ export default function SeirekiCalendar({ year, month, day, onDateSelect }: Seir
       canGoPrevMonth={canGoPrevMonth}
       onPrevMonth={goPrevMonth}
       onNextMonth={goNextMonth}
-      seirekiYear={viewYear}
-      month={viewMonth}
-      selectedDate={selectedDate}
-      onDayClick={handleDayClick}
-      disabledDays={disabledDays}
-    />
+    >
+      <CalendarGrid
+        seirekiYear={viewYear}
+        month={viewMonth}
+        selectedDate={selectedDate}
+        onDayClick={handleDayClick}
+        disabledDays={disabledDays}
+      />
+    </CalendarFrame>
   );
 }

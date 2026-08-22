@@ -1,37 +1,27 @@
 import type { Child } from 'hono/jsx';
 
-import CalendarGrid from './calendar-grid.js';
-
 interface CalendarFrameProps {
   heading: Child;
+  headerExtra?: Child;
   canGoPrevMonth: boolean;
   canGoNextMonth?: boolean;
   onPrevMonth: () => void;
   onNextMonth: () => void;
-  seirekiYear: number;
-  month: number;
-  selectedDate: { year: number; month: number; day: number } | null;
-  onDayClick: (day: number) => void;
-  disabledDays: Set<number>;
-  children?: Child;
+  children: Child;
 }
 
 export default function CalendarFrame({
   heading,
+  headerExtra,
   canGoPrevMonth,
   canGoNextMonth = true,
   onPrevMonth,
   onNextMonth,
-  seirekiYear,
-  month,
-  selectedDate,
-  onDayClick,
-  disabledDays,
   children,
 }: CalendarFrameProps) {
   return (
     <div class="mt-3 rounded-lg border border-base-300 p-3">
-      {children}
+      {headerExtra}
 
       <div class="mb-2 flex items-center justify-between">
         <span class="text-base font-bold">{heading}</span>
@@ -58,13 +48,7 @@ export default function CalendarFrame({
         </div>
       </div>
 
-      <CalendarGrid
-        seirekiYear={seirekiYear}
-        month={month}
-        selectedDate={selectedDate}
-        onDayClick={onDayClick}
-        disabledDays={disabledDays}
-      />
+      {children}
     </div>
   );
 }
