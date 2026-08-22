@@ -39,8 +39,9 @@ async function settle(page: Page) {
 function screenshotOptions(page: Page, maskSelector: string | undefined) {
   return {
     mask: maskSelector === undefined ? [] : [page.locator(maskSelector)],
-    // 文字のアンチエイリアスによる微差を許容する
-    maxDiffPixelRatio: 0.01,
+    // 生成と比較を同じイメージ上で行うためレンダリングは再現する。
+    // 割合で許容すると見出し 1 つ分の変化を見逃すので、実ピクセル数で絞る
+    maxDiffPixels: 100,
   };
 }
 
