@@ -24,7 +24,7 @@
   },
   "overrides": [
     {
-      "files": ["e2e/**/*.spec.ts"],
+      "files": ["e2e/**/*.ts"],
       "rules": {
         // E2E は 1 つのページに対する逐次操作であり、ループ内の await を
         // Promise.all へ並列化すると操作順が保証されないため

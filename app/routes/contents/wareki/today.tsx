@@ -41,7 +41,7 @@ export default createRoute((c) => {
 
   return c.render(
     <ToolPageLayout title="本日の和暦">
-      <div class="flex flex-col items-center gap-6 py-12">
+      <div class="flex flex-col items-center gap-6 py-12" data-testid="today-date">
         <p class="text-5xl font-bold sm:text-7xl">{displayYear}</p>
         <p class="text-4xl font-bold sm:text-6xl">{displayDate}</p>
         <p class="text-lg text-base-content/60">（{formatSeireki(seireki)}）</p>

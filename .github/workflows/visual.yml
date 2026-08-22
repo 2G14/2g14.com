@@ -57,6 +57,17 @@ jobs:
       # npm ci の prepare(lefthook install)が失敗する
       - run: git config --global --add safe.directory "$GITHUB_WORKSPACE"
       - run: npm ci
+      # container のブラウザと @playwright/test がずれると
+      # "Executable doesn't exist at /ms-playwright/..." という原因の分かりにくい
+      # エラーで落ちるため、先に検出して直し方を示す
+      - name: container イメージと @playwright/test のバージョン整合を確認
+        run: |
+          expected=1.62.1
+          installed="$(npx playwright --version | sed 's/^Version //')"
+          if [ "$installed" != "$expected" ]; then
+            echo "::error::@playwright/test が $installed に更新されています。このワークフローの container.image を mcr.microsoft.com/playwright:v${installed}-noble に、この step の expected も $installed に更新してください。"
+            exit 1
+          fi
       - run: npm run build
       - run: npx playwright test --project=visual
       # 差分画像(期待・実際・diff)が入る。表示が変わったときはここで中身を確認する
