@@ -1,0 +1,70 @@
+# 表示の変化を検知するためだけのワークフロー。
+#
+# 失敗は「表示が変わった」というシグナルであって、不具合とは限らない。
+# マージをブロックしない(ruleset の required status checks には入れないこと)。
+# 意図した変更であれば `npm run test:visual:update` で基準を更新してコミットする。
+name: Visual
+
+on:
+  push:
+    branches:
+      - master
+    paths:
+      - 'app/**'
+      - 'src/**'
+      - 'e2e/visual.spec.ts'
+      - 'e2e/visual.spec.ts-snapshots/**'
+      - 'playwright.config.ts'
+      - 'package.json'
+      - 'package-lock.json'
+      - '.github/workflows/visual.yml'
+  pull_request:
+    branches:
+      - master
+    paths:
+      - 'app/**'
+      - 'src/**'
+      - 'e2e/visual.spec.ts'
+      - 'e2e/visual.spec.ts-snapshots/**'
+      - 'playwright.config.ts'
+      - 'package.json'
+      - 'package-lock.json'
+      - '.github/workflows/visual.yml'
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  visual:
+    runs-on: ubuntu-latest
+    # 日本語フォントのレンダリングを揃えるため、スナップショット生成に使うのと同じ
+    # Playwright 公式イメージ上で実行する(@playwright/test の更新時はタグも合わせる)
+    container:
+      image: mcr.microsoft.com/playwright:v1.62.1-noble
+    steps:
+      - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@48b55a011bda9f5d6aeb4c2d9c7362e8dae4041e # v6.4.0
+        with:
+          node-version: '24'
+          cache: npm
+      # container 内ではワークスペースの所有者が git のチェックに引っかかり、
+      # npm ci の prepare(lefthook install)が失敗する
+      - run: git config --global --add safe.directory "$GITHUB_WORKSPACE"
+      - run: npm ci
+      - run: npm run build
+      - run: npx playwright test --project=visual
+      # 差分画像(期待・実際・diff)が入る。表示が変わったときはここで中身を確認する
+      - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        if: failure()
+        with:
+          name: visual-diff
+          path: |
+            playwright-report/
+            test-results/
+          retention-days: 7

@@ -19,6 +19,9 @@ npm run lint:fix     # oxlint --fix
 npm run format       # oxfmt --write .
 npm run format:check # oxfmt --check .
 npm run test         # vitest (watch mode)
+npm run test:e2e     # Playwright で e2e テスト (build + wrangler dev)
+npm run test:visual  # ビジュアル比較 (Docker 上で実行)
+npm run test:visual:update  # ビジュアル比較の基準スナップショットを更新
 npx vitest run       # テスト1回実行
 npx vitest run src/domain/wareki/era.test.ts  # 単一ファイルテスト
 ```
