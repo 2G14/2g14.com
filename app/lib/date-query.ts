@@ -19,8 +19,3 @@ export function dateToolUrl(base: string, values: DateQueryValues | null): strin
   const qs = dateQueryString(values);
   return qs ? `${base}?${qs}` : base;
 }
-
-export function replaceUrlQuery(queryString: string): void {
-  const url = `${window.location.pathname}${queryString ? `?${queryString}` : ''}`;
-  history.replaceState(null, '', url);
-}
