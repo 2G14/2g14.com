@@ -24,6 +24,14 @@
   },
   "overrides": [
     {
+      "files": ["e2e/**/*.spec.ts"],
+      "rules": {
+        // E2E は 1 つのページに対する逐次操作であり、ループ内の await を
+        // Promise.all へ並列化すると操作順が保証されないため
+        "no-await-in-loop": "off",
+      },
+    },
+    {
       "files": ["**/*.test.ts", "**/*.test.tsx"],
       "rules": {
         // テストでは使う場所の近くにヘルパー関数を書く方が読みやすいため、
