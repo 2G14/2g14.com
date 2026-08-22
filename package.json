@@ -12,7 +12,7 @@
     "build": "vite build --mode client && vite build",
     "preview": "wrangler dev",
     "deploy": "npm run build && wrangler deploy",
-    "typecheck": "tsc --noEmit",
+    "typecheck": "tsc --noEmit && tsc --noEmit -p e2e",
     "jscpd": "jscpd",
     "knip": "knip",
     "lint": "oxlint",
@@ -20,6 +20,8 @@
     "format": "oxfmt --write .",
     "format:check": "oxfmt --check .",
     "test": "vitest",
+    "test:e2e": "npm run build && playwright test",
+    "test:e2e:ui": "npm run build && playwright test --ui",
     "coverage": "vitest run --coverage",
     "generate-types": "wrangler types"
   },
@@ -31,6 +33,7 @@
   "devDependencies": {
     "@hono/vite-build": "^1.11.1",
     "@hono/vite-dev-server": "^0.26.0",
+    "@playwright/test": "^1.62.1",
     "@tailwindcss/vite": "^4.3.1",
     "@tsconfig/strictest": "^2.0.8",
     "@types/node": "^26.0.1",
