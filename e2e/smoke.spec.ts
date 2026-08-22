@@ -47,22 +47,22 @@ test('存在しないパスが 404 を返す', async ({ page }) => {
   expect(response?.status()).toBe(404);
 });
 
-test('和暦ツールの一覧から各ページへ遷移できる', async ({ page }) => {
-  await page.goto('/contents/wareki');
+const WAREKI_LINKS = [
+  { label: '本日の和暦', path: '/contents/wareki/today' },
+  { label: '和暦/西暦 対比表', path: '/contents/wareki/comparison-table' },
+  { label: '西暦→和暦 変換', path: '/contents/wareki/convert-from-seireki' },
+  { label: '和暦→西暦 変換', path: '/contents/wareki/convert-to-seireki' },
+] as const;
 
-  const links = [
-    { label: '本日の和暦', path: '/contents/wareki/today' },
-    { label: '和暦/西暦 対比表', path: '/contents/wareki/comparison-table' },
-    { label: '西暦→和暦 変換', path: '/contents/wareki/convert-from-seireki' },
-    { label: '和暦→西暦 変換', path: '/contents/wareki/convert-to-seireki' },
-  ];
-
-  for (const { label, path } of links) {
+for (const { label, path } of WAREKI_LINKS) {
+  test(`和暦ツールの一覧から「${label}」へ遷移できる`, async ({ page }) => {
     await page.goto('/contents/wareki');
+
     await page.getByRole('link', { name: label }).click();
+
     await expect(page).toHaveURL(new RegExp(`${path}$`, 'u'));
-  }
-});
+  });
+}
 
 test('コンテンツページに description と canonical が出力される', async ({ page }) => {
   await page.goto('/contents/wareki/today');
