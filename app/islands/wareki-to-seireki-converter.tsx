@@ -4,25 +4,42 @@ import ConverterLayout from '#app/components/converter-layout.js';
 import DateField from '#app/components/date-field.js';
 import WarekiCalendar from '#app/components/wareki-calendar.js';
 import { parseDateInput } from '#app/lib/date-input.js';
-import { dateQueryString, dateToolUrl, replaceUrlQuery } from '#app/lib/date-query.js';
+import {
+  type DateQueryValues,
+  dateQueryString,
+  dateToolUrl,
+  replaceUrlQuery,
+} from '#app/lib/date-query.js';
 import { seirekiToWareki, warekiToSeireki } from '#src/domain/wareki/conversion.js';
 import { ERAS } from '#src/domain/wareki/era.js';
-import { createSeireki, type Seireki } from '#src/domain/wareki/seireki.js';
+import { createSeireki } from '#src/domain/wareki/seireki.js';
 import { createWareki } from '#src/domain/wareki/wareki.js';
+
+interface ConvertResult {
+  text: string;
+  reverseQuery: DateQueryValues;
+}
 
 function tryConvert(
   era: string,
   yearStr: string,
   monthStr: string,
   dayStr: string,
-): { seireki: Seireki } | { error: string } | null {
+): ConvertResult | { error: string } | null {
   const parsed = parseDateInput(yearStr, monthStr, dayStr);
   if (!parsed || 'error' in parsed) return parsed;
 
   try {
     const wareki = createWareki({ era, ...parsed });
     const seireki = warekiToSeireki(wareki);
-    return { seireki };
+    return {
+      text: `${seireki.year}年${seireki.month}月${seireki.day}日`,
+      reverseQuery: {
+        year: String(seireki.year),
+        month: String(seireki.month),
+        day: String(seireki.day),
+      },
+    };
   } catch (e) {
     if (e instanceof Error) return { error: e.message };
     return { error: '変換中にエラーが発生しました。' };
@@ -65,18 +82,10 @@ export default function WarekiToSeirekiConverter({
   }, [era, year, month, day]);
 
   const result = tryConvert(era, year, month, day);
-  const seireki = result && !('error' in result) ? result.seireki : null;
-  const error = result && 'error' in result ? result : null;
 
   const reverseUrl = dateToolUrl(
     '/contents/wareki/convert-from-seireki',
-    seireki
-      ? {
-          year: String(seireki.year),
-          month: String(seireki.month),
-          day: String(seireki.day),
-        }
-      : null,
+    result && 'reverseQuery' in result ? result.reverseQuery : null,
   );
 
   return (
@@ -120,7 +129,7 @@ export default function WarekiToSeirekiConverter({
       }
       reverseUrl={reverseUrl}
       resultTitle="西暦"
-      result={seireki ? { text: `${seireki.year}年${seireki.month}月${seireki.day}日` } : error}
+      result={result}
       placeholder="和暦の日付を入力すると自動で変換されます。"
     />
   );
