@@ -56,6 +56,10 @@ updates:
       cloudflare:
         patterns: ['wrangler', '@cloudflare/*']
         update-types: ['minor', 'patch']
+      # container イメージのタグと同期が要るため、まとめずに単独で上げる
+      playwright:
+        patterns: ['@playwright/*']
+        update-types: ['minor', 'patch']
       dev-dependencies:
         dependency-type: development
         update-types: ['minor', 'patch']

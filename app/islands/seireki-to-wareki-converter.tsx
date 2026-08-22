@@ -154,6 +154,7 @@ export default function SeirekiToWarekiConverter({ initialYear, initialMonth, in
         <a
           href={reverseUrl}
           class="btn btn-circle rotate-90 btn-outline btn-sm md:rotate-0"
+          aria-label="逆変換"
           title="逆変換"
         >
           ⇄

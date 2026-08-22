@@ -13,8 +13,9 @@ const PAGES = [
   {
     name: 'today',
     path: '/contents/wareki/today',
-    // 日付表示は毎日変わるため、レイアウトだけを見て中身は隠す
-    maskSelector: 'div.flex.flex-col.items-center',
+    // 日付表示は毎日変わるため、レイアウトだけを見て中身は隠す。
+    // クラスで指すとマークアップ変更でマスクが外れ、翌日に落ちる
+    maskSelector: '[data-testid="today-date"]',
   },
   {
     name: 'comparison-table',

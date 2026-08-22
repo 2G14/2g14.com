@@ -9,9 +9,24 @@ set -euo pipefail
 cd "$(dirname "$0")/.."
 
 MODE="${1:-update}"
+case "$MODE" in
+  update | --check) ;;
+  *)
+    echo "不明な引数: ${MODE}(使い方: $0 [--check])" >&2
+    exit 1
+    ;;
+esac
+
 PORT=8787
 PW_VERSION="$(npx playwright --version | sed 's/^Version //')"
 IMAGE="mcr.microsoft.com/playwright:v${PW_VERSION}-noble"
+
+# 既に何かが待ち受けていると、そのサーバーに対して撮影してしまう。
+# 既定モードが update なので、古いビルドの画像が基準として残るのが最も怖い
+if curl -sf "http://localhost:${PORT}/" > /dev/null 2>&1; then
+  echo "ポート ${PORT} は既に使用されています。停止してから実行してください。" >&2
+  exit 1
+fi
 
 npm run build
 
@@ -20,10 +35,28 @@ SERVER_PID=$!
 trap 'kill "$SERVER_PID" 2>/dev/null || true' EXIT
 
 echo "waiting for http://localhost:${PORT} ..."
+ready=false
 for _ in $(seq 1 60); do
-  if curl -sf "http://localhost:${PORT}/" >/dev/null; then break; fi
+  if ! kill -0 "$SERVER_PID" 2> /dev/null; then
+    echo "wrangler dev が起動前に終了しました。" >&2
+    exit 1
+  fi
+  if curl -sf "http://localhost:${PORT}/" > /dev/null; then
+    ready=true
+    break
+  fi
   sleep 1
 done
+
+if [ "$ready" != true ]; then
+  echo "http://localhost:${PORT} が 60 秒以内に応答しませんでした。" >&2
+  exit 1
+fi
+
+PW_ARGS=(--project=visual)
+if [ "$MODE" != "--check" ]; then
+  PW_ARGS+=(--update-snapshots)
+fi
 
 docker run --rm \
   -v "$PWD:/work" -w /work \
@@ -33,7 +66,7 @@ docker run --rm \
   -e CI=1 \
   -e "E2E_BASE_URL=http://host.docker.internal:${PORT}" \
   "$IMAGE" \
-  npx playwright test --project=visual $([ "$MODE" = "--check" ] || echo --update-snapshots)
+  npx playwright test "${PW_ARGS[@]}"
 
 if [ "$MODE" != "--check" ]; then
   echo "スナップショットを更新しました。差分を確認してコミットしてください。"

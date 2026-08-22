@@ -1,23 +1,9 @@
-import { expect, test, type Locator, type Page } from '@playwright/test';
+import { expect, test } from '@playwright/test';
+
+import { actUntil, dateInputs, fillUntil } from './helpers.js';
 
 const FROM_SEIREKI = '/contents/wareki/convert-from-seireki';
 const TO_SEIREKI = '/contents/wareki/convert-to-seireki';
-
-function dateInputs(page: Page) {
-  const inputs = page.getByRole('spinbutton');
-  return { year: inputs.nth(0), month: inputs.nth(1), day: inputs.nth(2) };
-}
-
-/**
- * hydration 完了前の入力は island の state に反映されないため、
- * 結果表示が追随するまで入力をやり直す
- */
-async function fillUntil(input: Locator, value: string, expected: Locator) {
-  await expect(async () => {
-    await input.fill(value);
-    await expect(expected).toBeVisible({ timeout: 1_000 });
-  }).toPass({ timeout: 15_000 });
-}
 
 test.describe('西暦→和暦 変換', () => {
   test('クエリで渡した日付が入力欄と変換結果に反映される', async ({ page }) => {
@@ -54,10 +40,12 @@ test.describe('西暦→和暦 変換', () => {
   });
 
   test('逆変換リンクから和暦→西暦へ変換結果を引き継いで遷移できる', async ({ page }) => {
+    // 月/日が 1 のときクエリが省略され、遷移先が「今日」を初期値にしてしまうため
+    // 往復が壊れる(https://github.com/2G14/2g14.com/issues/25)。ここでは 15 日で確認する
     await page.goto(`${FROM_SEIREKI}?year=2020&month=5&day=15`);
     await expect(page.getByText('令和2年5月15日')).toBeVisible();
 
-    await page.getByTitle('逆変換').click();
+    await page.getByRole('link', { name: '逆変換' }).click();
 
     await expect(page).toHaveURL(new RegExp(`${TO_SEIREKI}\\?`, 'u'));
     await expect(page.getByRole('combobox')).toHaveValue('令和');
@@ -81,10 +69,10 @@ test.describe('和暦→西暦 変換', () => {
     await page.goto(`${TO_SEIREKI}?era=${encodeURIComponent('平成')}&year=10&month=5&day=1`);
     await expect(page.getByText('1998年5月1日')).toBeVisible();
 
-    await expect(async () => {
-      await page.getByRole('combobox').selectOption('昭和');
-      await expect(page.getByText('1935年5月1日')).toBeVisible({ timeout: 1_000 });
-    }).toPass({ timeout: 15_000 });
+    await actUntil(
+      () => page.getByRole('combobox').selectOption('昭和'),
+      page.getByText('1935年5月1日'),
+    );
   });
 
   test('その元号に存在しない日付でエラーが表示される', async ({ page }) => {

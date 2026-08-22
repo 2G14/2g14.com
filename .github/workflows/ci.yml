@@ -55,7 +55,6 @@ jobs:
           node-version: '24'
           cache: npm
       - run: npm ci
-      - run: npx playwright install --with-deps chromium
       - parallel:
           - run: npm run typecheck
           - run: npm run jscpd
@@ -64,6 +63,9 @@ jobs:
           - run: npm run format:check
           - run: npx vitest run
           - run: npm run build
+          # 公式がキャッシュを非推奨としているため毎回入れる。
+          # 他のチェックと並列にして実質的な待ち時間をなくす
+          - run: npx playwright install --with-deps chromium
       # 並列グループの build 成果物を wrangler dev で配信してブラウザから検証する
       - run: npx playwright test --project=chromium
       - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1

@@ -35,7 +35,7 @@ for (const { path, title, heading } of PAGES) {
   });
 }
 
-test('全ページが lang="ja" で描画される', async ({ page }) => {
+test('HTML シェルが lang="ja" で描画される', async ({ page }) => {
   await page.goto('/contents/wareki');
 
   await expect(page.locator('html')).toHaveAttribute('lang', 'ja');
