@@ -91,6 +91,7 @@ export default function SeirekiCalendar({ year, month, day, onDateSelect }: Seir
         </>
       }
       canGoPrevMonth={canGoPrevMonth}
+      canGoNextMonth
       onPrevMonth={goPrevMonth}
       onNextMonth={goNextMonth}
     >

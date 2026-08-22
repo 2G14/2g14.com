@@ -4,7 +4,7 @@ interface CalendarFrameProps {
   heading: Child;
   headerExtra?: Child;
   canGoPrevMonth: boolean;
-  canGoNextMonth?: boolean;
+  canGoNextMonth: boolean;
   onPrevMonth: () => void;
   onNextMonth: () => void;
   children: Child;
@@ -14,7 +14,7 @@ export default function CalendarFrame({
   heading,
   headerExtra,
   canGoPrevMonth,
-  canGoNextMonth = true,
+  canGoNextMonth,
   onPrevMonth,
   onNextMonth,
   children,
