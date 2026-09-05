@@ -40,21 +40,17 @@ permissions:
 
 jobs:
   visual:
-    # matrix の値がチェック名に入ると、Playwright を上げるたびに名前が変わる
-    name: visual
     runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        # container.image では env コンテキストが使えないため、バージョンは
-        # matrix で一箇所に置く。@playwright/test を更新したらここだけ直す
-        playwright: ['1.62.1']
     # 日本語フォントのレンダリングを揃えるため、スナップショット生成に使うのと同じ
     # Playwright 公式イメージ上で実行する。
     # actions と違い digest ピンしていないのは、digest からバージョンを読めず
     # 下のバージョン整合チェックと二重管理になるため。同じタグが差し替わって
     # 基準画像とずれた場合も、このジョブが落ちて基準を更新すれば回復できる
     container:
-      image: mcr.microsoft.com/playwright:v${{ matrix.playwright }}-noble
+      # @playwright/test を更新したら、このタグと下の EXPECTED の両方を直す。
+      # matrix にまとめるとチェック名がバージョン入りになり更新のたびに変わるため、
+      # 2 箇所に置いたうえで不一致を次の step で検出する
+      image: mcr.microsoft.com/playwright:v1.62.1-noble
     steps:
       - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
         with:
@@ -72,11 +68,11 @@ jobs:
       # エラーで落ちるため、先に検出して直し方を示す
       - name: container イメージと @playwright/test のバージョン整合を確認
         env:
-          EXPECTED: ${{ matrix.playwright }}
+          EXPECTED: '1.62.1'
         run: |
           installed="$(npx playwright --version | sed 's/^Version //')"
           if [ "$installed" != "$EXPECTED" ]; then
-            echo "::error::@playwright/test が $installed に更新されています。このワークフローの matrix.playwright を $installed に更新してください。"
+            echo "::error::@playwright/test が $installed に更新されています。このワークフローの container.image と EXPECTED を $installed に更新してください。"
             exit 1
           fi
       - run: npm run build
