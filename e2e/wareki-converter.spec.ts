@@ -48,7 +48,7 @@ test.describe('西暦→和暦 変換', () => {
     await page.getByRole('link', { name: '逆変換' }).click();
 
     await expect(page).toHaveURL(new RegExp(`${TO_SEIREKI}\\?`, 'u'));
-    await expect(page.getByRole('combobox')).toHaveValue('令和');
+    await expect(page.getByRole('combobox', { name: '元号' })).toHaveValue('令和');
     const { year, month, day } = dateInputs(page);
     await expect(year).toHaveValue('2');
     await expect(month).toHaveValue('5');
@@ -61,7 +61,7 @@ test.describe('和暦→西暦 変換', () => {
   test('クエリで渡した和暦が入力欄と変換結果に反映される', async ({ page }) => {
     await page.goto(`${TO_SEIREKI}?era=${encodeURIComponent('平成')}&year=1&month=1&day=8`);
 
-    await expect(page.getByRole('combobox')).toHaveValue('平成');
+    await expect(page.getByRole('combobox', { name: '元号' })).toHaveValue('平成');
     await expect(page.getByText('1989年1月8日')).toBeVisible();
   });
 
@@ -70,16 +70,52 @@ test.describe('和暦→西暦 変換', () => {
     await expect(page.getByText('1998年5月1日')).toBeVisible();
 
     await actUntil(
-      () => page.getByRole('combobox').selectOption('昭和'),
+      () => page.getByRole('combobox', { name: '元号' }).selectOption('昭和'),
       page.getByText('1935年5月1日'),
     );
   });
 
+  test('入力の変更に追随して URL のクエリが書き換わる', async ({ page }) => {
+    await page.goto(`${TO_SEIREKI}?era=${encodeURIComponent('平成')}&year=10&month=5&day=1`);
+
+    await fillUntil(dateInputs(page).year, '20', page.getByText('2008年5月1日'));
+
+    await expect(page).toHaveURL(/year=20/u);
+    await expect(page).toHaveURL(new RegExp(`era=${encodeURIComponent('平成')}`, 'u'));
+  });
+
+  test('逆変換リンクから西暦→和暦へ変換結果を引き継いで遷移できる', async ({ page }) => {
+    await page.goto(`${TO_SEIREKI}?era=${encodeURIComponent('平成')}&year=10&month=5&day=15`);
+    await expect(page.getByText('1998年5月15日')).toBeVisible();
+
+    await page.getByRole('link', { name: '逆変換' }).click();
+
+    await expect(page).toHaveURL(new RegExp(`${FROM_SEIREKI}\\?`, 'u'));
+    const { year, month, day } = dateInputs(page);
+    await expect(year).toHaveValue('1998');
+    await expect(month).toHaveValue('5');
+    await expect(day).toHaveValue('15');
+    await expect(page.getByText('平成10年5月15日')).toBeVisible();
+  });
+
   test('その元号に存在しない日付でエラーが表示される', async ({ page }) => {
+    // 令和は 2019-05-01 開始で、令和1年1月1日は存在しない
     await page.goto(`${TO_SEIREKI}?era=${encodeURIComponent('令和')}&year=1&month=1&day=1`);
 
-    await expect(page.getByRole('alert')).toBeVisible();
+    await expect(page.getByRole('alert')).toContainText('令和');
   });
+});
+
+test('月/日が 1 でも逆変換の往復で日付が保たれる', async ({ page }) => {
+  // #25 が直るまで失敗する。修正されると「予期せず成功した」で落ちるので気づける
+  test.fail();
+
+  await page.goto(`${FROM_SEIREKI}?year=2020&month=1&day=1`);
+  await expect(page.getByText('令和2年1月1日')).toBeVisible();
+
+  await page.getByRole('link', { name: '逆変換' }).click();
+
+  await expect(page.getByText('2020年1月1日')).toBeVisible();
 });
 
 test.describe('JavaScript 無効時', () => {

@@ -40,6 +40,8 @@ permissions:
 
 jobs:
   visual:
+    # matrix の値がチェック名に入ると、Playwright を上げるたびに名前が変わる
+    name: visual
     runs-on: ubuntu-latest
     strategy:
       matrix:

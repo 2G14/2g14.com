@@ -36,7 +36,9 @@ const PAGES = [
 
 async function settle(page: Page) {
   // toHaveScreenshot 自体が連続フレームの安定まで待つため、フォントの読み込みだけ待てばよい
-  await page.evaluate(() => document.fonts.ready);
+  await page.evaluate(async () => {
+    await document.fonts.ready;
+  });
 }
 
 function screenshotOptions(page: Page, maskSelector: string | undefined) {
