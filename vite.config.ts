@@ -15,8 +15,8 @@ export default defineConfig({
     build(),
   ],
   test: {
-    // ドメインロジックのテストだけを対象にする。既定の include は全階層を舐めるため、
-    // Playwright の e2e/*.spec.ts と .claude/worktrees/ 配下の複製まで拾ってしまう
+    // 既定の include は全階層を舐めるため、Playwright の e2e/*.spec.ts と
+    // .claude/worktrees/ 配下の複製まで拾ってしまう
     include: ['src/**/*.test.ts'],
   },
 });
