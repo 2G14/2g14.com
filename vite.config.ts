@@ -1,9 +1,9 @@
+/// <reference types="vitest/config" />
 import build from '@hono/vite-build/cloudflare-workers';
 import adapter from '@hono/vite-dev-server/cloudflare';
 import tailwindcss from '@tailwindcss/vite';
 import honox from 'honox/vite';
 import { defineConfig } from 'vite';
-import { configDefaults } from 'vitest/config';
 
 export default defineConfig({
   plugins: [
@@ -15,8 +15,8 @@ export default defineConfig({
     build(),
   ],
   test: {
-    // e2e/ は Playwright が実行する。.claude/worktrees/ は作業用の複製で、
-    // 放置すると同じテストが worktree の数だけ多重実行される
-    exclude: [...configDefaults.exclude, 'e2e/**', '.claude/**'],
+    // ドメインロジックのテストだけを対象にする。既定の include は全階層を舐めるため、
+    // Playwright の e2e/*.spec.ts と .claude/worktrees/ 配下の複製まで拾ってしまう
+    include: ['src/**/*.test.ts'],
   },
 });
