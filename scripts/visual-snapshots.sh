@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# ビジュアルリグレッションの基準スナップショットを更新する(--check で比較のみ)。
+# ビジュアルリグレッションの比較を行う(--update で基準スナップショットを更新)。
 #
 # フォントのレンダリングは OS ごとに変わるため、スナップショットは CI と同じ Linux で
 # 生成したものだけを基準とする。ホストで wrangler dev を立て、Playwright 公式イメージの
@@ -8,11 +8,12 @@ set -euo pipefail
 
 cd "$(dirname "$0")/.."
 
-MODE="${1:-update}"
+# 既定は比較。引数なしの実行が基準の書き換えにならないようにする
+MODE="${1:-check}"
 case "$MODE" in
-  update | --check) ;;
+  check | --update) ;;
   *)
-    echo "不明な引数: ${MODE}(使い方: $0 [--check])" >&2
+    echo "不明な引数: ${MODE}(使い方: $0 [--update])" >&2
     exit 1
     ;;
 esac
@@ -56,7 +57,7 @@ if [ "$ready" != true ]; then
 fi
 
 PW_ARGS=(--project=visual)
-if [ "$MODE" != "--check" ]; then
+if [ "$MODE" = "--update" ]; then
   PW_ARGS+=(--update-snapshots)
 fi
 
@@ -73,6 +74,6 @@ docker run --rm \
   "$IMAGE" \
   npx playwright test "${PW_ARGS[@]}"
 
-if [ "$MODE" != "--check" ]; then
+if [ "$MODE" = "--update" ]; then
   echo "スナップショットを更新しました。差分を確認してコミットしてください。"
 fi
