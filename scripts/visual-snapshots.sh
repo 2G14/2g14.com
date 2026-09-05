@@ -8,7 +8,7 @@ set -euo pipefail
 
 cd "$(dirname "$0")/.."
 
-# 既定は比較。引数なしの実行が基準の書き換えにならないようにする
+# 引数なしの実行が基準の書き換えにならないようにする
 MODE="${1:-check}"
 case "$MODE" in
   check | --update) ;;
@@ -23,7 +23,7 @@ PW_VERSION="$(npx playwright --version | sed 's/^Version //')"
 IMAGE="mcr.microsoft.com/playwright:v${PW_VERSION}-noble"
 
 # 既に何かが待ち受けていると、そのサーバーに対して撮影してしまう。
-# 既定モードが update なので、古いビルドの画像が基準として残るのが最も怖い
+# --update では、古いビルドの画面がそのまま基準として焼き付く
 if curl -sf "http://localhost:${PORT}/" > /dev/null 2>&1; then
   echo "ポート ${PORT} は既に使用されています。停止してから実行してください。" >&2
   exit 1

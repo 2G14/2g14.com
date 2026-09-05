@@ -50,6 +50,5 @@ test('目次のリンクから元号セクションへアンカー移動でき�
   // DOM 順で撃ち分けている(https://github.com/2G14/2g14.com/issues/26)
   await page.getByRole('link', { name: '昭和' }).first().click();
 
-  // ハッシュは percent-encoding されるため、デコードして比較する
   await expect.poll(() => decodeURIComponent(page.url())).toContain('#昭和');
 });
