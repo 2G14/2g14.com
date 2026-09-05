@@ -12,6 +12,9 @@ export default defineConfig({
   fullyParallel: true,
   forbidOnly: isCI,
   retries: isCI ? 1 : 0,
+  // actUntil が hydration 待ちを吸収しているため、それでも落ちるものは本物のレース。
+  // リトライで通っても success にしない
+  failOnFlakyTests: isCI,
   reporter: isCI ? [['github'], ['html', { open: 'never' }]] : [['list']],
   use: {
     baseURL: externalBaseURL ?? LOCAL_URL,

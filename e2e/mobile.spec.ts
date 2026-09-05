@@ -33,6 +33,7 @@ const tocToggle = (page: Page) => page.getByRole('banner').getByText('目次');
 test('対比表の目次がドロワーに収まり、サイドバーは表示されない', async ({ page }) => {
   await page.goto('/contents/wareki/comparison-table');
 
+  // 非表示の要素はアクセシビリティツリーに現れず getByRole('complementary') では取れない。
   // toBeHidden は要素そのものが無くても通るため、存在も併せて確かめる
   await expect(page.locator('aside')).toHaveCount(1);
   await expect(page.locator('aside')).toBeHidden();

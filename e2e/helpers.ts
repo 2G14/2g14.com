@@ -40,6 +40,9 @@ export async function openCalendar(page: Page): Promise<Locator> {
 }
 
 export function dateInputs(page: Page): DateInputs {
-  const inputs = page.getByRole('spinbutton');
-  return { year: inputs.nth(0), month: inputs.nth(1), day: inputs.nth(2) };
+  return {
+    year: page.getByRole('spinbutton', { name: '年' }),
+    month: page.getByRole('spinbutton', { name: '月' }),
+    day: page.getByRole('spinbutton', { name: '日' }),
+  };
 }
