@@ -67,9 +67,8 @@ test.describe('デスクトップ', () => {
 });
 
 test.describe('モバイル', () => {
-  // describe 内で指定できないのは defaultBrowserType だけなので、そこだけ除いて
-  // isMobile / hasTouch / deviceScaleFactor まで実機どおりに揃える。
-  // これらが欠けると (hover: hover) や (pointer: coarse) が実機と逆に評価される
+  // defaultBrowserType だけは describe 内で指定できないため除いている。
+  // isMobile / hasTouch が欠けると (hover: hover) や (pointer: coarse) が実機と逆に評価される
   test.use(pixel5);
 
   definePageSnapshots('mobile');
