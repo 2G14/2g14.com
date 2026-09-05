@@ -51,7 +51,7 @@ npx vitest run src/domain/wareki/era.test.ts  # 単一ファイルテスト
 
 - ルート追加は `app/routes/` 配下にファイルを置く（HonoX ファイルベースルーティング）
 - ドメインロジックは `src/domain/` に置き、HonoX/Hono に依存させない
-- テストファイルは対象ファイルと同じディレクトリに `*.test.ts` で配置
+- テストファイルは対象ファイルと同じディレクトリに `*.test.ts(x)` で配置
 - `lang="ja"` が `_renderer.tsx` で設定済み
 - ドメインモデルでは Branded types を使いファクトリ関数経由でバリデーション済みオブジェクトを保証する
 
