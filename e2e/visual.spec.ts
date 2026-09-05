@@ -1,4 +1,4 @@
-import { expect, test, type Page } from '@playwright/test';
+import { devices, expect, test, type Page } from '@playwright/test';
 
 // スナップショットはフォントのレンダリングが OS で変わるため、CI と同じ Linux で
 // 生成したものだけを基準として管理する。更新は scripts/visual-snapshots.sh
@@ -6,6 +6,8 @@ test.skip(
   process.platform !== 'linux',
   'ビジュアル比較は Linux で生成したスナップショットを基準にしている',
 );
+
+const { defaultBrowserType: _defaultBrowserType, ...pixel5 } = devices['Pixel 5'];
 
 const PAGES = [
   { name: 'top', path: '/' },
@@ -65,9 +67,10 @@ test.describe('デスクトップ', () => {
 });
 
 test.describe('モバイル', () => {
-  // devices[...] は defaultBrowserType を含み describe 内では指定できないため、
-  // ビジュアル比較で意味を持つビューポートだけを指定する(Pixel 5 相当)
-  test.use({ viewport: { width: 393, height: 851 } });
+  // describe 内で指定できないのは defaultBrowserType だけなので、そこだけ除いて
+  // isMobile / hasTouch / deviceScaleFactor まで実機どおりに揃える。
+  // これらが欠けると (hover: hover) や (pointer: coarse) が実機と逆に評価される
+  test.use(pixel5);
 
   definePageSnapshots('mobile');
 });

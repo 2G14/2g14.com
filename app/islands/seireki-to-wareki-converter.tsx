@@ -118,6 +118,7 @@ export default function SeirekiToWarekiConverter({ initialYear, initialMonth, in
               type="button"
               class="btn btn-square btn-ghost btn-sm"
               onClick={() => setCalendarOpen(!calendarOpen)}
+              aria-label="カレンダーで選択"
               title="カレンダーで選択"
             >
               <svg

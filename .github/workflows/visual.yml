@@ -47,7 +47,10 @@ jobs:
         # matrix で一箇所に置く。@playwright/test を更新したらここだけ直す
         playwright: ['1.62.1']
     # 日本語フォントのレンダリングを揃えるため、スナップショット生成に使うのと同じ
-    # Playwright 公式イメージ上で実行する
+    # Playwright 公式イメージ上で実行する。
+    # actions と違い digest ピンしていないのは、digest からバージョンを読めず
+    # 下のバージョン整合チェックと二重管理になるため。同じタグが差し替わって
+    # 基準画像とずれた場合も、このジョブが落ちて基準を更新すれば回復できる
     container:
       image: mcr.microsoft.com/playwright:v${{ matrix.playwright }}-noble
     steps:
