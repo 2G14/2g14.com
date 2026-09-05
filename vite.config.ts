@@ -15,6 +15,6 @@ export default defineConfig({
     build(),
   ],
   test: {
-    include: ['src/**/*.test.ts'],
+    include: ['src/**/*.test.ts', 'app/**/*.test.{ts,tsx}'],
   },
 });

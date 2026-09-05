@@ -54,3 +54,10 @@ npx vitest run src/domain/wareki/era.test.ts  # 単一ファイルテスト
 - テストファイルは対象ファイルと同じディレクトリに `*.test.ts` で配置
 - `lang="ja"` が `_renderer.tsx` で設定済み
 - ドメインモデルでは Branded types を使いファクトリ関数経由でバリデーション済みオブジェクトを保証する
+
+### テスト
+
+- 境界値や不正入力の網羅は Vitest(`src/`・`app/`)で行い、e2e はルーティング・SSR・hydration といったレイヤ間の接続だけを見る
+- e2e のセレクタは role とアクセシブルネームで取る。取れない場合は要素側に `aria-label` を与えて取れるようにする
+- `data-testid` はビジュアル比較でマスクする要素にだけ使う（操作対象の指定には使わない）
+- 表示を意図的に変えたら `npm run test:visual:update` で基準スナップショットを更新してコミットする

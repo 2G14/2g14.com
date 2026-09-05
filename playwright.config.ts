@@ -30,6 +30,8 @@ export default defineConfig({
       name: 'visual',
       use: { ...devices['Desktop Chrome'] },
       testMatch: /visual\.spec\.ts/u,
+      // 撮り直しても差分は変わらないため、失敗時に 2 回撮らない
+      retries: 0,
     },
   ],
   // exactOptionalPropertyTypes 下では webServer に undefined を代入できないため、
