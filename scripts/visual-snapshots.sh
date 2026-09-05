@@ -4,6 +4,9 @@
 # フォントのレンダリングは OS ごとに変わるため、スナップショットは CI と同じ Linux で
 # 生成したものだけを基準とする。ホストで wrangler dev を立て、Playwright 公式イメージの
 # コンテナからそこへ接続して撮影する。
+#
+# macOS の Docker Desktop 前提。wrangler dev は localhost にしかバインドせず、
+# Linux では host-gateway が docker0 の IP になって届かない(--ip 0.0.0.0 が要る)。
 set -euo pipefail
 
 cd "$(dirname "$0")/.."
@@ -33,7 +36,7 @@ npm run build
 
 # ホットキー(b/d/x)用の raw mode に入らせない。この用途では使えないうえ、
 # 端末の状態を壊す・docker と入力を取り合う元になる
-npx wrangler dev --port "$PORT" < /dev/null &
+./node_modules/.bin/wrangler dev --port "$PORT" < /dev/null &
 SERVER_PID=$!
 trap 'kill "$SERVER_PID" 2>/dev/null || true' EXIT
 
