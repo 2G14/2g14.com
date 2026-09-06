@@ -102,11 +102,15 @@ test.describe('和暦→西暦 変換', () => {
     // 令和は 2019-05-01 開始で、令和1年1月1日は存在しない
     await page.goto(`${TO_SEIREKI}?era=${encodeURIComponent('令和')}&year=1&month=1&day=1`);
 
-    await expect(page.getByRole('alert')).toContainText('令和');
+    await expect(page.getByRole('alert')).toHaveText('令和1年1月1日は存在しません');
   });
 });
 
 test('月/日が 1 でも逆変換の往復で日付が保たれる', async ({ page }) => {
+  // 遷移先は未指定の月/日を「今日」で埋めるため、1月1日だけは壊れていても往復が成立する
+  const now = new Date();
+  test.skip(now.getMonth() === 0 && now.getDate() === 1, '既定値と期待値が偶然一致する日');
+
   // #25 が直るまで失敗する。修正されると「予期せず成功した」で落ちるので気づける
   test.fail();
 

@@ -70,6 +70,9 @@ jobs:
         env:
           EXPECTED: '1.62.1'
         run: |
+          # image だけ更新して EXPECTED を直し忘れると、このチェックをすり抜ける
+          grep -q "playwright:v${EXPECTED}-noble" .github/workflows/visual.yml \
+            || { echo "::error::container.image と EXPECTED が一致していません"; exit 1; }
           installed="$(npx playwright --version | sed 's/^Version //')"
           if [ "$installed" != "$EXPECTED" ]; then
             echo "::error::@playwright/test が $installed に更新されています。このワークフローの container.image と EXPECTED を $installed に更新してください。"

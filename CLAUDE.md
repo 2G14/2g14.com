@@ -60,4 +60,5 @@ npx vitest run src/domain/wareki/era.test.ts  # 単一ファイルテスト
 - 境界値や不正入力の網羅は Vitest(`src/`・`app/`)で行い、e2e はルーティング・SSR・hydration といったレイヤ間の接続だけを見る
 - e2e のセレクタは role とアクセシブルネームで取る。取れない場合は要素側に `aria-label` を与えて取れるようにする
 - `data-testid` はビジュアル比較でマスクする要素にだけ使う（操作対象の指定には使わない）
+- `app/islands/` にはテストファイルを置けない（islands プラグインが変換対象にするため構文エラーになる）。island を対象にするテストは `app/` 直下に置く
 - 表示を意図的に変えたら `npm run test:visual:update` で基準スナップショットを更新してコミットする
