@@ -16,7 +16,12 @@ beforeAll(() => {
 
 afterAll(() => {
   vi.useRealTimers();
-  process.env['TZ'] = ORIGINAL_TZ;
+  // process.env への代入は文字列化されるため、未設定だった場合は "undefined" が入る
+  if (ORIGINAL_TZ === undefined) {
+    delete process.env['TZ'];
+  } else {
+    process.env['TZ'] = ORIGINAL_TZ;
+  }
 });
 
 // islands は素の new Date() を使っており、修正されると成功して落ちる(issue #27)
