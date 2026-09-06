@@ -42,13 +42,20 @@ export default createRoute((c) => {
   return c.render(
     <ToolPageLayout title="本日の和暦">
       <div class="flex flex-col items-center gap-6 py-12">
-        <p class="text-5xl font-bold sm:text-7xl" data-testid="today-wareki-year">
+        {/* w-full にしないと要素幅が日付の桁数で変わり、ビジュアル比較のマスク幅がぶれる */}
+        <p
+          class="w-full text-center text-5xl font-bold sm:text-7xl"
+          data-testid="today-wareki-year"
+        >
           {displayYear}
         </p>
-        <p class="text-4xl font-bold sm:text-6xl" data-testid="today-wareki-date">
+        <p
+          class="w-full text-center text-4xl font-bold sm:text-6xl"
+          data-testid="today-wareki-date"
+        >
           {displayDate}
         </p>
-        <p class="text-lg text-base-content/60" data-testid="today-seireki">
+        <p class="w-full text-center text-lg text-base-content/60" data-testid="today-seireki">
           （{formatSeireki(seireki)}）
         </p>
       </div>
