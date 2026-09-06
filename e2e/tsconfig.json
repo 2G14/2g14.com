@@ -1,0 +1,8 @@
+{
+  "extends": "../tsconfig.json",
+  "include": ["**/*.ts", "../playwright.config.ts"],
+  "compilerOptions": {
+    // Playwright は Node 上で動くため、Workers 向けの型定義とは別立てにする
+    "types": ["node"]
+  }
+}

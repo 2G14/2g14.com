@@ -1,3 +1,4 @@
+/// <reference types="vitest/config" />
 import build from '@hono/vite-build/cloudflare-workers';
 import adapter from '@hono/vite-dev-server/cloudflare';
 import tailwindcss from '@tailwindcss/vite';
@@ -13,4 +14,7 @@ export default defineConfig({
     tailwindcss(),
     build(),
   ],
+  test: {
+    include: ['src/**/*.test.ts', 'app/**/*.test.{ts,tsx}'],
+  },
 });

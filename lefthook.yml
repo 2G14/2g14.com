@@ -16,6 +16,8 @@ pre-commit:
       glob:
         - 'app/**'
         - 'src/**'
+        - 'e2e/**'
+        - 'playwright.config.ts'
         - 'package.json'
         - 'package-lock.json'
         - 'tsconfig.json'
