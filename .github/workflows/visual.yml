@@ -15,6 +15,8 @@ on:
       - 'e2e/visual.spec.ts'
       - 'e2e/visual.spec.ts-snapshots/**'
       - 'playwright.config.ts'
+      # Tailwind プラグインの設定変更で CSS 出力が変わる
+      - 'vite.config.ts'
       - 'package.json'
       - 'package-lock.json'
       - '.github/workflows/visual.yml'
@@ -27,6 +29,8 @@ on:
       - 'e2e/visual.spec.ts'
       - 'e2e/visual.spec.ts-snapshots/**'
       - 'playwright.config.ts'
+      # Tailwind プラグインの設定変更で CSS 出力が変わる
+      - 'vite.config.ts'
       - 'package.json'
       - 'package-lock.json'
       - '.github/workflows/visual.yml'

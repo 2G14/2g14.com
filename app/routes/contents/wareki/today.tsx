@@ -39,10 +39,14 @@ export default createRoute((c) => {
       </header>
 
       <div class="mx-auto my-8 max-w-5xl px-4">
-        <div class="flex flex-col items-center gap-6 py-12" data-testid="today-date">
-          <p class="text-5xl font-bold sm:text-7xl">{displayYear}</p>
-          <p class="text-4xl font-bold sm:text-6xl">{displayDate}</p>
-          <p class="text-lg text-base-content/60">
+        <div class="flex flex-col items-center gap-6 py-12">
+          <p class="text-5xl font-bold sm:text-7xl" data-testid="today-wareki-year">
+            {displayYear}
+          </p>
+          <p class="text-4xl font-bold sm:text-6xl" data-testid="today-wareki-date">
+            {displayDate}
+          </p>
+          <p class="text-lg text-base-content/60" data-testid="today-seireki">
             （{seireki.year}年{seireki.month}月{seireki.day}日）
           </p>
         </div>

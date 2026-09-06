@@ -22,6 +22,7 @@ npm run lint         # リント
 npm run format       # フォーマット
 npm run test         # テスト (watch mode)
 npm run test:e2e     # Playwright で e2e テスト (build + wrangler dev)
+npm run test:e2e:ui  # Playwright を UI モードで実行
 npm run test:visual  # ビジュアル比較 (Docker 上で実行)
 npm run test:visual:update  # ビジュアル比較の基準スナップショットを更新
 ```

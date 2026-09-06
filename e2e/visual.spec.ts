@@ -15,9 +15,15 @@ const PAGES = [
   {
     name: 'today',
     path: '/contents/wareki/today',
-    // 日付表示は毎日変わるため、レイアウトだけを見て中身は隠す。
-    // クラスで指すとマークアップ変更でマスクが外れ、翌日に落ちる
-    maskSelector: '[data-testid="today-date"]',
+    // 日付そのものは毎日変わるため隠す。visibility で文字を消したうえで
+    // mask で領域を塗る。visibility だけだと白地に溶けて大きさの変化が写らず、
+    // mask だけだと line-height からはみ出したグリフが矩形の外に残る。
+    // クラスで指すとマークアップ変更で対象から外れ、翌日に落ちる
+    hideSelectors: [
+      '[data-testid="today-wareki-year"]',
+      '[data-testid="today-wareki-date"]',
+      '[data-testid="today-seireki"]',
+    ],
   },
   {
     name: 'comparison-table',
@@ -41,13 +47,21 @@ async function settle(page: Page) {
   });
 }
 
-function screenshotOptions(page: Page, maskSelector: string | undefined) {
-  return {
-    mask: maskSelector === undefined ? [] : [page.locator(maskSelector)],
-    // 生成と比較を同じイメージ上で行うためレンダリングは再現する。
-    // 割合で許容すると見出し 1 つ分の変化を見逃すので、実ピクセル数で絞る
-    maxDiffPixels: 100,
-  };
+const SCREENSHOT_OPTIONS = {
+  // 折り返し以下も比較したいので全体を撮る。日付に依存する行数は
+  // クエリで確定させてあるため高さは安定する
+  fullPage: true,
+  // 生成と比較を同じイメージ上で行うためレンダリングは再現する。
+  // 割合で許容すると見出し 1 つ分の変化を見逃すので、実ピクセル数で絞る
+  maxDiffPixels: 100,
+} as const;
+
+async function hide(page: Page, selectors: readonly string[]) {
+  if (selectors.length === 0) return;
+
+  await page.addStyleTag({
+    content: selectors.map((selector) => `${selector} { visibility: hidden; }`).join('\n'),
+  });
 }
 
 function definePageSnapshots(suffix: 'desktop' | 'mobile') {
@@ -55,11 +69,13 @@ function definePageSnapshots(suffix: 'desktop' | 'mobile') {
     test(`${entry.name} の外観`, async ({ page }) => {
       await page.goto(entry.path);
       await settle(page);
+      const hidden = 'hideSelectors' in entry ? entry.hideSelectors : [];
+      await hide(page, hidden);
 
-      await expect(page).toHaveScreenshot(
-        `${entry.name}-${suffix}.png`,
-        screenshotOptions(page, 'maskSelector' in entry ? entry.maskSelector : undefined),
-      );
+      await expect(page).toHaveScreenshot(`${entry.name}-${suffix}.png`, {
+        ...SCREENSHOT_OPTIONS,
+        mask: hidden.map((selector) => page.locator(selector)),
+      });
     });
   }
 }

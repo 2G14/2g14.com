@@ -21,6 +21,14 @@ case "$MODE" in
     ;;
 esac
 
+# Linux では host.docker.internal が 127.0.0.1 のリスナに届かず 60 秒待って死ぬ。
+# 原因の分かる形で先に落とす
+if [ "$(uname)" != "Darwin" ]; then
+  echo "このスクリプトは macOS の Docker Desktop 前提です($(uname) で実行されました)。" >&2
+  echo "Linux で動かすには wrangler dev に --ip 0.0.0.0 を渡すか --network host に切り替えてください。" >&2
+  exit 1
+fi
+
 PORT=8787
 PW_VERSION="$(npx playwright --version | sed 's/^Version //')"
 IMAGE="mcr.microsoft.com/playwright:v${PW_VERSION}-noble"

@@ -24,19 +24,23 @@ afterAll(() => {
   }
 });
 
-// islands は素の new Date() を使っており、修正されると成功して落ちる(issue #27)
-test.fails('クエリなしの西暦→和暦は JST の今日を初期値にする', async () => {
-  const { month, day } = todayInJST();
+// islands は素の new Date() を使うため、TZ=UTC では JST の前日を初期値にする。
+// issue #27 が直るとここが落ちるので、そのとき期待値を todayInJST() 側へ入れ替える。
+// test.fails ではなく正で書くのは、import や描画が壊れた場合も検知するため
+test('クエリなしの西暦→和暦は UTC の今日を初期値にしてしまう', async () => {
+  const jst = todayInJST();
 
   const html = await (<SeirekiToWarekiConverter />).toString();
 
-  expect(html).toContain(`${month}月${day}日`);
+  expect(html).toContain('9月5日');
+  expect(html).not.toContain(`${jst.month}月${jst.day}日`);
 });
 
-test.fails('クエリなしの和暦→西暦は JST の今日を初期値にする', async () => {
-  const { year, month, day } = todayInJST();
+test('クエリなしの和暦→西暦は UTC の今日を初期値にしてしまう', async () => {
+  const jst = todayInJST();
 
   const html = await (<WarekiToSeirekiConverter />).toString();
 
-  expect(html).toContain(`${year}年${month}月${day}日`);
+  expect(html).toContain('2026年9月5日');
+  expect(html).not.toContain(`${jst.year}年${jst.month}月${jst.day}日`);
 });
