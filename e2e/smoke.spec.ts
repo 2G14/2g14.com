@@ -60,7 +60,8 @@ for (const { label, path } of WAREKI_LINKS) {
 
     await page.getByRole('link', { name: label }).click();
 
-    await expect(page).toHaveURL(new RegExp(`${path}$`, 'u'));
+    // 遷移先の island は hydration 後に URL へクエリを足すため、パスだけを見る
+    await expect(page).toHaveURL((url) => url.pathname === path);
   });
 }
 

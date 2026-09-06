@@ -39,7 +39,7 @@ test('絞り込んだ元号の対比表に開始年と終了年の行が並ぶ',
 test('未知の元号を指定すると絞り込みなしのページへリダイレクトされる', async ({ page }) => {
   await page.goto(`${PATH}?era=unknown-era`);
 
-  await expect(page).toHaveURL(new RegExp(`${PATH}$`, 'u'));
+  await expect(page).toHaveURL((url) => url.pathname === PATH && url.search === '');
   await expect(page.getByRole('heading', { level: 2, name: '令和' })).toBeVisible();
 });
 
