@@ -7,8 +7,8 @@ Claude Code を Docker Sandbox (clone mode) で動かすための template + kit
 | ファイル                          | 役割                                                                                                    |
 | --------------------------------- | ------------------------------------------------------------------------------------------------------- |
 | `Dockerfile` / `mise-config.toml` | template。`claude-code-minimal` ベースに mise 経由で node 24 / npm / gh を焼き込み、git を apt で最新化 |
-| `agent-kit/`                      | sandbox kit(汎用)。YOLO なしの claude 起動定義。**現リリースでは未使用**(下記)                          |
-| `project-kit/`                    | mixin kit(このリポ固有)。`mise.jdx.dev` の許可と agentContext を注入                                    |
+| `agent-kit/`                      | sandbox kit(汎用)。built-in claude を継承し YOLO なしで起動する                                        |
+| `project-kit/`                    | mixin kit(このリポ固有)。`mise.jdx.dev` の許可と agentInstructions を注入                              |
 | `sandbox.sh`                      | build / run のラッパー                                                                                  |
 
 ## 初回セットアップ(一度だけ)
@@ -29,22 +29,21 @@ sbx secret set anthropic
 ```
 
 - 依存はインストールされないため、セッション冒頭に `npm install` を実行する
-  (agentContext でエージェントにも指示済み)
+  (agentInstructions でエージェントにも指示済み)
 - エージェントのコミットはホスト側の `sandbox-<name>` git リモートから取り込める
 
 ## YOLO モードについて
 
-sbx は claude を `--dangerously-skip-permissions`(YOLO)付きで起動する。
-現状これを宣言的に無効化する手段はない:
+sbx の built-in claude は `--dangerously-skip-permissions`(YOLO)付きで
+起動するため、`agent-kit/` で `extends: claude` してフラグを差し替えている。
+`extends` により OAuth 認証とエージェント設定の生成は built-in のまま継承される。
 
-- 公式手段は custom sandbox kit(`agent-kit/` がそれ)だが、デーモンが
-  built-in エージェントのみ受け付けるため使えない(v0.37.1 時点でも拒否を確認)
-- さらに sandbox kit は OAuth credential 注入が効かない既知バグがある
-  ([sbx-releases#242](https://github.com/docker/sbx-releases/issues/242)、
-  経緯は [#47](https://github.com/docker/sbx-releases/issues/47))
+書き換えで踏みやすい点が2つある:
 
-当面は起動後に `/permissions` で手動切替する。上記が解消されたら
-`sandbox.sh` の `cmd_run` を agent-kit 経由の起動に戻す。
+- kit の `name:` を数字で始めると、`unknown agent ...
+  (built-in agents only in this release)` という無関係なエラーで拒否される
+- `command` に空配列を置くと未指定として親の YOLO フラグを継承してしまうため、
+  非空の引数で上書きする必要がある
 
 ## ツールの更新
 

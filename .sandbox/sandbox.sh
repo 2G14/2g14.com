@@ -26,14 +26,12 @@ cmd_build() {
   sbx template load "$tar"
 }
 
-# agent-kit(YOLO 無効化)はデーモンが custom agent kit を拒否するため未使用
-# (v0.37.1 時点でも拒否を確認)。sbx-releases issue #47 / #242 の解消後に組み込む。
 cmd_run() {
   cd "$REPO_ROOT"
   sbx run --clone \
-    -t docker.io/library/2g14-sandbox:latest \
+    --kit "$SANDBOX_DIR/agent-kit" \
     --kit "$SANDBOX_DIR/project-kit" \
-    claude .
+    claude-2g14 .
 }
 
 case "${1:-}" in
