@@ -16,7 +16,8 @@ EOF
 }
 
 cmd_build() {
-  docker build -t "$IMAGE_TAG" "$SANDBOX_DIR"
+  # --pull なしだとベースが古いまま残り、同梱 claude が新しい起動フラグを拒否する
+  docker build --pull -t "$IMAGE_TAG" "$SANDBOX_DIR"
   # sbx のランタイムは docker daemon と別なので tar 経由でロードする
   local tmpdir tar
   tmpdir="$(mktemp -d -t 2g14-sandbox)"

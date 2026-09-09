@@ -35,15 +35,10 @@ sbx secret set anthropic
 ## YOLO モードについて
 
 sbx の built-in claude は `--dangerously-skip-permissions`(YOLO)付きで
-起動するため、`agent-kit/` で `extends: claude` してフラグを差し替えている。
-`extends` により OAuth 認証とエージェント設定の生成は built-in のまま継承される。
-
-書き換えで踏みやすい点が2つある:
-
-- kit の `name:` を数字で始めると、`unknown agent ...
-  (built-in agents only in this release)` という無関係なエラーで拒否される
-- `command` に空配列を置くと未指定として親の YOLO フラグを継承してしまうため、
-  非空の引数で上書きする必要がある
+起動する。`agent-kit/` はこれを外すための kit で、公式の
+[claude-safe の例](https://docs.docker.com/ai/sandboxes/customize/kit-examples/)
+に自作 template の `image` を足しただけの構成になっている。
+`extends` により OAuth 認証とエージェント設定の生成は built-in から継承される。
 
 ## ツールの更新
 
