@@ -1,0 +1,11 @@
+schemaVersion: '2'
+kind: sandbox
+# 数字で始まる名前は built-in agents only という無関係なエラーで拒否される
+name: claude-2g14
+displayName: Claude Code (no YOLO, mise toolchain)
+description: mise 経由で node/gh を導入した template 上で Claude Code を承認プロンプト付きで起動する。
+extends: claude
+
+sandbox:
+  image: docker.io/library/2g14-sandbox:latest
+  entrypoint: [claude, '--permission-mode', 'manual']
