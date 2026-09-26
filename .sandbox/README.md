@@ -18,8 +18,12 @@ Claude Code を Docker Sandbox (clone mode) で動かすための template + kit
 sbx secret set github
 
 # Anthropic 認証が未登録なら
-sbx secret set anthropic
+sbx secret set anthropic --oauth
 ```
+
+初回の `run` では、agent-kit に Anthropic の認証情報を渡してよいかを
+確認するプロンプトが出るので許可する。非対話で起動すると拒否扱いになり、
+`no binding authorizes anthropic` と表示されて認証情報が注入されない。
 
 ## 使い方
 

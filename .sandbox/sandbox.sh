@@ -30,9 +30,8 @@ cmd_build() {
 cmd_run() {
   cd "$REPO_ROOT"
   sbx run --clone \
-    --kit "$SANDBOX_DIR/agent-kit" \
     --kit "$SANDBOX_DIR/project-kit" \
-    claude-2g14 .
+    "$SANDBOX_DIR/agent-kit" .
 }
 
 case "${1:-}" in
