@@ -16,14 +16,19 @@ Claude Code を Docker Sandbox (clone mode) で動かすための template + kit
 ```bash
 # GitHub トークンを登録(proxy が代理認証。実トークンはサンドボックスに入らない)
 sbx secret set github
-
-# Anthropic 認証が未登録なら
-sbx secret set anthropic --oauth
 ```
+
+Anthropic の OAuth は `sbx secret set` からは開始できず、サンドボックス内の
+Claude で `/login` してサインインする。proxy がトークンをホスト側に保存し、
+サンドボックス内にはダミー値だけが残る。
 
 初回の `run` では、agent-kit に Anthropic の認証情報を渡してよいかを
 確認するプロンプトが出るので許可する。非対話で起動すると拒否扱いになり、
 `no binding authorizes anthropic` と表示されて認証情報が注入されない。
+
+sbx は built-in claude 用に `defaultMode: bypassPermissions` の設定を
+シードするが、起動フラグの `--permission-mode manual` が優先される。
+`ls` のような読み取り専用コマンドは manual でも承認なしで実行される。
 
 ## 使い方
 
