@@ -29,4 +29,4 @@ RUN echo 'eval "$(mise activate bash)"' >> /home/agent/.bashrc
 
 ENV IS_SANDBOX=1
 WORKDIR /home/agent/workspace
-ENTRYPOINT ["claude", "--permission-mode", "manual"]
+ENTRYPOINT ["claude"]

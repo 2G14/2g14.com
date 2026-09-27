@@ -3,16 +3,9 @@ schemaVersion: "3"
 kind: mixin
 displayName: 2g14.com project mixin
 # description はエージェントの CLAUDE.md の目次に載り、本文は必要時にだけ読まれる
-description: 作業を始める前に読むこと。npm install の要否と導入済みツールの説明
+description: 作業を始める前に読むこと。このリポで最初に必要な準備
 
 capabilities:
-  - type: com.docker.sandbox/network-policy@1
-    config:
-      runtime:
-        allow:
-          # balanced ポリシーでは mise バイナリの配布元だけが default deny のため
-          - mise.jdx.dev:443
-
   - type: com.docker.sandbox/agent-context@1
     config:
       contentFile: ./project-context.md

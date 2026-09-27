@@ -50,3 +50,8 @@ If you accidentally added completion scripts and broke the shell:
 1. Remove the completion line(s) from `/etc/sandbox-persistent.sh`
 2. Exit and restart the Claude Code session
 3. Verify with `echo "test"` that bash works again
+
+## 導入済みツール
+
+node / npm / gh は mise、git は apt で導入済み(PATH 設定済み)。ワークスペースに
+`mise.toml` があれば、そこで固定された版が初回実行時にインストールされる。

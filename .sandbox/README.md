@@ -4,15 +4,17 @@ Claude Code を Docker Sandbox (clone mode) で、承認プロンプト付きで
 
 ## 構成
 
-| ファイル       | 役割                                                                                                   |
-| -------------- | ------------------------------------------------------------------------------------------------------ |
-| `claude-2g14/` | workload。`claude-code-minimal` ベースに claude・mise 経由の node / npm / gh・apt の git を入れて起動する |
-| `project/`     | mixin。`mise.jdx.dev` の許可と、このリポ向けのエージェント用コンテキストを加える                       |
-| `sandbox.sh`   | 起動用のラッパー                                                                                       |
+| ファイル       | 役割                                                                                                                            |
+| -------------- | ------------------------------------------------------------------------------------------------------------------------------- |
+| `claude-2g14/` | workload。`claude-code-minimal` ベースに claude・mise 経由の node / npm / gh・apt の git を入れて起動する。ほかのリポでも使える |
+| `project/`     | mixin。このリポ固有のエージェント向け指示だけを加える                                                                           |
+| `sandbox.sh`   | 起動用のラッパー                                                                                                                |
 
 `claude-2g14/` は公式の
 [examples/claude](https://github.com/docker/sandbox-kit-spec/tree/main/examples/claude)
-を基にしており、差分は YOLO モードを外したことと Dockerfile のベースとツール導入だけ。
+を基にしている。差分は YOLO モードを外したこと(起動時に `--dangerously-skip-permissions`
+を渡さず、`bypassPermissions` の設定もシードしない)と、Dockerfile のベースとツール導入、
+そのツールが使う通信の許可だけ。
 
 ## 初回セットアップ(一度だけ)
 
