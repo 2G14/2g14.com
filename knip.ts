@@ -1,8 +1,14 @@
 import type { KnipConfig } from 'knip';
 
 export default {
-  entry: ['app/server.ts', 'app/client.ts', 'app/routes/**/*.{ts,tsx}', 'app/style.css'],
-  project: ['app/**/*.{ts,tsx,css}', 'src/**/*.ts'],
+  entry: [
+    'app/server.ts',
+    'app/client.ts',
+    'app/routes/**/*.{ts,tsx}',
+    'app/style.css',
+    'e2e/**/*.spec.ts',
+  ],
+  project: ['app/**/*.{ts,tsx,css}', 'src/**/*.ts', 'e2e/**/*.ts'],
   compilers: {
     // CSS の @import / @plugin は knip が解釈できないため import 文へ変換する
     css: (text: string) =>
