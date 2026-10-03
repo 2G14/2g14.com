@@ -52,15 +52,17 @@ sbx env run
 kit はサンドボックスの作成時にビルドされ、変更がなければ再利用される。
 `sbx env` は Experimental で、コマンドやファイル形式が変わる可能性がある。
 
-- npm 依存はサンドボックスの起動時に `npm ci` で入る。`node_modules` が既にあれば何もしない。
-  失敗しても起動は続くので、依存が無ければ `/var/log/sbx-kit-startup.log` を確認する
+- npm 依存はサンドボックスの起動時に `npm ci` で入る。インストールが完了していれば
+  (`node_modules/.package-lock.json` があれば)何もしない。失敗しても起動は続き、原因は
+  `/var/log/sbx-kit-startup.log` に残る。エージェントにも、目印が無ければ `npm ci` するよう伝えている
 - エージェントのコミットはホスト側の `sandbox-<name>` git リモートから取り込める
 - `ls` のような読み取り専用コマンドは承認なしで実行される。YOLO が外れているかは
   書き込みを伴う操作で確かめる
 
 ## ツールの更新
 
-- claude: `claude-2g14/claude-2g14.yaml` の `version` 引数で固定している
+- claude: ビルド時に入れる版を `claude-2g14/claude-2g14.yaml` の `version` 引数で決めている。
+  実行中は claude 自身の自動更新で新しい版に上がる
 - node / npm: リポ直下の `mise.toml` と `claude-2g14/mise-config.toml` の両方を同じ版にそろえる。
   kit のビルドからは `mise.toml` を参照できないため、2か所に書いている。ずれていると
   初回実行時に mise が `mise.toml` 側の版をダウンロードし直す

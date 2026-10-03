@@ -2,15 +2,21 @@
 schemaVersion: "3"
 kind: mixin
 displayName: 2g14.com project mixin
-description: このリポの npm 依存をサンドボックスの起動時に入れる
+# description はエージェントの CLAUDE.md の目次に常に載るので、失敗時の対処をここに書く
+description: npm 依存は起動時に npm ci で入れている。node_modules/.package-lock.json が無ければ失敗しているので、作業前に npm ci を実行すること
 
 capabilities:
   - type: com.docker.sandbox/lifecycle@1
     config:
       startup:
         # install ではなく startup に置くのは、install の時点ではまだ clone が無いため。
+        # node_modules の有無で判定しないのは、途中で失敗した残骸を完了と誤認するため。
         # 失敗しても終了コードを 0 にするのは、startup の失敗でサンドボックスが起動しなくなるため
-        - command: [sh, -c, 'export PATH="$HOME/.local/share/mise/shims:$PATH"; cd "$WORKSPACE_DIR" && { [ -d node_modules ] || npm ci --no-audit --no-fund; } || echo "npm ci failed" >&2']
+        - command: [sh, -c, 'export PATH="$HOME/.local/share/mise/shims:$PATH"; cd "$WORKSPACE_DIR" && { [ -f node_modules/.package-lock.json ] || npm ci --no-audit --no-fund; } || echo "npm ci failed" >&2']
           user: agent
           env: [WORKSPACE_DIR]
           description: Install npm dependencies once the clone exists
+
+  - type: com.docker.sandbox/agent-context@1
+    config:
+      contentFile: ./project-context.md
