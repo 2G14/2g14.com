@@ -2,10 +2,15 @@
 schemaVersion: "3"
 kind: mixin
 displayName: 2g14.com project mixin
-# description はエージェントの CLAUDE.md の目次に載り、本文は必要時にだけ読まれる
-description: 作業を始める前に読むこと。このリポで最初に必要な準備
+description: このリポの npm 依存をサンドボックスの起動時に入れる
 
 capabilities:
-  - type: com.docker.sandbox/agent-context@1
+  - type: com.docker.sandbox/lifecycle@1
     config:
-      contentFile: ./project-context.md
+      startup:
+        # install ではなく startup に置くのは、install の時点ではまだ clone が無いため。
+        # 失敗しても終了コードを 0 にするのは、startup の失敗でサンドボックスが起動しなくなるため
+        - command: [sh, -c, 'export PATH="$HOME/.local/share/mise/shims:$PATH"; cd "$WORKSPACE_DIR" && { [ -d node_modules ] || npm ci --no-audit --no-fund; } || echo "npm ci failed" >&2']
+          user: agent
+          env: [WORKSPACE_DIR]
+          description: Install npm dependencies once the clone exists

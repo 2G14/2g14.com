@@ -9,7 +9,7 @@ Claude Code を Docker Sandbox (clone mode) で、承認プロンプト付きで
 | ----------------------- | ------------------------------------------------------------------------------------------------------------------------------- |
 | `../sbxenv.yaml`        | workload と mixin を clone mode で組み合わせる environment file                                                                   |
 | `claude-2g14/`          | workload。`claude-code-minimal` ベースに claude・mise 経由の node / npm / gh・apt の git を入れて起動する。node / npm の版はこのリポに合わせている |
-| `project/`              | mixin。このリポ固有のエージェント向け指示だけを加える                                                                           |
+| `project/`              | mixin。このリポの npm 依存をサンドボックスの起動時に入れる                                                                      |
 
 `claude-2g14/` は公式の
 [examples/claude](https://github.com/docker/sandbox-kit-spec/tree/main/examples/claude)
@@ -52,8 +52,8 @@ sbx env run
 kit はサンドボックスの作成時にビルドされ、変更がなければ再利用される。
 `sbx env` は Experimental で、コマンドやファイル形式が変わる可能性がある。
 
-- 依存はインストールされないため、セッション冒頭に `npm install` を実行する
-  (mixin のコンテキストでエージェントにも指示している)
+- npm 依存はサンドボックスの起動時に `npm ci` で入る。`node_modules` が既にあれば何もしない。
+  失敗しても起動は続くので、依存が無ければ `/var/log/sbx-kit-startup.log` を確認する
 - エージェントのコミットはホスト側の `sandbox-<name>` git リモートから取り込める
 - `ls` のような読み取り専用コマンドは承認なしで実行される。YOLO が外れているかは
   書き込みを伴う操作で確かめる
