@@ -1,5 +1,5 @@
 # node と npm はリポ直下の mise.toml と同じ版にする。ずれると初回実行時に
-# mise が別の版をダウンロードし直すため(sandbox.sh が一致を確認する)
+# mise が別の版をダウンロードし直す(kit のビルドからは mise.toml を参照できない)
 [tools]
 node = "24.18.0"
 npm = "11.17.0"
