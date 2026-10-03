@@ -1,0 +1,32 @@
+# claude の導入部分は docker/sandbox-kit-spec の examples/claude と同じ。
+# claude は yaml の version 引数で固定するので、ベースに同梱された版には依存しない。
+FROM docker/sandbox-templates:claude-code-minimal
+ARG CLAUDE_VERSION
+ARG TARGETARCH
+USER root
+RUN case "$TARGETARCH" in \
+      amd64) platform=linux-x64 ;; \
+      arm64) platform=linux-arm64 ;; \
+      *) echo "unsupported TARGETARCH: $TARGETARCH" >&2; exit 1 ;; \
+    esac \
+ && mkdir -p /home/agent/.local/share/claude/versions /home/agent/.local/bin \
+ && curl -fsSL "https://downloads.claude.ai/claude-code-releases/${CLAUDE_VERSION}/${platform}/claude" \
+      -o "/home/agent/.local/share/claude/versions/${CLAUDE_VERSION}" \
+ && chmod 0755 "/home/agent/.local/share/claude/versions/${CLAUDE_VERSION}" \
+ && ln -sfn "/home/agent/.local/share/claude/versions/${CLAUDE_VERSION}" /home/agent/.local/bin/claude \
+ && chown -R agent:agent /home/agent/.local
+
+# git は mise のレジストリに存在しないため apt で最新化する
+RUN apt-get update && apt-get install -y --only-upgrade git && rm -rf /var/lib/apt/lists/*
+
+USER agent
+RUN curl -fsSL https://mise.run | sh
+COPY --chown=agent:agent mise-config.toml /home/agent/.config/mise/config.toml
+ENV PATH="/home/agent/.local/share/mise/shims:/home/agent/.local/bin:${PATH}"
+RUN mise install && mise reshim
+# 対話シェルでは shims ではなく activate を使う(mise の推奨)
+RUN echo 'eval "$(mise activate bash)"' >> /home/agent/.bashrc
+
+ENV IS_SANDBOX=1
+WORKDIR /home/agent/workspace
+ENTRYPOINT ["claude"]
