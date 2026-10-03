@@ -1,7 +1,7 @@
 # syntax=docker/sandbox-kit:3
 # docker/sandbox-kit-spec の examples/claude を基にしている。
 # 差分は YOLO モード(bypassPermissions)を外したことと、
-# Dockerfile のベースイメージとツール導入、そのツールが使う通信の許可だけ。
+# Dockerfile のベースイメージとツール導入、そのツールが使う通信と認証の許可だけ。
 schemaVersion: "3"
 displayName: Claude Code (no YOLO, mise toolchain)
 description: mise 経由で node/gh を導入した環境で Claude Code を承認プロンプト付きで起動する
@@ -27,7 +27,7 @@ capabilities:
   # the image config declares instead of assuming one.
   - type: com.docker.sandbox/sbx@1
 
-  - type: com.docker.sandbox/network-policy@1
+  - type: com.docker.sandbox/network-policy@2
     config:
       runtime:
         allow:
@@ -42,6 +42,33 @@ capabilities:
           # WebSocket open here so claude.ai and the mobile app can
           # drive this session.
           - bridge.claudeusercontent.com:443
+          # ここから GitHub の通信許可と、下の GitHub の credential は
+          # docker/sandbox-kit-spec の examples/gh と同じ。gh は mise で
+          # 入れているので、それが使う通信と認証もこの workload に置く。
+          - github.com
+          - hosts: [api.github.com]
+            methods: [GET, HEAD, POST, PATCH, PUT, DELETE]
+          - hosts: [uploads.github.com]
+            methods: [POST, PUT]
+        deny:
+          # リポジトリ自体の削除などを、注入したトークンで行わせない
+          - hosts: [api.github.com]
+            methods: [DELETE]
+            paths: [/repos/**]
+
+  - type: com.docker.sandbox/credential@1
+    description: GitHub API access for gh
+    optional: true
+    config:
+      service: github
+      phase: runtime
+      apiKey:
+        name: GH_TOKEN
+        proxyManaged: true
+        inject:
+          - {domain: api.github.com, header: Authorization, format: "Bearer %s"}
+          - {domain: uploads.github.com, header: Authorization, format: "Bearer %s"}
+          - {domain: github.com, header: Authorization, format: "Bearer %s"}
 
   # Declaring both apiKey and oauth means "whichever the host has bound":
   # the engine derives the mode from host credential state and the

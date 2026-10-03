@@ -6,7 +6,7 @@ Claude Code を Docker Sandbox (clone mode) で、承認プロンプト付きで
 
 | ファイル       | 役割                                                                                                                            |
 | -------------- | ------------------------------------------------------------------------------------------------------------------------------- |
-| `claude-2g14/` | workload。`claude-code-minimal` ベースに claude・mise 経由の node / npm / gh・apt の git を入れて起動する。ほかのリポでも使える |
+| `claude-2g14/` | workload。`claude-code-minimal` ベースに claude・mise 経由の node / npm / gh・apt の git を入れて起動する。node / npm の版はこのリポに合わせている |
 | `project/`     | mixin。このリポ固有のエージェント向け指示だけを加える                                                                           |
 | `sandbox.sh`   | 起動用のラッパー                                                                                                                |
 
@@ -14,7 +14,8 @@ Claude Code を Docker Sandbox (clone mode) で、承認プロンプト付きで
 [examples/claude](https://github.com/docker/sandbox-kit-spec/tree/main/examples/claude)
 を基にしている。差分は YOLO モードを外したこと(起動時に `--dangerously-skip-permissions`
 を渡さず、`bypassPermissions` の設定もシードしない)と、Dockerfile のベースとツール導入、
-そのツールが使う通信の許可だけ。
+そのツールが使う通信と認証の許可だけ。GitHub 部分は
+[examples/gh](https://github.com/docker/sandbox-kit-spec/tree/main/examples/gh) と同じ。
 
 ## 初回セットアップ(一度だけ)
 
@@ -32,9 +33,16 @@ Anthropic の OAuth は `sbx secret set` からは開始できず、サンドボ
 Claude で `/login` してサインインする。proxy がトークンをホスト側に保存し、
 サンドボックス内にはダミー値だけが残る。
 
-初回の `run` では、kit に Anthropic の認証情報を渡してよいかを確認する
+gh と GitHub への git 操作に使うトークンを登録する。proxy が送信時に差し替えるので、
+実トークンはサンドボックスに入らない。登録しなくても起動はできる:
+
+```bash
+sbx secret set github
+```
+
+初回の `run` では、kit に Anthropic と GitHub の認証情報を渡してよいかを確認する
 プロンプトが出るので許可する。非対話で起動すると拒否扱いになり、
-`no binding authorizes anthropic` と表示されて認証情報が注入されない。
+`no binding authorizes ...` と表示されて認証情報が注入されない。
 
 ## 使い方
 
@@ -53,6 +61,7 @@ kit は `sbx run` の中でビルドされ、変更がなければ再利用さ�
 ## ツールの更新
 
 - claude: `claude-2g14/claude-2g14.yaml` の `version` 引数で固定している
-- node / gh: `claude-2g14/mise-config.toml` で管理(node はメジャー固定、gh は
-  ビルド時点の latest)。ただしリポ直下の `mise.toml` が版を固定している場合は
-  そちらが優先され、初回実行時にその版がインストールされる
+- node / npm: リポ直下の `mise.toml` と `claude-2g14/mise-config.toml` の両方を同じ版にする。
+  ずれていると初回実行時に mise が別の版をダウンロードし直すので、`sandbox.sh` が
+  一致を確認し、ずれていれば起動しない
+- gh: `claude-2g14/mise-config.toml` で管理(ビルド時点の latest)

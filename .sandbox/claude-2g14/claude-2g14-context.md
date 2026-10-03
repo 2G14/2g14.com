@@ -53,5 +53,4 @@ If you accidentally added completion scripts and broke the shell:
 
 ## 導入済みツール
 
-node / npm / gh は mise、git は apt で導入済み(PATH 設定済み)。ワークスペースに
-`mise.toml` があれば、そこで固定された版が初回実行時にインストールされる。
+node / npm / gh は mise、git は apt で導入済み(PATH 設定済み)。

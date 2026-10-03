@@ -1,4 +1,6 @@
-# node のみメジャー固定: 実行環境の互換性は守り、CLI ツールは最新に追従する
+# node と npm はリポ直下の mise.toml と同じ版にする。ずれると初回実行時に
+# mise が別の版をダウンロードし直すため(sandbox.sh が一致を確認する)
 [tools]
-node = "24"
+node = "24.18.0"
+npm = "11.17.0"
 gh = "latest"
