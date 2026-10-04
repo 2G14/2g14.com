@@ -80,7 +80,7 @@ kit はサンドボックスの作成時にビルドされ、変更がなけれ�
   失敗したら `/tmp/sbx-npm-ci.failed` を置き、エージェントにもその見分け方を伝えている。
   完了すると `node_modules/.sbx-npm-ci-done` を置き、次回以降の起動では何もしない。
   失敗しても起動は続き、原因は `/var/log/sbx-kit-startup.log` に残る
-- エージェントのコミットはホスト側の `sandbox-<name>` git リモートから取り込める。
+- エージェントのコミットはホスト側の `sandbox-claude-2g14` git リモートから取り込める。
   `.sandbox/` や `sbxenv.yaml` の変更が含まれていたら必ず中身を確認する(サンドボックスの
   権限や通信の許可を広げられるため)
 - `ls` のような読み取り専用コマンドは承認なしで実行される。YOLO が外れているかは
@@ -101,7 +101,7 @@ kit の変更は、サンドボックスを作り直したときにだけ反映�
 消えるので、エージェントのコミットを先に取り込んでおく:
 
 ```bash
-git fetch sandbox-claude-2g14-2g14.com
+git fetch sandbox-claude-2g14
 sbx env rm
 sbx env run
 ```
