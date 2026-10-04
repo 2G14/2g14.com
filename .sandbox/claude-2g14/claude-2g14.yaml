@@ -1,7 +1,8 @@
 # syntax=docker/sandbox-kit:3
-# docker/sandbox-kit-spec の examples/claude を基にしている。
+# docker/sandbox-kit-spec の examples/claude(コミット 2401f20a)を基にしている。
 # 差分は YOLO モード(bypassPermissions)を外したことと、
 # Dockerfile のベースイメージとツール導入、そのツールが使う通信と認証の許可だけ。
+# 上流の英語コメントは、上流との差分を取りやすくするために残している。
 schemaVersion: "3"
 displayName: Claude Code (no YOLO, mise toolchain)
 description: mise 経由で node/gh を導入した環境で Claude Code を承認プロンプト付きで起動する
@@ -36,7 +37,7 @@ capabilities:
           - downloads.claude.ai:443
           - claude.com:443
           - mcp-proxy.anthropic.com:443
-          # balanced ポリシーでは mise バイナリの配布元だけが default deny のため
+          # mise self-update が使う。balanced では拒否され、ツールの追加(mise use)には不要
           - mise.jdx.dev:443
           # /remote-control and /teleport relay: the daemon keeps a
           # WebSocket open here so claude.ai and the mobile app can

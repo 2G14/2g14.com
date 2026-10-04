@@ -1,5 +1,5 @@
 # claude の導入部分は docker/sandbox-kit-spec の examples/claude と同じ。
-# claude は yaml の version 引数で固定するので、ベースに同梱された版には依存しない。
+# ビルド時に入れる claude の版は yaml の version 引数で決める(実行中は自動更新される)。
 FROM docker/sandbox-templates:claude-code-minimal
 ARG CLAUDE_VERSION
 ARG TARGETARCH
@@ -16,8 +16,10 @@ RUN case "$TARGETARCH" in \
  && ln -sfn "/home/agent/.local/share/claude/versions/${CLAUDE_VERSION}" /home/agent/.local/bin/claude \
  && chown -R agent:agent /home/agent/.local
 
-# git は mise のレジストリに存在しないため apt で最新化する
-RUN apt-get update && apt-get install -y --only-upgrade git && rm -rf /var/lib/apt/lists/*
+# git は mise のレジストリに存在しないため apt で最新化する。
+# ベースが apt で入れている gh は消す。残すと PATH 次第で mise の gh と入れ替わるため
+RUN apt-get update && apt-get install -y --only-upgrade git && apt-get purge -y gh \
+ && rm -rf /var/lib/apt/lists/*
 
 USER agent
 RUN curl -fsSL https://mise.run | sh
@@ -30,3 +32,6 @@ RUN echo 'eval "$(mise activate bash)"' >> /home/agent/.bashrc
 ENV IS_SANDBOX=1
 WORKDIR /home/agent/workspace
 ENTRYPOINT ["claude"]
+# ベースの CMD は ["claude", "--dangerously-skip-permissions"]。ENTRYPOINT の設定で
+# 暗黙に空になるが、YOLO を外すことがこの kit の目的なので明示的に空にする
+CMD []

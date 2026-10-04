@@ -54,3 +54,12 @@ If you accidentally added completion scripts and broke the shell:
 ## 導入済みツール
 
 node / npm / gh は mise、git は apt で導入済み(PATH 設定済み)。
+
+## GitHub CLI
+
+- 認証は proxy が管理している。`GH_TOKEN` はダミー値で、github.com・api.github.com・
+  uploads.github.com への通信に proxy が本物のトークンを付ける。トークンを表示したり
+  コピーしたりしないこと(どのみち本物の値ではない)
+- `gh auth login` は実行しないこと。`GH_TOKEN` が優先されるので効かない
+- gh が 401 を返す場合は、ホスト側で GitHub のトークンが登録されていない。
+  利用者に `sbx secret set github` を頼む
