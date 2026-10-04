@@ -15,14 +15,14 @@ export default function EditableYear({
   displayLabel = `${value}年`,
   onYearInput,
 }: EditableYearProps) {
-  const [editing, setEditing] = useState(false);
+  const [draft, setDraft] = useState<string | null>(null);
 
-  if (!editing) {
+  if (draft === null) {
     return (
       <button
         type="button"
         class="btn btn-ghost text-base btn-sm"
-        onClick={() => setEditing(true)}
+        onClick={() => setDraft(String(value))}
         title="年を直接入力"
       >
         {displayLabel}
@@ -34,15 +34,17 @@ export default function EditableYear({
     <input
       type="number"
       class={`input-bordered input ${widthClass} text-center input-sm`}
-      value={value}
+      value={draft}
       min={min}
       onInput={(e) => {
-        const v = Number((e.target as HTMLInputElement).value);
-        if (Number.isInteger(v) && v >= min) onYearInput(v);
+        const raw = (e.target as HTMLInputElement).value;
+        setDraft(raw);
+        const year = Number(raw);
+        if (Number.isInteger(year) && year >= min) onYearInput(year);
       }}
-      onBlur={() => setEditing(false)}
+      onBlur={() => setDraft(null)}
       onKeyDown={(e) => {
-        if ((e as KeyboardEvent).key === 'Enter') setEditing(false);
+        if ((e as KeyboardEvent).key === 'Enter') setDraft(null);
       }}
       autoFocus
     />
