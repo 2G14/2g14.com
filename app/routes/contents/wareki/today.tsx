@@ -1,7 +1,14 @@
 import { createRoute } from 'honox/factory';
 
 import PageHead from '#app/components/page-head.js';
+import ToolPageLayout from '#app/components/tool-page-layout.js';
 import { seirekiToWareki } from '#src/domain/wareki/conversion.js';
+import {
+  formatMonthDay,
+  formatSeireki,
+  formatSeirekiYear,
+  formatWarekiEraYear,
+} from '#src/domain/wareki/format.js';
 import { createSeireki } from '#src/domain/wareki/seireki.js';
 import { todayInJST } from '#src/lib/date.js';
 
@@ -27,27 +34,19 @@ export default createRoute((c) => {
     />
   );
 
-  const displayYear = wareki ? `${wareki.era}${wareki.year}年` : `${seireki.year}年`;
-  const displayDate = `${seireki.month}月${seireki.day}日`;
+  const displayYear = wareki
+    ? formatWarekiEraYear(wareki.era, wareki.year)
+    : formatSeirekiYear(seireki.year);
+  const displayDate = formatMonthDay(seireki.month, seireki.day);
 
   return c.render(
-    <div>
-      <header class="navbar sticky top-0 z-30 min-h-12 bg-base-100 shadow-sm">
-        <div class="flex-1">
-          <h1 class="text-xl font-bold">本日の和暦</h1>
-        </div>
-      </header>
-
-      <div class="mx-auto my-8 max-w-5xl px-4">
-        <div class="flex flex-col items-center gap-6 py-12">
-          <p class="text-5xl font-bold sm:text-7xl">{displayYear}</p>
-          <p class="text-4xl font-bold sm:text-6xl">{displayDate}</p>
-          <p class="text-lg text-base-content/60">
-            （{seireki.year}年{seireki.month}月{seireki.day}日）
-          </p>
-        </div>
+    <ToolPageLayout title="本日の和暦">
+      <div class="flex flex-col items-center gap-6 py-12">
+        <p class="text-5xl font-bold sm:text-7xl">{displayYear}</p>
+        <p class="text-4xl font-bold sm:text-6xl">{displayDate}</p>
+        <p class="text-lg text-base-content/60">（{formatSeireki(seireki)}）</p>
       </div>
-    </div>,
+    </ToolPageLayout>,
     { title: PAGE_TITLE, head },
   );
 });
