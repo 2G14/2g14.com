@@ -62,4 +62,4 @@ node / npm / gh は mise、git は apt で導入済み(PATH 設定済み)。
   コピーしたりしないこと(どのみち本物の値ではない)
 - `gh auth login` は実行しないこと。`GH_TOKEN` が優先されるので効かない
 - gh が 401 を返す場合は、ホスト側で GitHub のトークンが登録されていない。
-  利用者に `sbx secret set github` を頼む
+  利用者に `sbx secret set github --command 'gh auth token'` の実行を頼む

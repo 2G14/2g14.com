@@ -32,23 +32,24 @@ Anthropic の OAuth は `sbx secret set` からは開始できず、サンドボ
 Claude で `/login` してサインインする。proxy がトークンをホスト側に保存し、
 サンドボックス内にはダミー値だけが残る。
 
-gh と GitHub への git 操作に使うトークンを登録する。proxy が送信時に差し替えるので、
-実トークンはサンドボックスに入らない:
+gh と GitHub への git 操作に使うトークンを登録する。ドキュメントが案内している方法で、
+ホストの gh のログイントークンを渡す(ホストで `gh auth login` 済みであること)。
+daemon が既定では 55 分ごとにホストの gh からトークンを取り直す。proxy が送信時に
+付けるので、実トークンはサンドボックスに入らない:
 
 ```bash
-sbx secret set github
+sbx secret set github --command 'gh auth token'
 ```
 
-- トークンはこのリポジトリだけに絞った fine-grained personal access token にし、
-  権限は Contents と Pull requests の読み書き程度に留める。Administration・Secrets・
-  Workflows は付けない。`gh auth token` の出力(広い権限を持つ)を流用しない
+- このトークンは、ホストの gh ログインと同じ権限(通常はアカウントのリポジトリ全体)を持つ。
+  より絞りたい場合は、このリポジトリだけに限った fine-grained personal access token を
+  `sbx secret set github` で登録してもよい
 - kit は `/repos/**` への DELETE を拒否しているが、公開範囲の変更やブランチ保護の
-  書き換え、force push などは通る。実際の防御はトークンの権限なので、master には
-  GitHub の ruleset で保護をかけておく
-- `sbx secret set github` は既定でグローバル(全サンドボックス共通)に登録される。
-  このサンドボックスだけに渡したい場合は `--sandbox <name>` を付ける
+  書き換え、force push などは通る。master には GitHub の ruleset で保護をかけておく
+- 登録は既定でグローバル(全サンドボックス共通)になる。このサンドボックスだけに
+  渡したい場合は `--sandbox <name>` を付ける
 - 登録しなくても起動はできる。その場合も `GH_TOKEN` にはダミー値が入るので、
-  gh は 401 を返し、`gh auth login` でも直らない
+  gh は 401 を返す。サンドボックス内で `gh auth login` しても `GH_TOKEN` が優先されて効かない
 
 ホストの SSH エージェントは既定でサンドボックスに転送され、GitHub への SSH(22番)も
 balanced で許可されている。ホストのエージェントに鍵を登録すると、サンドボックスから
