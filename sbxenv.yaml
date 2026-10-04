@@ -1,4 +1,4 @@
-schemaVersion: "1"
+schemaVersion: '1'
 # 省略するとワークスペースのディレクトリ名から決まり、git リモート名も変わるため固定する
 name: claude-2g14
 agent: claude-2g14
