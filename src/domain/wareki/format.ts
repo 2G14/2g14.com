@@ -9,6 +9,10 @@ export function formatWarekiEraYear(era: string, year: number): string {
   return `${era}${formatWarekiYear(year)}`;
 }
 
+export function formatSeirekiYear(year: number): string {
+  return `${year}年`;
+}
+
 export function formatMonthDay(month: number, day: number): string {
   return `${month}月${day}日`;
 }
@@ -18,5 +22,5 @@ export function formatWareki(wareki: Wareki): string {
 }
 
 export function formatSeireki(seireki: Seireki): string {
-  return `${seireki.year}年${formatMonthDay(seireki.month, seireki.day)}`;
+  return formatSeirekiYear(seireki.year) + formatMonthDay(seireki.month, seireki.day);
 }

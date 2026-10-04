@@ -3,6 +3,7 @@ import { describe, expect, it } from 'vitest';
 import {
   formatMonthDay,
   formatSeireki,
+  formatSeirekiYear,
   formatWareki,
   formatWarekiEraYear,
   formatWarekiYear,
@@ -24,6 +25,12 @@ describe('formatWarekiEraYear', () => {
   it('元号と年をつなげる', () => {
     expect(formatWarekiEraYear('令和', 8)).toBe('令和8年');
     expect(formatWarekiEraYear('令和', 1)).toBe('令和元年');
+  });
+});
+
+describe('formatSeirekiYear', () => {
+  it('西暦の年を表記する', () => {
+    expect(formatSeirekiYear(2026)).toBe('2026年');
   });
 });
 

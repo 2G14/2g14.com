@@ -3,7 +3,12 @@ import { createRoute } from 'honox/factory';
 import PageHead from '#app/components/page-head.js';
 import ToolPageLayout from '#app/components/tool-page-layout.js';
 import { seirekiToWareki } from '#src/domain/wareki/conversion.js';
-import { formatMonthDay, formatSeireki, formatWarekiEraYear } from '#src/domain/wareki/format.js';
+import {
+  formatMonthDay,
+  formatSeireki,
+  formatSeirekiYear,
+  formatWarekiEraYear,
+} from '#src/domain/wareki/format.js';
 import { createSeireki } from '#src/domain/wareki/seireki.js';
 import { todayInJST } from '#src/lib/date.js';
 
@@ -29,7 +34,9 @@ export default createRoute((c) => {
     />
   );
 
-  const displayYear = wareki ? formatWarekiEraYear(wareki.era, wareki.year) : `${seireki.year}年`;
+  const displayYear = wareki
+    ? formatWarekiEraYear(wareki.era, wareki.year)
+    : formatSeirekiYear(seireki.year);
   const displayDate = formatMonthDay(seireki.month, seireki.day);
 
   return c.render(
