@@ -1,3 +1,5 @@
+import { todayInJST } from '#src/lib/date.js';
+
 const WEEKDAY_LABELS = ['日', '月', '火', '水', '木', '金', '土'] as const;
 
 interface CalendarGridProps {
@@ -18,10 +20,7 @@ export default function CalendarGrid({
   const firstDayOfWeek = new Date(seirekiYear, month - 1, 1).getDay();
   const daysInMonth = new Date(seirekiYear, month, 0).getDate();
 
-  const now = new Date();
-  const todayYear = now.getFullYear();
-  const todayMonth = now.getMonth() + 1;
-  const todayDay = now.getDate();
+  const today = todayInJST();
 
   const cells: (number | null)[] = [];
   for (let i = 0; i < firstDayOfWeek; i++) cells.push(null);
@@ -49,7 +48,7 @@ export default function CalendarGrid({
           selectedDate.year === seirekiYear &&
           selectedDate.month === month &&
           selectedDate.day === day;
-        const isToday = seirekiYear === todayYear && month === todayMonth && day === todayDay;
+        const isToday = seirekiYear === today.year && month === today.month && day === today.day;
 
         let cls = 'btn btn-ghost btn-sm h-9 w-9 min-h-0 p-0';
         if (isSelected) {

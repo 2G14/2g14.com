@@ -13,6 +13,7 @@ import { ERAS } from '#src/domain/wareki/era.js';
 import { formatSeireki } from '#src/domain/wareki/format.js';
 import { createSeireki } from '#src/domain/wareki/seireki.js';
 import { createWareki } from '#src/domain/wareki/wareki.js';
+import { todayInJST } from '#src/lib/date.js';
 
 function tryConvert(
   era: string,
@@ -49,12 +50,7 @@ interface Props {
 }
 
 function todayWareki() {
-  const now = new Date();
-  const seireki = createSeireki({
-    year: now.getFullYear(),
-    month: now.getMonth() + 1,
-    day: now.getDate(),
-  });
+  const seireki = createSeireki(todayInJST());
   const wareki = seirekiToWareki(seireki);
   if (wareki) return wareki;
   return { era: ERAS[0]!.name, year: 1, month: 1, day: 1 };

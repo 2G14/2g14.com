@@ -4,6 +4,7 @@ import CalendarFrame from '#app/components/calendar-frame.js';
 import CalendarGrid from '#app/components/calendar-grid.js';
 import EditableYear from '#app/components/editable-year.js';
 import { isInteger } from '#app/lib/date-input.js';
+import { todayInJST } from '#src/lib/date.js';
 
 const MIN_YEAR = 1868;
 const MIN_MONTH = 9;
@@ -17,15 +18,13 @@ interface SeirekiCalendarProps {
 }
 
 export default function SeirekiCalendar({ year, month, day, onDateSelect }: SeirekiCalendarProps) {
-  const now = new Date();
-  const defaultYear = now.getFullYear();
-  const defaultMonth = now.getMonth() + 1;
+  const today = todayInJST();
 
   const [viewYear, setViewYear] = useState(() =>
-    isInteger(year) && year >= MIN_YEAR ? year : defaultYear,
+    isInteger(year) && year >= MIN_YEAR ? year : today.year,
   );
   const [viewMonth, setViewMonth] = useState(() =>
-    isInteger(month) && month >= 1 && month <= 12 ? month : defaultMonth,
+    isInteger(month) && month >= 1 && month <= 12 ? month : today.month,
   );
 
   useEffect(() => {

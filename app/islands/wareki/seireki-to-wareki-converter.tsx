@@ -10,6 +10,7 @@ import { dateQueryString, parseQueryNumber } from '#app/lib/wareki/date-query.js
 import { seirekiToWareki } from '#src/domain/wareki/conversion.js';
 import { formatWareki } from '#src/domain/wareki/format.js';
 import { createSeireki } from '#src/domain/wareki/seireki.js';
+import { todayInJST } from '#src/lib/date.js';
 
 function tryConvert(year: number | null, month: number | null, day: number | null): ConvertResult {
   const parsed = parseDateInput(year, month, day);
@@ -44,14 +45,10 @@ interface Props {
 }
 
 export default function SeirekiToWarekiConverter({ initialYear, initialMonth, initialDay }: Props) {
-  const now = new Date();
-  const [year, setYear] = useState<number | null>(
-    parseQueryNumber(initialYear) ?? now.getFullYear(),
-  );
-  const [month, setMonth] = useState<number | null>(
-    parseQueryNumber(initialMonth) ?? now.getMonth() + 1,
-  );
-  const [day, setDay] = useState<number | null>(parseQueryNumber(initialDay) ?? now.getDate());
+  const today = todayInJST();
+  const [year, setYear] = useState<number | null>(parseQueryNumber(initialYear) ?? today.year);
+  const [month, setMonth] = useState<number | null>(parseQueryNumber(initialMonth) ?? today.month);
+  const [day, setDay] = useState<number | null>(parseQueryNumber(initialDay) ?? today.day);
 
   useEffect(() => {
     replaceUrlQuery(dateQueryString({ year, month, day }));

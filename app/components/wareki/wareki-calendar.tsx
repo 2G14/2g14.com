@@ -6,6 +6,7 @@ import EditableYear from '#app/components/editable-year.js';
 import { isInteger } from '#app/lib/date-input.js';
 import { ERAS, type Era } from '#src/domain/wareki/era.js';
 import { formatWarekiYear } from '#src/domain/wareki/format.js';
+import { todayInJST } from '#src/lib/date.js';
 
 const ERAS_DISPLAY = ERAS.toReversed();
 
@@ -19,8 +20,7 @@ function warekiToSeirekiYear(era: Era, warekiYear: number): number {
 
 function getLastMonth(era: Era): { seirekiYear: number; month: number } {
   if (!era.end) {
-    const now = new Date();
-    return { seirekiYear: now.getFullYear() + 10, month: 12 };
+    return { seirekiYear: todayInJST().year + 10, month: 12 };
   }
   if (era.end.day === 1) {
     const m = era.end.month - 1;
