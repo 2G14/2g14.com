@@ -33,8 +33,14 @@ describe('dateQueryString', () => {
     expect(dateQueryString({ year: 2026, month: 1, day: 1 })).toBe('year=2026&month=1&day=1');
   });
 
-  it('未入力の値は省略する', () => {
-    expect(dateQueryString({ year: null, month: null, day: null })).toBe('');
+  it('読み戻せる値だけを受け取る', () => {
+    const qs = dateQueryString({ year: 2026, month: 1, day: 1 });
+    const params = new URLSearchParams(qs);
+    expect({
+      year: parseQueryNumber(params.get('year') ?? undefined),
+      month: parseQueryNumber(params.get('month') ?? undefined),
+      day: parseQueryNumber(params.get('day') ?? undefined),
+    }).toEqual({ year: 2026, month: 1, day: 1 });
   });
 });
 

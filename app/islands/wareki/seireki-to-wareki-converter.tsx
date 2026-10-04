@@ -3,7 +3,7 @@ import { useEffect, useState } from 'hono/jsx';
 import DateField from '#app/components/date-field.js';
 import ConverterView from '#app/components/wareki/converter-view.js';
 import SeirekiCalendar from '#app/components/wareki/seireki-calendar.js';
-import { parseDateInput } from '#app/lib/date-input.js';
+import { isInteger, parseDateInput } from '#app/lib/date-input.js';
 import { replaceUrlQuery } from '#app/lib/url.js';
 import { type ConvertResult, reverseToolUrl } from '#app/lib/wareki/convert-result.js';
 import { dateQueryString, parseQueryNumber } from '#app/lib/wareki/date-query.js';
@@ -51,6 +51,8 @@ export default function SeirekiToWarekiConverter({ initialYear, initialMonth, in
   const [day, setDay] = useState<number | null>(parseQueryNumber(initialDay) ?? today.day);
 
   useEffect(() => {
+    // 読み戻せない値を URL に残すと、リロード時に欠けた分が今日の日付で埋まってしまう
+    if (!isInteger(year) || !isInteger(month) || !isInteger(day)) return;
     replaceUrlQuery(dateQueryString({ year, month, day }));
   }, [year, month, day]);
 
