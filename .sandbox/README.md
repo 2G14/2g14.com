@@ -5,10 +5,10 @@ Claude Code を Docker Sandbox (clone mode) で、承認プロンプト付きで
 
 ## 構成
 
-| ファイル                | 役割                                                                                                                            |
-| ----------------------- | ------------------------------------------------------------------------------------------------------------------------------- |
-| `../sbxenv.yaml`        | workload を clone mode で起動する environment file                                                                                |
-| `claude-2g14/`          | workload。`claude-code-minimal` ベースに claude・mise 経由の node / npm / gh・apt の git を入れて起動する。node / npm の版はこのリポに合わせている |
+| ファイル         | 役割                                                                                                                                               |
+| ---------------- | -------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `../sbxenv.yaml` | workload を clone mode で起動する environment file                                                                                                 |
+| `claude-2g14/`   | workload。`claude-code-minimal` ベースに claude・mise 経由の node / npm / gh・apt の git を入れて起動する。node / npm の版はこのリポに合わせている |
 
 `claude-2g14/` は公式の
 [examples/claude](https://github.com/docker/sandbox-kit-spec/tree/main/examples/claude)
