@@ -22,3 +22,8 @@ npm run lint         # リント
 npm run format       # フォーマット
 npm run test         # テスト (watch mode)
 ```
+
+## Docker Sandbox
+
+Claude Code を Docker Sandbox で動かす設定がリポ直下の `sbxenv.yaml` と `.sandbox/` にある。
+使い方は [.sandbox/README.md](.sandbox/README.md) を参照。
