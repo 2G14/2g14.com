@@ -3,6 +3,7 @@ import { createRoute } from 'honox/factory';
 import PageHead from '#app/components/page-head.js';
 import ToolPageLayout from '#app/components/tool-page-layout.js';
 import { ERAS } from '#src/domain/wareki/era.js';
+import { formatWarekiYear } from '#src/domain/wareki/format.js';
 import { todayInJST } from '#src/lib/date.js';
 
 const PAGE_TITLE = '和暦/西暦 対比表 - 元号別の年号一覧';
@@ -98,7 +99,7 @@ export default createRoute((c) => {
                             <tbody>
                               {pairs.map(({ wareki, seireki }) => (
                                 <tr class="hover:bg-base-200">
-                                  <td>{wareki}年</td>
+                                  <td>{formatWarekiYear(wareki)}</td>
                                   <td>{seireki}年</td>
                                 </tr>
                               ))}

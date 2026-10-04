@@ -12,7 +12,7 @@ export default function EditableYear({
   value,
   min,
   widthClass,
-  displayLabel = String(value),
+  displayLabel = `${value}年`,
   onYearInput,
 }: EditableYearProps) {
   const [editing, setEditing] = useState(false);
@@ -25,7 +25,7 @@ export default function EditableYear({
         onClick={() => setEditing(true)}
         title="年を直接入力"
       >
-        {displayLabel}年
+        {displayLabel}
       </button>
     );
   }

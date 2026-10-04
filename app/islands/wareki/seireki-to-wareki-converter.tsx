@@ -8,6 +8,7 @@ import { replaceUrlQuery } from '#app/lib/url.js';
 import { type ConvertResult, reverseToolUrl } from '#app/lib/wareki/convert-result.js';
 import { dateQueryString, parseQueryNumber } from '#app/lib/wareki/date-query.js';
 import { seirekiToWareki } from '#src/domain/wareki/conversion.js';
+import { formatWareki } from '#src/domain/wareki/format.js';
 import { createSeireki } from '#src/domain/wareki/seireki.js';
 
 function tryConvert(year: number | null, month: number | null, day: number | null): ConvertResult {
@@ -22,7 +23,7 @@ function tryConvert(year: number | null, month: number | null, day: number | nul
     }
     return {
       kind: 'ok',
-      text: `${wareki.era}${wareki.year}年${wareki.month}月${wareki.day}日`,
+      text: formatWareki(wareki),
       reverseQuery: {
         era: wareki.era,
         year: wareki.year,

@@ -5,6 +5,7 @@ import CalendarGrid from '#app/components/calendar-grid.js';
 import EditableYear from '#app/components/editable-year.js';
 import { isInteger } from '#app/lib/date-input.js';
 import { ERAS, type Era } from '#src/domain/wareki/era.js';
+import { formatWarekiYear } from '#src/domain/wareki/format.js';
 
 const ERAS_DISPLAY = ERAS.toReversed();
 
@@ -146,7 +147,7 @@ export default function WarekiCalendar({
     onDateSelect(viewEra.name, viewWarekiYear, viewMonth, d);
   };
 
-  const yearLabel = viewWarekiYear === 1 ? '元' : String(viewWarekiYear);
+  const yearLabel = formatWarekiYear(viewWarekiYear);
 
   return (
     <CalendarFrame

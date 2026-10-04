@@ -10,6 +10,7 @@ import { type ConvertResult, reverseToolUrl } from '#app/lib/wareki/convert-resu
 import { dateQueryString, parseQueryNumber } from '#app/lib/wareki/date-query.js';
 import { seirekiToWareki, warekiToSeireki } from '#src/domain/wareki/conversion.js';
 import { ERAS } from '#src/domain/wareki/era.js';
+import { formatSeireki } from '#src/domain/wareki/format.js';
 import { createSeireki } from '#src/domain/wareki/seireki.js';
 import { createWareki } from '#src/domain/wareki/wareki.js';
 
@@ -27,7 +28,7 @@ function tryConvert(
     const seireki = warekiToSeireki(wareki);
     return {
       kind: 'ok',
-      text: `${seireki.year}年${seireki.month}月${seireki.day}日`,
+      text: formatSeireki(seireki),
       reverseQuery: {
         year: seireki.year,
         month: seireki.month,

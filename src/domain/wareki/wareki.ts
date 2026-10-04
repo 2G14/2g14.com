@@ -1,4 +1,5 @@
 import { ERAS, type EraName, InvalidEraError } from './era.js';
+import { formatMonthDay, formatWarekiEraYear } from './format.js';
 import { InvalidSeirekiError, isValidDate } from './seireki.js';
 
 const brand = Symbol('Wareki');
@@ -41,7 +42,9 @@ export function createWareki({ era, year, month, day }: WarekiInput): Wareki {
   if (year === 1) {
     const start = eraEntry.start;
     if (month < start.month || (month === start.month && day < start.day)) {
-      throw new InvalidWarekiError(`${era}${year}年${month}月${day}日は存在しません`);
+      throw new InvalidWarekiError(
+        `${formatWarekiEraYear(era, year)}${formatMonthDay(month, day)}は存在しません`,
+      );
     }
   }
 
