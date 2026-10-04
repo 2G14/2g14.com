@@ -4,7 +4,6 @@ name: claude-2g14
 agent: claude-2g14
 kits:
   - ./.sandbox/claude-2g14
-  - ./.sandbox/project
 workspace:
   path: .
   clone: true

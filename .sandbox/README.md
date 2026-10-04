@@ -7,9 +7,8 @@ Claude Code を Docker Sandbox (clone mode) で、承認プロンプト付きで
 
 | ファイル                | 役割                                                                                                                            |
 | ----------------------- | ------------------------------------------------------------------------------------------------------------------------------- |
-| `../sbxenv.yaml`        | workload と mixin を clone mode で組み合わせる environment file                                                                   |
+| `../sbxenv.yaml`        | workload を clone mode で起動する environment file                                                                                |
 | `claude-2g14/`          | workload。`claude-code-minimal` ベースに claude・mise 経由の node / npm / gh・apt の git を入れて起動する。node / npm の版はこのリポに合わせている |
-| `project/`              | mixin。このリポの npm 依存をサンドボックスの起動時に入れる                                                                      |
 
 `claude-2g14/` は公式の
 [examples/claude](https://github.com/docker/sandbox-kit-spec/tree/main/examples/claude)
@@ -25,8 +24,8 @@ v3 kit は `sbx` の中で buildx によってビルドされ、OCI 形式で出
 `OCI exporter is not supported for the docker driver` で失敗する。OrbStack や
 Docker Desktop の設定で containerd image store を有効にしておく。
 
-ホストの `sbx` のネットワークポリシーは balanced を前提にしている。起動時の `npm ci` は
-registry.npmjs.org への通信を使うので、より厳しいポリシーでは失敗する。
+ホストの `sbx` のネットワークポリシーは balanced を前提にしている。`npm ci` などで使う
+registry.npmjs.org への通信も、これで許可されている。
 
 Anthropic の OAuth は `sbx secret set` からは開始できず、サンドボックス内の
 Claude で `/login` してサインインする。proxy がトークンをホスト側に保存し、
@@ -75,11 +74,9 @@ sbx env run
 kit はサンドボックスの作成時にビルドされ、変更がなければ再利用される。
 `sbx env` は Experimental で、コマンドやファイル形式が変わる可能性がある。
 
-- npm 依存はサンドボックスの起動時に startup フックの `npm ci` で入る。startup は
-  エージェントと並行して走るので、フックが実行中なら `/tmp/sbx-npm-ci.running`、
-  失敗したら `/tmp/sbx-npm-ci.failed` を置き、エージェントにもその見分け方を伝えている。
-  完了すると `node_modules/.sbx-npm-ci-done` を置き、次回以降の起動では何もしない。
-  失敗しても起動は続き、原因は `/var/log/sbx-kit-startup.log` に残る
+- clone には `node_modules` が無い。必要になったらエージェントが `npm ci` する
+  (承認プロンプトが出る)。起動時に自動で入れないのは、承認なしで依存パッケージの
+  インストールスクリプトを走らせないため
 - エージェントのコミットはホスト側の `sandbox-claude-2g14` git リモートから取り込める。
   `.sandbox/` や `sbxenv.yaml` の変更が含まれていたら必ず中身を確認する(サンドボックスの
   権限や通信の許可を広げられるため)
@@ -94,6 +91,20 @@ kit はサンドボックスの作成時にビルドされ、変更がなけれ�
   kit のビルドからは `mise.toml` を参照できないため、2か所に書いている。ずれていると
   初回実行時に mise が `mise.toml` 側の版をダウンロードし直す
 - gh: `claude-2g14/mise-config.toml` で管理(ビルド時点の latest)
+
+## 複数のサンドボックスで並列に作業する
+
+clone mode ではサンドボックスごとに専用の clone が作られるので、同じディレクトリから
+複数起動して別々のブランチで作業できる。2つ目以降は名前を変えて起動し、その
+サンドボックスに対する `sbx env` のコマンドには毎回同じ `--name` を付ける:
+
+```bash
+sbx env run --name claude-2g14-b
+git fetch sandbox-claude-2g14-b
+sbx env rm --name claude-2g14-b
+```
+
+`--name` を付け忘れると、既定のサンドボックス(`claude-2g14`)に対する操作になる。
 
 ## kit を変更したとき
 
