@@ -29,8 +29,8 @@ describe('dateQueryString', () => {
     );
   });
 
-  it('月・日が 1 のときは省略する', () => {
-    expect(dateQueryString({ year: 2026, month: 1, day: 1 })).toBe('year=2026');
+  it('月・日が 1 でも省略しない', () => {
+    expect(dateQueryString({ year: 2026, month: 1, day: 1 })).toBe('year=2026&month=1&day=1');
   });
 
   it('未入力の値は省略する', () => {

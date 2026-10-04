@@ -15,8 +15,8 @@ export function dateQueryString(values: DateQueryValues): string {
   const params = new URLSearchParams();
   if (values.era) params.set('era', values.era);
   if (values.year !== null) params.set('year', String(values.year));
-  if (values.month !== null && values.month !== 1) params.set('month', String(values.month));
-  if (values.day !== null && values.day !== 1) params.set('day', String(values.day));
+  if (values.month !== null) params.set('month', String(values.month));
+  if (values.day !== null) params.set('day', String(values.day));
   return params.toString();
 }
 
