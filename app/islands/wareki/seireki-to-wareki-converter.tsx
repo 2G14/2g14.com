@@ -12,15 +12,16 @@ import { createSeireki } from '#src/domain/wareki/seireki.js';
 
 function tryConvert(year: number | null, month: number | null, day: number | null): ConvertResult {
   const parsed = parseDateInput(year, month, day);
-  if (!parsed || 'error' in parsed) return parsed;
+  if (parsed.kind !== 'ok') return parsed;
 
   try {
-    const seireki = createSeireki(parsed);
+    const seireki = createSeireki(parsed.date);
     const wareki = seirekiToWareki(seireki);
     if (!wareki) {
-      return { error: '明治以前の日付は変換できません。' };
+      return { kind: 'error', message: '明治以前の日付は変換できません。' };
     }
     return {
+      kind: 'ok',
       text: `${wareki.era}${wareki.year}年${wareki.month}月${wareki.day}日`,
       reverseQuery: {
         era: wareki.era,
@@ -30,8 +31,8 @@ function tryConvert(year: number | null, month: number | null, day: number | nul
       },
     };
   } catch (e) {
-    if (e instanceof Error) return { error: e.message };
-    return { error: '変換中にエラーが発生しました。' };
+    if (e instanceof Error) return { kind: 'error', message: e.message };
+    return { kind: 'error', message: '変換中にエラーが発生しました。' };
   }
 }
 

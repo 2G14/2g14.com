@@ -20,12 +20,13 @@ function tryConvert(
   day: number | null,
 ): ConvertResult {
   const parsed = parseDateInput(year, month, day);
-  if (!parsed || 'error' in parsed) return parsed;
+  if (parsed.kind !== 'ok') return parsed;
 
   try {
-    const wareki = createWareki({ era, ...parsed });
+    const wareki = createWareki({ era, ...parsed.date });
     const seireki = warekiToSeireki(wareki);
     return {
+      kind: 'ok',
       text: `${seireki.year}年${seireki.month}月${seireki.day}日`,
       reverseQuery: {
         year: seireki.year,
@@ -34,8 +35,8 @@ function tryConvert(
       },
     };
   } catch (e) {
-    if (e instanceof Error) return { error: e.message };
-    return { error: '変換中にエラーが発生しました。' };
+    if (e instanceof Error) return { kind: 'error', message: e.message };
+    return { kind: 'error', message: '変換中にエラーが発生しました。' };
   }
 }
 

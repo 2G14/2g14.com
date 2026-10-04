@@ -69,14 +69,12 @@ export default function ConverterView({
       <div class="card bg-base-100 shadow">
         <div class="card-body">
           <h2 class="card-title">{resultTitle}</h2>
-          {result ? (
-            'error' in result ? (
-              <div role="alert" class="mt-2 alert alert-error">
-                <span>{result.error}</span>
-              </div>
-            ) : (
-              <p class="mt-4 text-center text-2xl font-bold">{result.text}</p>
-            )
+          {result.kind === 'ok' ? (
+            <p class="mt-4 text-center text-2xl font-bold">{result.text}</p>
+          ) : result.kind === 'error' ? (
+            <div role="alert" class="mt-2 alert alert-error">
+              <span>{result.message}</span>
+            </div>
           ) : (
             <p class="mt-2 text-base-content/50">{placeholder}</p>
           )}
