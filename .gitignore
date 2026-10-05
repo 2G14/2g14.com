@@ -27,3 +27,9 @@ pnpm-debug.log*
 
 # Claude Code worktrees
 .claude/worktrees/
+
+# playwright
+test-results/
+playwright-report/
+blob-report/
+playwright/.cache/

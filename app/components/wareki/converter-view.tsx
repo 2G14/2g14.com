@@ -35,6 +35,7 @@ export default function ConverterView({
               type="button"
               class="btn btn-square btn-ghost btn-sm"
               onClick={() => setCalendarOpen(!calendarOpen)}
+              aria-label="カレンダーで選択"
               title="カレンダーで選択"
             >
               <svg
@@ -60,6 +61,7 @@ export default function ConverterView({
         <a
           href={reverseUrl}
           class="btn btn-circle rotate-90 btn-outline btn-sm md:rotate-0"
+          aria-label="逆変換"
           title="逆変換"
         >
           ⇄

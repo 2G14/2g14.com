@@ -1,0 +1,90 @@
+#!/usr/bin/env bash
+# ビジュアルリグレッションの比較を行う(--update で基準スナップショットを更新)。
+#
+# フォントのレンダリングは OS ごとに変わるため、スナップショットは CI と同じ Linux で
+# 生成したものだけを基準とする。ホストで wrangler dev を立て、Playwright 公式イメージの
+# コンテナからそこへ接続して撮影する。
+#
+# macOS の Docker Desktop 前提。wrangler dev は localhost にしかバインドせず、
+# Linux では host-gateway が docker0 の IP になって届かない(--ip 0.0.0.0 が要る)。
+set -euo pipefail
+
+cd "$(dirname "$0")/.."
+
+# 引数なしの実行が基準の書き換えにならないようにする
+MODE="${1:-check}"
+case "$MODE" in
+  check | --update) ;;
+  *)
+    echo "不明な引数: ${MODE}(使い方: $0 [--update])" >&2
+    exit 1
+    ;;
+esac
+
+# Linux では host.docker.internal が 127.0.0.1 のリスナに届かず 60 秒待って死ぬ。
+# 原因の分かる形で先に落とす
+if [ "$(uname)" != "Darwin" ]; then
+  echo "このスクリプトは macOS の Docker Desktop 前提です($(uname) で実行されました)。" >&2
+  echo "Linux で動かすには wrangler dev に --ip 0.0.0.0 を渡すか --network host に切り替えてください。" >&2
+  exit 1
+fi
+
+PORT=8787
+PW_VERSION="$(npx playwright --version | sed 's/^Version //')"
+IMAGE="mcr.microsoft.com/playwright:v${PW_VERSION}-noble"
+
+# 既に何かが待ち受けていると、そのサーバーに対して撮影してしまう。
+# --update では、古いビルドの画面がそのまま基準として焼き付く
+if curl -sf "http://localhost:${PORT}/" > /dev/null 2>&1; then
+  echo "ポート ${PORT} は既に使用されています。停止してから実行してください。" >&2
+  exit 1
+fi
+
+npm run build
+
+# ホットキー(b/d/x)用の raw mode に入らせない。この用途では使えないうえ、
+# 端末の状態を壊す・docker と入力を取り合う元になる
+./node_modules/.bin/wrangler dev --port "$PORT" < /dev/null &
+SERVER_PID=$!
+trap 'kill "$SERVER_PID" 2>/dev/null || true' EXIT
+
+echo "waiting for http://localhost:${PORT} ..."
+ready=false
+for _ in $(seq 1 60); do
+  if ! kill -0 "$SERVER_PID" 2> /dev/null; then
+    echo "wrangler dev が起動前に終了しました。" >&2
+    exit 1
+  fi
+  if curl -sf "http://localhost:${PORT}/" > /dev/null; then
+    ready=true
+    break
+  fi
+  sleep 1
+done
+
+if [ "$ready" != true ]; then
+  echo "http://localhost:${PORT} が 60 秒以内に応答しませんでした。" >&2
+  exit 1
+fi
+
+PW_ARGS=(--project=visual)
+if [ "$MODE" = "--update" ]; then
+  PW_ARGS+=(--update-snapshots)
+fi
+
+# node_modules をそのままマウントしている。コンテナ内で動かすのは pure JS の
+# Playwright だけで、esbuild や workerd のような macOS 向け native binary には触れない。
+# コンテナ側で npm run build までやりたくなったらこの前提が崩れる
+docker run --rm \
+  -v "$PWD:/work" -w /work \
+  --add-host=host.docker.internal:host-gateway \
+  --user "$(id -u):$(id -g)" \
+  -e HOME=/tmp \
+  -e CI=1 \
+  -e "E2E_BASE_URL=http://host.docker.internal:${PORT}" \
+  "$IMAGE" \
+  npx playwright test "${PW_ARGS[@]}"
+
+if [ "$MODE" = "--update" ]; then
+  echo "スナップショットを更新しました。差分を確認してコミットしてください。"
+fi
