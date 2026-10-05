@@ -32,7 +32,7 @@ test('絞り込んだ元号の対比表に開始年と終了年の行が並ぶ',
     table.getByRole('row').filter({ has: page.getByRole('cell', { name: seireki, exact: true }) });
 
   // 平成は 1989-01-08 開始、令和の開始年 2019 までを含む
-  await expect(rowOf('1989年').getByRole('cell').first()).toHaveText('1年');
+  await expect(rowOf('1989年').getByRole('cell').first()).toHaveText('元年');
   await expect(rowOf('2019年').getByRole('cell').first()).toHaveText('31年');
 });
 

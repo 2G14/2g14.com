@@ -40,8 +40,6 @@ test.describe('西暦→和暦 変換', () => {
   });
 
   test('逆変換リンクから和暦→西暦へ変換結果を引き継いで遷移できる', async ({ page }) => {
-    // 月/日が 1 のときクエリが省略され、遷移先が「今日」を初期値にしてしまうため
-    // 往復が壊れる(https://github.com/2G14/2g14.com/issues/25)。ここでは 15 日で確認する
     await page.goto(`${FROM_SEIREKI}?year=2020&month=5&day=15`);
     await expect(page.getByText('令和2年5月15日')).toBeVisible();
 
@@ -99,21 +97,14 @@ test.describe('和暦→西暦 変換', () => {
   });
 
   test('その元号に存在しない日付でエラーが表示される', async ({ page }) => {
-    // 令和は 2019-05-01 開始で、令和1年1月1日は存在しない
+    // 令和は 2019-05-01 開始で、令和元年1月1日は存在しない
     await page.goto(`${TO_SEIREKI}?era=${encodeURIComponent('令和')}&year=1&month=1&day=1`);
 
-    await expect(page.getByRole('alert')).toHaveText('令和1年1月1日は存在しません');
+    await expect(page.getByRole('alert')).toHaveText('令和元年1月1日は存在しません');
   });
 });
 
 test('月/日が 1 でも逆変換の往復で日付が保たれる', async ({ page }) => {
-  // 遷移先は未指定の月/日を「今日」で埋めるため、1月1日だけは壊れていても往復が成立する
-  const now = new Date();
-  test.skip(now.getMonth() === 0 && now.getDate() === 1, '既定値と期待値が偶然一致する日');
-
-  // #25 が直るまで失敗する。修正されると「予期せず成功した」で落ちるので気づける
-  test.fail();
-
   await page.goto(`${FROM_SEIREKI}?year=2020&month=1&day=1`);
   await expect(page.getByText('令和2年1月1日')).toBeVisible();
 
