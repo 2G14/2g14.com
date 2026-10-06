@@ -23,6 +23,10 @@ export function lookupEto(year: number | null): EtoResult {
     kind: 'ok',
     year,
     eto,
-    sameJunishiYears: yearsForJunishi(junishiIndex, year - NEIGHBOR_RANGE, year + NEIGHBOR_RANGE),
+    sameJunishiYears: yearsForJunishi(
+      junishiIndex,
+      Math.max(year - NEIGHBOR_RANGE, MIN_YEAR),
+      Math.min(year + NEIGHBOR_RANGE, MAX_YEAR),
+    ),
   };
 }

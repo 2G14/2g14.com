@@ -10,6 +10,14 @@ describe('lookupEto', () => {
     expect(result.kind === 'ok' && result.sameJunishiYears).toEqual([2050, 2038, 2026, 2014, 2002]);
   });
 
+  it('同じ十二支の年は入力できる範囲(1〜9999)に収める', () => {
+    const atMin = lookupEto(1);
+    const atMax = lookupEto(9999);
+
+    expect(atMin.kind === 'ok' && atMin.sameJunishiYears).toEqual([25, 13, 1]);
+    expect(atMax.kind === 'ok' && atMax.sameJunishiYears).toEqual([9999, 9987, 9975]);
+  });
+
   it('年が未入力なら empty を返す', () => {
     expect(lookupEto(null)).toEqual({ kind: 'empty' });
   });
