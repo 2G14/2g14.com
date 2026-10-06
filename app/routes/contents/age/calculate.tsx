@@ -1,6 +1,7 @@
 import { createRoute } from 'honox/factory';
 
 import PageHead from '#app/components/page-head.js';
+import ToolPageLayout from '#app/components/tool-page-layout.js';
 import AgeCalculator from '#app/islands/age-calculator.js';
 
 const PAGE_TITLE = '生年月日から年齢計算 - 満年齢・数え年・生後日数';
@@ -26,17 +27,9 @@ export default createRoute((c) => {
   );
 
   return c.render(
-    <div>
-      <header class="navbar sticky top-0 z-30 min-h-12 bg-base-100 shadow-sm">
-        <div class="flex-1">
-          <h1 class="text-xl font-bold">生年月日から年齢計算</h1>
-        </div>
-      </header>
-
-      <div class="mx-auto my-8 max-w-5xl px-4">
-        <AgeCalculator initialYear={yearParam} initialMonth={monthParam} initialDay={dayParam} />
-      </div>
-    </div>,
+    <ToolPageLayout title="生年月日から年齢計算">
+      <AgeCalculator initialYear={yearParam} initialMonth={monthParam} initialDay={dayParam} />
+    </ToolPageLayout>,
     { title: PAGE_TITLE, head },
   );
 });

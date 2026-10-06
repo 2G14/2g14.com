@@ -1,6 +1,7 @@
 import { createRoute } from 'honox/factory';
 
 import PageHead from '#app/components/page-head.js';
+import ToolPageLayout from '#app/components/tool-page-layout.js';
 import EtoYearSearch from '#app/islands/eto-year-search.js';
 
 const PAGE_TITLE = '生まれ年の干支検索 - 西暦年から干支を調べる';
@@ -23,17 +24,9 @@ export default createRoute((c) => {
   );
 
   return c.render(
-    <div>
-      <header class="navbar sticky top-0 z-30 min-h-12 bg-base-100 shadow-sm">
-        <div class="flex-1">
-          <h1 class="text-xl font-bold">生まれ年の干支検索</h1>
-        </div>
-      </header>
-
-      <div class="mx-auto my-8 max-w-5xl px-4">
-        <EtoYearSearch initialYear={yearParam} />
-      </div>
-    </div>,
+    <ToolPageLayout title="生まれ年の干支検索">
+      <EtoYearSearch initialYear={yearParam} />
+    </ToolPageLayout>,
     { title: PAGE_TITLE, head },
   );
 });

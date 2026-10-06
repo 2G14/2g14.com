@@ -1,6 +1,7 @@
 import { createRoute } from 'honox/factory';
 
 import PageHead from '#app/components/page-head.js';
+import ToolPageLayout from '#app/components/tool-page-layout.js';
 import { etoFromYear } from '#src/domain/eto/eto.js';
 import { warekiYearLabel } from '#src/domain/wareki/year-label.js';
 import { todayInJST } from '#src/lib/date.js';
@@ -38,58 +39,50 @@ export default createRoute((c) => {
   );
 
   return c.render(
-    <div>
-      <header class="navbar sticky top-0 z-30 min-h-12 bg-base-100 shadow-sm">
-        <div class="flex-1">
-          <h1 class="text-xl font-bold">年齢早見表</h1>
-        </div>
-      </header>
+    <ToolPageLayout title="年齢早見表">
+      <p class="mb-4 text-sm text-base-content/60">
+        {currentYear}年の年齢早見表です。満年齢は今年の誕生日を迎えた後の年齢です（誕生日前は 1
+        歳引いてください）。
+      </p>
 
-      <div class="mx-auto my-8 max-w-5xl px-4">
-        <p class="mb-4 text-sm text-base-content/60">
-          {currentYear}年の年齢早見表です。満年齢は今年の誕生日を迎えた後の年齢です（誕生日前は 1
-          歳引いてください）。
-        </p>
-
-        <div class="card bg-base-100 shadow">
-          <div class="card-body p-0">
-            <div class="overflow-x-auto">
-              <table class="table table-zebra">
-                <caption class="sr-only">生まれ年ごとの年齢早見表</caption>
-                <thead>
-                  <tr>
-                    <th>西暦</th>
-                    <th>和暦</th>
-                    <th>満年齢</th>
-                    <th>数え年</th>
-                    <th>干支</th>
+      <div class="card bg-base-100 shadow">
+        <div class="card-body p-0">
+          <div class="overflow-x-auto">
+            <table class="table table-zebra">
+              <caption class="sr-only">生まれ年ごとの年齢早見表</caption>
+              <thead>
+                <tr>
+                  <th>西暦</th>
+                  <th>和暦</th>
+                  <th>満年齢</th>
+                  <th>数え年</th>
+                  <th>干支</th>
+                </tr>
+              </thead>
+              <tbody>
+                {rows.map((row) => (
+                  <tr class="hover:bg-base-200">
+                    <td>
+                      <a href={`/contents/age/calculate?year=${row.year}`} class="link">
+                        {row.year}年
+                      </a>
+                    </td>
+                    <td>{row.warekiLabel ?? '—'}</td>
+                    <td>{row.fullAge}歳</td>
+                    <td>{row.kazoedoshi}歳</td>
+                    <td>
+                      <a href={`/contents/eto/search-by-year?year=${row.year}`} class="link">
+                        {row.eto.junishi.kanji}（{row.eto.junishi.animal}）・{row.eto.kanji}
+                      </a>
+                    </td>
                   </tr>
-                </thead>
-                <tbody>
-                  {rows.map((row) => (
-                    <tr class="hover:bg-base-200">
-                      <td>
-                        <a href={`/contents/age/calculate?year=${row.year}`} class="link">
-                          {row.year}年
-                        </a>
-                      </td>
-                      <td>{row.warekiLabel ?? '—'}</td>
-                      <td>{row.fullAge}歳</td>
-                      <td>{row.kazoedoshi}歳</td>
-                      <td>
-                        <a href={`/contents/eto/search-by-year?year=${row.year}`} class="link">
-                          {row.eto.junishi.kanji}（{row.eto.junishi.animal}）・{row.eto.kanji}
-                        </a>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
+                ))}
+              </tbody>
+            </table>
           </div>
         </div>
       </div>
-    </div>,
+    </ToolPageLayout>,
     { title: PAGE_TITLE, head },
   );
 });

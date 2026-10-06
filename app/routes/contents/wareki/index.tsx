@@ -1,7 +1,7 @@
 import { createRoute } from 'honox/factory';
 
 import PageHead from '#app/components/page-head.js';
-import ToolPageLayout from '#app/components/tool-page-layout.js';
+import ToolIndex from '#app/components/tool-index.js';
 
 const PAGE_TITLE = '和暦ツール';
 const META_DESCRIPTION =
@@ -43,19 +43,5 @@ export default createRoute((c) => {
     />
   );
 
-  return c.render(
-    <ToolPageLayout title={PAGE_TITLE}>
-      <div class="grid grid-cols-1 gap-3 sm:grid-cols-2">
-        {PAGES.map((page) => (
-          <a href={page.href} class="card bg-base-100 shadow transition-shadow hover:shadow-md">
-            <div class="card-body p-4">
-              <h2 class="card-title text-base">{page.label}</h2>
-              <p class="text-sm text-base-content/60">{page.description}</p>
-            </div>
-          </a>
-        ))}
-      </div>
-    </ToolPageLayout>,
-    { title: PAGE_TITLE, head },
-  );
+  return c.render(<ToolIndex title={PAGE_TITLE} pages={PAGES} />, { title: PAGE_TITLE, head });
 });
