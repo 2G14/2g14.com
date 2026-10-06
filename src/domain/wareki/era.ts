@@ -64,6 +64,9 @@ export const ERAS = RAW_ERAS.map((e, i) => ({
 
 export type EraName = Era['name'];
 
+/** 変換できる最も古い日付（明治の始まり） */
+export const EARLIEST_ERA_START: Seireki = ERAS.at(-1)!.start;
+
 export class InvalidEraError extends Error {
   constructor(message: string = '不明な元号です') {
     super(message);

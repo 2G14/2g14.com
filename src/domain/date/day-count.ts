@@ -16,3 +16,8 @@ export function toDayNumber(date: Seireki): number {
 export function diffDays(from: Seireki, to: Seireki): number {
   return toDayNumber(to) - toDayNumber(from);
 }
+
+/** 0 = 日曜 … 6 = 土曜。1970-01-01 は木曜(4) */
+export function dayOfWeek(date: Seireki): number {
+  return (((toDayNumber(date) + 4) % 7) + 7) % 7;
+}

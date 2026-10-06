@@ -1,3 +1,5 @@
+import { dayOfWeek } from '#src/domain/date/day-count.js';
+import { createSeireki, daysInMonth } from '#src/domain/date/seireki.js';
 import { todayInJST } from '#src/lib/date.js';
 
 const WEEKDAY_LABELS = ['日', '月', '火', '水', '木', '金', '土'] as const;
@@ -17,14 +19,16 @@ export default function CalendarGrid({
   onDayClick,
   disabledDays,
 }: CalendarGridProps) {
-  const firstDayOfWeek = new Date(seirekiYear, month - 1, 1).getDay();
-  const daysInMonth = new Date(seirekiYear, month, 0).getDate();
+  // Date は 0〜99 年を 1900 年代に読み替えるため使わない
+  const weekdayOf = (day: number) => dayOfWeek(createSeireki({ year: seirekiYear, month, day }));
+  const firstDayOfWeek = weekdayOf(1);
+  const lastDay = daysInMonth(seirekiYear, month);
 
   const today = todayInJST();
 
   const cells: (number | null)[] = [];
   for (let i = 0; i < firstDayOfWeek; i++) cells.push(null);
-  for (let d = 1; d <= daysInMonth; d++) cells.push(d);
+  for (let d = 1; d <= lastDay; d++) cells.push(d);
 
   return (
     <div class="grid grid-cols-7 gap-1 text-center text-sm">
@@ -41,7 +45,7 @@ export default function CalendarGrid({
       {cells.map((day) => {
         if (day === null) return <div class="h-9 w-9" />;
 
-        const dayOfWeek = new Date(seirekiYear, month - 1, day).getDay();
+        const weekday = weekdayOf(day);
         const isDisabled = disabledDays?.has(day) ?? false;
         const isSelected =
           selectedDate !== null &&
@@ -60,8 +64,8 @@ export default function CalendarGrid({
         if (isDisabled) {
           cls += ' btn-disabled opacity-40';
         } else if (!isSelected) {
-          if (dayOfWeek === 0) cls += ' text-error';
-          else if (dayOfWeek === 6) cls += ' text-info';
+          if (weekday === 0) cls += ' text-error';
+          else if (weekday === 6) cls += ' text-info';
         }
 
         return (

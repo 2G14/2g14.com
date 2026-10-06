@@ -9,6 +9,7 @@ import { replaceUrlQuery } from '#app/lib/url.js';
 import { type ConvertResult, reverseToolUrl } from '#app/lib/wareki/convert-result.js';
 import { createSeireki } from '#src/domain/date/seireki.js';
 import { seirekiToWareki } from '#src/domain/wareki/conversion.js';
+import { EARLIEST_ERA_START } from '#src/domain/wareki/era.js';
 import { formatWareki } from '#src/domain/wareki/format.js';
 import { todayInJST } from '#src/lib/date.js';
 
@@ -75,6 +76,7 @@ export default function SeirekiToWarekiConverter({ initialYear, initialMonth, in
           year={year}
           month={month}
           day={day}
+          min={EARLIEST_ERA_START}
           onDateSelect={(y, m, d) => {
             setYear(y);
             setMonth(m);

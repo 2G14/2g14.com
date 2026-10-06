@@ -25,25 +25,15 @@ function isLeapYear(year: number): boolean {
   return (year % 4 === 0 && year % 100 !== 0) || year % 400 === 0;
 }
 
+export function daysInMonth(year: number, month: number): number {
+  const days = [31, isLeapYear(year) ? 29 : 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31][month - 1];
+  if (days === undefined) throw new InvalidSeirekiError(`想定外の月: ${month}`);
+  return days;
+}
+
 export function isValidDate(year: number, month: number, day: number): boolean {
   if (month < 1 || month > 12) return false;
-  const daysInMonth = [
-    31,
-    isLeapYear(year) ? 29 : 28,
-    31,
-    30,
-    31,
-    30,
-    31,
-    31,
-    30,
-    31,
-    30,
-    31,
-  ] as const;
-  const days = daysInMonth[month - 1];
-  if (!days) throw new InvalidSeirekiError(`想定外の月: ${month}`);
-  return day >= 1 && day <= days;
+  return day >= 1 && day <= daysInMonth(year, month);
 }
 
 export function createSeireki({ year, month, day }: SeirekiInput): Seireki {

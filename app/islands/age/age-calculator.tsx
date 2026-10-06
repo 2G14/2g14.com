@@ -12,6 +12,9 @@ import { createSeireki } from '#src/domain/date/seireki.js';
 import { formatWareki } from '#src/domain/wareki/format.js';
 import { todayInJST } from '#src/lib/date.js';
 
+// 入力欄の年の下限(1)に合わせる
+const EARLIEST_BIRTH_DATE = { year: 1, month: 1, day: 1 };
+
 interface Props {
   initialYear?: string | undefined;
   initialMonth?: string | undefined;
@@ -50,6 +53,7 @@ export default function AgeCalculator({ initialYear, initialMonth, initialDay }:
               year={year}
               month={month}
               day={day}
+              min={EARLIEST_BIRTH_DATE}
               onDateSelect={(y, m, d) => {
                 setYear(y);
                 setMonth(m);
