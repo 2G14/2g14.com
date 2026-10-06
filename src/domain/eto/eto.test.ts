@@ -48,6 +48,7 @@ describe('etoFromYear', () => {
   it('非整数はエラーになる', () => {
     expect(() => etoFromYear(2025.5)).toThrow(InvalidEtoYearError);
     expect(() => etoFromYear(Number.NaN)).toThrow(InvalidEtoYearError);
+    expect(() => etoFromYear(1e21)).toThrow(InvalidEtoYearError);
   });
 });
 
@@ -60,5 +61,9 @@ describe('yearsForJunishi', () => {
   it('範囲外の十二支番号はエラーになる', () => {
     expect(() => yearsForJunishi(-1, 2000, 2026)).toThrow(InvalidEtoYearError);
     expect(() => yearsForJunishi(12, 2000, 2026)).toThrow(InvalidEtoYearError);
+  });
+
+  it('安全な整数を超える年は例外を投げる', () => {
+    expect(() => yearsForJunishi(0, 1e21 - 24, 1e21 + 24)).toThrow(InvalidEtoYearError);
   });
 });

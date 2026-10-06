@@ -14,6 +14,12 @@ describe('lookupEto', () => {
     expect(lookupEto(null)).toEqual({ kind: 'empty' });
   });
 
+  it('入力欄の範囲(1〜9999)外の年はエラーを返す', () => {
+    expect(lookupEto(0)).toMatchObject({ kind: 'error' });
+    expect(lookupEto(10000)).toMatchObject({ kind: 'error' });
+    expect(lookupEto(1e21)).toMatchObject({ kind: 'error' });
+  });
+
   it('整数でない年はエラーを返す', () => {
     expect(lookupEto(2026.5)).toMatchObject({ kind: 'error' });
   });

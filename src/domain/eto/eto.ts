@@ -38,7 +38,10 @@ export const JUNISHI = [
   { kanji: '亥', kana: 'い', animal: 'いのしし', emoji: '🐗' },
 ] as const satisfies readonly Junishi[];
 
+const brand = Symbol('Kanshi');
+
 export interface Kanshi {
+  readonly [brand]: unknown;
   readonly jikkan: Jikkan;
   readonly junishi: Junishi;
   /** 六十干支の通し番号（甲子 = 1、癸亥 = 60） */
@@ -67,8 +70,8 @@ function mod(n: number, m: number): number {
  * 西暦 4 年が甲子（1 番）であることを基準に 60 年周期で巡る。
  */
 export function etoFromYear(year: number): Kanshi {
-  if (!Number.isInteger(year)) {
-    throw new InvalidEtoYearError(`年は整数である必要があります: ${year}`);
+  if (!Number.isSafeInteger(year)) {
+    throw new InvalidEtoYearError(`年は安全な整数である必要があります: ${year}`);
   }
 
   const jikkan = JIKKAN[mod(year - 4, 10)]!;
@@ -80,7 +83,7 @@ export function etoFromYear(year: number): Kanshi {
     kanshiNumber: mod(year - 4, 60) + 1,
     kanji: `${jikkan.kanji}${junishi.kanji}`,
     reading: `${jikkan.kana}${junishi.kana}`,
-  };
+  } as Kanshi;
 }
 
 /**
@@ -89,6 +92,10 @@ export function etoFromYear(year: number): Kanshi {
 export function yearsForJunishi(junishiIndex: number, fromYear: number, toYear: number): number[] {
   if (!Number.isInteger(junishiIndex) || junishiIndex < 0 || junishiIndex >= JUNISHI.length) {
     throw new InvalidEtoYearError(`十二支の番号は 0〜11 である必要があります: ${junishiIndex}`);
+  }
+  // 安全な整数を超えると year-- で値が変わらず、ループが終わらない
+  if (!Number.isSafeInteger(fromYear) || !Number.isSafeInteger(toYear)) {
+    throw new InvalidEtoYearError(`年は安全な整数である必要があります: ${fromYear}〜${toYear}`);
   }
 
   const years: number[] = [];
