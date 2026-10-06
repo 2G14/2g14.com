@@ -2,7 +2,7 @@ import { createRoute } from 'honox/factory';
 
 import PageHead from '#app/components/page-head.js';
 import ToolPageLayout from '#app/components/tool-page-layout.js';
-import EtoYearSearch from '#app/islands/eto-year-search.js';
+import EtoYearSearch from '#app/islands/eto/eto-year-search.js';
 
 const PAGE_TITLE = '生まれ年の干支検索 - 西暦年から干支を調べる';
 const META_DESCRIPTION =

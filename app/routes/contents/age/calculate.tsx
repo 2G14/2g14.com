@@ -2,7 +2,7 @@ import { createRoute } from 'honox/factory';
 
 import PageHead from '#app/components/page-head.js';
 import ToolPageLayout from '#app/components/tool-page-layout.js';
-import AgeCalculator from '#app/islands/age-calculator.js';
+import AgeCalculator from '#app/islands/age/age-calculator.js';
 
 const PAGE_TITLE = '生年月日から年齢計算 - 満年齢・数え年・生後日数';
 const META_DESCRIPTION =

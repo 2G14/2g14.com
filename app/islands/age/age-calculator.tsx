@@ -2,13 +2,14 @@ import { useEffect, useState } from 'hono/jsx';
 
 import CalendarToggleButton from '#app/components/calendar-toggle-button.js';
 import DateField from '#app/components/date-field.js';
-import SeirekiCalendar from '#app/components/wareki/seireki-calendar.js';
+import SeirekiCalendar from '#app/components/seireki-calendar.js';
 import { calculateAgeResult } from '#app/lib/age/age-result.js';
 import { isInteger } from '#app/lib/date-input.js';
+import { dateQueryString, dateToolUrl, parseQueryNumber } from '#app/lib/date-query.js';
 import { replaceUrlQuery } from '#app/lib/url.js';
-import { dateQueryString, dateToolUrl, parseQueryNumber } from '#app/lib/wareki/date-query.js';
+import { formatSeireki } from '#src/domain/date/format.js';
 import { createSeireki } from '#src/domain/date/seireki.js';
-import { formatSeireki, formatWareki } from '#src/domain/wareki/format.js';
+import { formatWareki } from '#src/domain/wareki/format.js';
 import { todayInJST } from '#src/lib/date.js';
 
 interface Props {

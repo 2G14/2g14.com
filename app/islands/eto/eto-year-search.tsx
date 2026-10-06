@@ -2,9 +2,9 @@ import { useEffect, useState } from 'hono/jsx';
 
 import DateField from '#app/components/date-field.js';
 import { isInteger } from '#app/lib/date-input.js';
+import { parseQueryNumber } from '#app/lib/date-query.js';
 import { lookupEto } from '#app/lib/eto/eto-result.js';
 import { replaceUrlQuery } from '#app/lib/url.js';
-import { parseQueryNumber } from '#app/lib/wareki/date-query.js';
 import { warekiYearLabel } from '#src/domain/wareki/year-label.js';
 import { todayInJST } from '#src/lib/date.js';
 

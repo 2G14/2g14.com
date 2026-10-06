@@ -1,6 +1,7 @@
+import { formatMonthDay } from '../date/format.js';
 import { InvalidSeirekiError, isValidDate } from '../date/seireki.js';
 import { ERAS, type EraName, InvalidEraError } from './era.js';
-import { formatMonthDay, formatWarekiEraYear } from './format.js';
+import { formatWarekiEraYear } from './format.js';
 
 const brand = Symbol('Wareki');
 

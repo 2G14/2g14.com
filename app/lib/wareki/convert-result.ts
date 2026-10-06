@@ -1,5 +1,5 @@
+import { type DateQueryValues, dateToolUrl } from '../date-query.js';
 import type { NoResult } from '../result.js';
-import { type DateQueryValues, dateToolUrl } from './date-query.js';
 
 export type ConvertResult = NoResult | { kind: 'ok'; text: string; reverseQuery: DateQueryValues };
 

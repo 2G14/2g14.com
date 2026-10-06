@@ -2,10 +2,11 @@ import { createRoute } from 'honox/factory';
 
 import PageHead from '#app/components/page-head.js';
 import ToolPageLayout from '#app/components/tool-page-layout.js';
+import { formatSeirekiYear } from '#src/domain/date/format.js';
 import { createSeireki } from '#src/domain/date/seireki.js';
 import { etoFromYear } from '#src/domain/eto/eto.js';
 import { seirekiToWareki } from '#src/domain/wareki/conversion.js';
-import { formatSeirekiYear, formatWarekiEraYear } from '#src/domain/wareki/format.js';
+import { formatWarekiEraYear } from '#src/domain/wareki/format.js';
 import { todayInJST } from '#src/lib/date.js';
 
 const PAGE_TITLE = '今年の干支 - 今年の十二支と十干十二支を表示';
