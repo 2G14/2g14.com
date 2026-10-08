@@ -32,6 +32,9 @@ export default function EtoYearSearch({ initialYear }: Props) {
           <div class="mt-4 flex items-end gap-3">
             <DateField label="年" value={year} max={9999} widthClass="w-24" onInput={setYear} />
           </div>
+          <p class="mt-4 text-xs text-base-content/50">
+            ※ 干支は1月1日で切り替えています（立春で切り替える暦もあります）。
+          </p>
         </div>
       </div>
 

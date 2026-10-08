@@ -36,6 +36,9 @@ export function isValidDate(year: number, month: number, day: number): boolean {
   return day >= 1 && day <= daysInMonth(year, month);
 }
 
+/** 日本でグレゴリオ暦が施行された日（明治5年12月3日が明治6年1月1日になった） */
+export const GREGORIAN_START_IN_JAPAN: SeirekiInput = { year: 1873, month: 1, day: 1 };
+
 export function createSeireki({ year, month, day }: SeirekiInput): Seireki {
   if (!isValidDate(year, month, day)) {
     throw new InvalidSeirekiError(`無効な日付: ${year}-${month}-${day}`);

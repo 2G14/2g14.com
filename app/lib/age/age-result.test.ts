@@ -35,7 +35,8 @@ describe('calculateAgeResult', () => {
     expect(calculateAgeResult(2026, 10, 7, TODAY)).toMatchObject({ kind: 'error' });
   });
 
-  it('明治以前の生年月日でも年齢は計算し、和暦は null にする', () => {
-    expect(calculateAgeResult(1800, 1, 1, TODAY)).toMatchObject({ kind: 'ok', wareki: null });
+  it('日本でグレゴリオ暦が施行された 1873-01-01 より前はエラーを返す', () => {
+    expect(calculateAgeResult(1872, 12, 31, TODAY)).toMatchObject({ kind: 'error' });
+    expect(calculateAgeResult(1873, 1, 1, TODAY)).toMatchObject({ kind: 'ok' });
   });
 });

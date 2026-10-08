@@ -7,7 +7,12 @@ import {
   nextBirthday,
   weeksSinceBirth,
 } from '#src/domain/age/age.js';
-import { createSeireki, type Seireki } from '#src/domain/date/seireki.js';
+import {
+  compareSeirekis,
+  createSeireki,
+  GREGORIAN_START_IN_JAPAN,
+  type Seireki,
+} from '#src/domain/date/seireki.js';
 import { etoFromYear, type Kanshi } from '#src/domain/eto/eto.js';
 import { seirekiToWareki } from '#src/domain/wareki/conversion.js';
 import type { Wareki } from '#src/domain/wareki/wareki.js';
@@ -40,6 +45,13 @@ export function calculateAgeResult(
 
   try {
     const birth = createSeireki(parsed.date);
+    // それより前の日本の日付は旧暦で、西暦として入れても実際の暦日とずれる
+    if (compareSeirekis(birth, createSeireki(GREGORIAN_START_IN_JAPAN)) < 0) {
+      return {
+        kind: 'error',
+        message: '1873年（明治6年）1月1日より前の生年月日は計算できません。',
+      };
+    }
 
     return {
       kind: 'ok',

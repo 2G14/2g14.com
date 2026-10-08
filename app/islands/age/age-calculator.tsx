@@ -8,12 +8,9 @@ import { isInteger } from '#app/lib/date-input.js';
 import { dateQueryString, dateToolUrl, parseQueryNumber } from '#app/lib/date-query.js';
 import { replaceUrlQuery } from '#app/lib/url.js';
 import { formatSeireki } from '#src/domain/date/format.js';
-import { createSeireki } from '#src/domain/date/seireki.js';
+import { createSeireki, GREGORIAN_START_IN_JAPAN } from '#src/domain/date/seireki.js';
 import { formatWareki } from '#src/domain/wareki/format.js';
 import { todayInJST } from '#src/lib/date.js';
-
-// 入力欄の年の下限(1)に合わせる
-const EARLIEST_BIRTH_DATE = { year: 1, month: 1, day: 1 };
 
 interface Props {
   initialYear?: string | undefined;
@@ -53,7 +50,7 @@ export default function AgeCalculator({ initialYear, initialMonth, initialDay }:
               year={year}
               month={month}
               day={day}
-              min={EARLIEST_BIRTH_DATE}
+              min={GREGORIAN_START_IN_JAPAN}
               onDateSelect={(y, m, d) => {
                 setYear(y);
                 setMonth(m);
@@ -64,6 +61,7 @@ export default function AgeCalculator({ initialYear, initialMonth, initialDay }:
           <p class="mt-4 text-xs text-base-content/50">
             ※ 満年齢は誕生日当日に加齢する一般的な数え方です（法律上は誕生日の前日に加齢）。
             2月29日生まれは平年では3月1日に加齢するものとして扱います。
+            干支は1月1日で切り替えています（立春で切り替える暦もあります）。
           </p>
         </div>
       </div>
