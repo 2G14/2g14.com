@@ -14,4 +14,9 @@
   html {
     @apply scroll-smooth font-sans;
   }
+
+  /* popover は非モーダルで背景のスクロールを止めないため、ドロワー表示中はここで止める */
+  html:has(#toc-drawer:popover-open) {
+    overflow: hidden;
+  }
 }
