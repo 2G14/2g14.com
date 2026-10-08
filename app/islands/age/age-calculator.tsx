@@ -8,9 +8,12 @@ import { isInteger } from '#app/lib/date-input.js';
 import { dateQueryString, dateToolUrl, parseQueryNumber } from '#app/lib/date-query.js';
 import { replaceUrlQuery } from '#app/lib/url.js';
 import { formatSeireki } from '#src/domain/date/format.js';
-import { createSeireki, GREGORIAN_START_IN_JAPAN } from '#src/domain/date/seireki.js';
+import { createSeireki } from '#src/domain/date/seireki.js';
 import { formatWareki } from '#src/domain/wareki/format.js';
 import { todayInJST } from '#src/lib/date.js';
+
+// 入力欄の年の下限(1)に合わせる
+const EARLIEST_BIRTH_DATE = { year: 1, month: 1, day: 1 };
 
 interface Props {
   initialYear?: string | undefined;
@@ -38,7 +41,7 @@ export default function AgeCalculator({ initialYear, initialMonth, initialDay }:
     <div class="grid grid-cols-1 items-start gap-3 md:grid-cols-2 md:gap-6">
       <div class="card bg-base-100 shadow">
         <div class="card-body">
-          <h2 class="card-title">生年月日（西暦）</h2>
+          <h2 class="card-title">生年月日（西暦・グレゴリオ暦）</h2>
           <div class="mt-4 flex flex-wrap items-end gap-3">
             <DateField label="年" value={year} max={9999} widthClass="w-20" onInput={setYear} />
             <DateField label="月" value={month} max={12} widthClass="w-14" onInput={setMonth} />
@@ -50,7 +53,7 @@ export default function AgeCalculator({ initialYear, initialMonth, initialDay }:
               year={year}
               month={month}
               day={day}
-              min={GREGORIAN_START_IN_JAPAN}
+              min={EARLIEST_BIRTH_DATE}
               onDateSelect={(y, m, d) => {
                 setYear(y);
                 setMonth(m);
@@ -62,6 +65,7 @@ export default function AgeCalculator({ initialYear, initialMonth, initialDay }:
             ※ 満年齢は誕生日当日に加齢する一般的な数え方です（法律上は誕生日の前日に加齢）。
             2月29日生まれは平年では3月1日に加齢するものとして扱います。
             干支は1月1日で切り替えています（立春で切り替える暦もあります）。
+            1582年10月15日より前の日付も、グレゴリオ暦をさかのぼって計算します。
           </p>
         </div>
       </div>
@@ -101,26 +105,35 @@ export default function AgeCalculator({ initialYear, initialMonth, initialDay }:
               <div class="divider my-0" />
 
               <div class="text-sm text-base-content/70">
-                <p>
-                  生まれた日の和暦:{' '}
-                  {result.wareki ? (
-                    <a
-                      href={dateToolUrl('/contents/wareki/convert-from-seireki', result.birth)}
-                      class="link"
-                    >
-                      {formatWareki(result.wareki)}
-                    </a>
-                  ) : (
-                    '明治以前'
-                  )}
-                </p>
-                <p>
-                  生まれ年の干支:{' '}
-                  <a href={`/contents/eto/search-by-year?year=${result.birth.year}`} class="link">
-                    {result.eto.junishi.kanji}（{result.eto.junishi.animal}{' '}
-                    {result.eto.junishi.emoji}）・{result.eto.kanji}（{result.eto.reading}）
-                  </a>
-                </p>
+                {result.japaneseCalendar ? (
+                  <>
+                    <p>
+                      生まれた日の和暦:{' '}
+                      <a
+                        href={dateToolUrl('/contents/wareki/convert-from-seireki', result.birth)}
+                        class="link"
+                      >
+                        {formatWareki(result.japaneseCalendar.wareki)}
+                      </a>
+                    </p>
+                    <p>
+                      生まれ年の干支:{' '}
+                      <a
+                        href={`/contents/eto/search-by-year?year=${result.birth.year}`}
+                        class="link"
+                      >
+                        {result.japaneseCalendar.eto.junishi.kanji}（
+                        {result.japaneseCalendar.eto.junishi.animal}{' '}
+                        {result.japaneseCalendar.eto.junishi.emoji}）・
+                        {result.japaneseCalendar.eto.kanji}（{result.japaneseCalendar.eto.reading}）
+                      </a>
+                    </p>
+                  </>
+                ) : (
+                  <p>
+                    1873年より前は日本の暦（旧暦）とグレゴリオ暦の日付が合わないため、和暦と干支は表示しません。
+                  </p>
+                )}
               </div>
             </div>
           )}

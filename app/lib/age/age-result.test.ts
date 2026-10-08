@@ -14,8 +14,10 @@ describe('calculateAgeResult', () => {
       kind: 'ok',
       fullAge: 36,
       kazoedoshi: 37,
-      wareki: { era: '平成', year: 2, month: 5, day: 1 },
-      eto: { kanji: '庚午' },
+      japaneseCalendar: {
+        wareki: { era: '平成', year: 2, month: 5, day: 1 },
+        eto: { kanji: '庚午' },
+      },
     });
   });
 
@@ -35,8 +37,19 @@ describe('calculateAgeResult', () => {
     expect(calculateAgeResult(2026, 10, 7, TODAY)).toMatchObject({ kind: 'error' });
   });
 
-  it('日本でグレゴリオ暦が施行された 1873-01-01 より前はエラーを返す', () => {
-    expect(calculateAgeResult(1872, 12, 31, TODAY)).toMatchObject({ kind: 'error' });
-    expect(calculateAgeResult(1873, 1, 1, TODAY)).toMatchObject({ kind: 'ok' });
+  it('日本でグレゴリオ暦が施行された 1873-01-01 より前も年齢は計算し、和暦と干支は出さない', () => {
+    expect(calculateAgeResult(1872, 12, 31, TODAY)).toMatchObject({
+      kind: 'ok',
+      fullAge: 153,
+      japaneseCalendar: null,
+    });
+    expect(calculateAgeResult(1873, 1, 1, TODAY)).toMatchObject({
+      kind: 'ok',
+      japaneseCalendar: { wareki: { era: '明治', year: 6 } },
+    });
+  });
+
+  it('1582 年より前もグレゴリオ暦をさかのぼって計算する', () => {
+    expect(calculateAgeResult(1, 1, 1, TODAY)).toMatchObject({ kind: 'ok', fullAge: 2025 });
   });
 });

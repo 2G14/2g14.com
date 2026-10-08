@@ -28,8 +28,8 @@ interface AgeSummary {
   days: number;
   weeks: number;
   months: number;
-  wareki: Wareki | null;
-  eto: Kanshi;
+  /** 1873 年より前は null */
+  japaneseCalendar: { wareki: Wareki; eto: Kanshi } | null;
 }
 
 export type AgeResult = NoResult | ({ kind: 'ok' } & AgeSummary);
@@ -45,13 +45,10 @@ export function calculateAgeResult(
 
   try {
     const birth = createSeireki(parsed.date);
-    // それより前の日本の日付は旧暦で、西暦として入れても実際の暦日とずれる
-    if (compareSeirekis(birth, createSeireki(GREGORIAN_START_IN_JAPAN)) < 0) {
-      return {
-        kind: 'error',
-        message: '1873年（明治6年）1月1日より前の生年月日は計算できません。',
-      };
-    }
+    const wareki = seirekiToWareki(birth);
+    // それより前の日本は旧暦で、和暦の月日も干支が切り替わる正月もグレゴリオ暦と合わない
+    const usesJapaneseGregorian =
+      compareSeirekis(birth, createSeireki(GREGORIAN_START_IN_JAPAN)) >= 0;
 
     return {
       kind: 'ok',
@@ -62,8 +59,8 @@ export function calculateAgeResult(
       days: daysSinceBirth(birth, today),
       weeks: weeksSinceBirth(birth, today),
       months: monthsSinceBirth(birth, today),
-      wareki: seirekiToWareki(birth),
-      eto: etoFromYear(birth.year),
+      japaneseCalendar:
+        usesJapaneseGregorian && wareki ? { wareki, eto: etoFromYear(birth.year) } : null,
     };
   } catch (e) {
     if (e instanceof Error) return { kind: 'error', message: e.message };
