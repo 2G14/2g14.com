@@ -32,6 +32,9 @@ interface AgeSummary {
   japaneseCalendar: { wareki: Wareki; eto: Kanshi } | null;
 }
 
+// 入力欄の下限に合わせる。西暦 0 年や紀元前はグレゴリオ暦の年番号として扱わない
+const MIN_YEAR = 1;
+
 export type AgeResult = NoResult | ({ kind: 'ok' } & AgeSummary);
 
 export function calculateAgeResult(
@@ -42,6 +45,9 @@ export function calculateAgeResult(
 ): AgeResult {
   const parsed = parseDateInput(year, month, day);
   if (parsed.kind !== 'ok') return parsed;
+  if (parsed.date.year < MIN_YEAR) {
+    return { kind: 'error', message: `年は${MIN_YEAR}以上で入力してください。` };
+  }
 
   try {
     const birth = createSeireki(parsed.date);

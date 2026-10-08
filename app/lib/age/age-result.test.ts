@@ -25,6 +25,11 @@ describe('calculateAgeResult', () => {
     expect(calculateAgeResult(null, null, null, TODAY)).toEqual({ kind: 'empty' });
   });
 
+  it('1 年より前はエラーを返す', () => {
+    expect(calculateAgeResult(0, 1, 1, TODAY)).toMatchObject({ kind: 'error' });
+    expect(calculateAgeResult(-1, 1, 1, TODAY)).toMatchObject({ kind: 'error' });
+  });
+
   it('月や日が欠けていればエラーを返す', () => {
     expect(calculateAgeResult(1990, null, 1, TODAY)).toMatchObject({ kind: 'error' });
   });
