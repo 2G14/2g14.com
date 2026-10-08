@@ -60,60 +60,58 @@ export default createRoute((c) => {
   );
 
   return c.render(
-    <div class="drawer drawer-end">
-      <input id="toc-drawer" type="checkbox" class="drawer-toggle" />
-
-      <div class="drawer-content">
-        <ToolPageLayout
-          title="和暦/西暦 対比表"
-          headerExtra={
-            <div class="flex-none md:hidden">
-              <label for="toc-drawer" class="btn btn-ghost btn-sm">
-                目次
-              </label>
-            </div>
-          }
-        >
-          <div class="grid grid-cols-1 items-start gap-6 md:grid-cols-[1fr_200px]">
-            <main class="grid min-w-0 grid-cols-1 items-start gap-8">
-              {eras.map((era) => {
-                const endYear = era.end?.year ?? currentYear;
-                const pairs = eraYearPairs(era.start.year, endYear);
-                if (pairs.length === 0) return null;
-                return (
-                  <section id={anchorId(era.name)} class="scroll-mt-12">
-                    <h2 class="sticky top-12 z-20 rounded-xl bg-base-100/70 px-2 py-2 text-xl font-semibold backdrop-blur-md">
-                      {era.name}
-                    </h2>
-                    <div class="card mt-2 bg-base-100 shadow">
-                      <div class="card-body p-0">
-                        <div class="overflow-x-auto">
-                          <table class="table table-zebra">
-                            <caption class="sr-only">{era.name}の和暦・西暦対比表</caption>
-                            <thead>
-                              <tr>
-                                <th>和暦</th>
-                                <th>西暦</th>
+    <>
+      <ToolPageLayout
+        title="和暦/西暦 対比表"
+        headerExtra={
+          <div class="flex-none md:hidden">
+            <button type="button" popovertarget="toc-drawer" class="btn btn-ghost btn-sm">
+              目次
+            </button>
+          </div>
+        }
+      >
+        <div class="grid grid-cols-1 items-start gap-6 md:grid-cols-[1fr_200px]">
+          <main class="grid min-w-0 grid-cols-1 items-start gap-8">
+            {eras.map((era) => {
+              const endYear = era.end?.year ?? currentYear;
+              const pairs = eraYearPairs(era.start.year, endYear);
+              if (pairs.length === 0) return null;
+              return (
+                <section id={anchorId(era.name)} class="scroll-mt-12">
+                  <h2 class="sticky top-12 z-20 rounded-xl bg-base-100/70 px-2 py-2 text-xl font-semibold backdrop-blur-md">
+                    {era.name}
+                  </h2>
+                  <div class="card mt-2 bg-base-100 shadow">
+                    <div class="card-body p-0">
+                      <div class="overflow-x-auto">
+                        <table class="table table-zebra">
+                          <caption class="sr-only">{era.name}の和暦・西暦対比表</caption>
+                          <thead>
+                            <tr>
+                              <th>和暦</th>
+                              <th>西暦</th>
+                            </tr>
+                          </thead>
+                          <tbody>
+                            {pairs.map(({ wareki, seireki }) => (
+                              <tr class="hover:bg-base-200">
+                                <td>{formatWarekiYear(wareki)}</td>
+                                <td>{seireki}年</td>
                               </tr>
-                            </thead>
-                            <tbody>
-                              {pairs.map(({ wareki, seireki }) => (
-                                <tr class="hover:bg-base-200">
-                                  <td>{formatWarekiYear(wareki)}</td>
-                                  <td>{seireki}年</td>
-                                </tr>
-                              ))}
-                            </tbody>
-                          </table>
-                        </div>
+                            ))}
+                          </tbody>
+                        </table>
                       </div>
                     </div>
-                  </section>
-                );
-              })}
-            </main>
+                  </div>
+                </section>
+              );
+            })}
+          </main>
 
-            <aside class="hidden max-h-[calc(100vh-4rem)] w-48 self-start overflow-auto md:sticky md:top-24 md:block">
+          <aside class="hidden max-h-[calc(100vh-4rem)] w-48 self-start overflow-auto md:sticky md:top-24 md:block">
+            <nav aria-label="目次">
               <ul class="menu menu-sm">
                 {tocItems.map((item) => (
                   <li>
@@ -121,35 +119,46 @@ export default createRoute((c) => {
                   </li>
                 ))}
               </ul>
-            </aside>
-          </div>
-        </ToolPageLayout>
-      </div>
-
-      <div class="drawer-side z-40">
-        <label for="toc-drawer" class="drawer-overlay" />
-        <div class="min-h-full w-64 bg-base-100">
-          <div class="flex items-center justify-between border-b border-base-300 px-4 py-3">
-            <h2 class="text-lg font-semibold">目次</h2>
-            <label for="toc-drawer" class="btn btn-circle btn-ghost btn-sm">
-              &times;
-            </label>
-          </div>
-          <ul class="menu">
-            {tocItems.map((item) => (
-              <li>
-                <a
-                  href={`#${anchorId(item)}`}
-                  onclick="document.getElementById('toc-drawer').checked=false"
-                >
-                  {item}
-                </a>
-              </li>
-            ))}
-          </ul>
+            </nav>
+          </aside>
         </div>
-      </div>
-    </div>,
+      </ToolPageLayout>
+
+      {/* daisyUI の drawer は checkbox + label で組まれ、トグルが button role を持てないため
+          Popover API で組む。Esc・外側クリックでの close と aria-expanded はブラウザが担う。
+          popover を真偽値で書くと Hono が popover="true" を出力し、無効値として manual 扱いになる */}
+      <nav
+        id="toc-drawer"
+        popover="auto"
+        aria-label="目次(ドロワー)"
+        class="fixed inset-y-0 right-0 left-auto m-0 h-dvh max-h-none w-64 translate-x-full border-0 bg-base-100 p-0 text-base-content transition-all transition-discrete duration-300 backdrop:bg-black/40 open:translate-x-0 starting:open:translate-x-full"
+      >
+        <div class="flex items-center justify-between border-b border-base-300 px-4 py-3">
+          <h2 class="text-lg font-semibold">目次</h2>
+          <button
+            type="button"
+            popovertarget="toc-drawer"
+            popovertargetaction="hide"
+            aria-label="目次を閉じる"
+            class="btn btn-circle btn-ghost btn-sm"
+          >
+            &times;
+          </button>
+        </div>
+        <ul class="menu w-full">
+          {tocItems.map((item) => (
+            <li>
+              <a
+                href={`#${anchorId(item)}`}
+                onclick="document.getElementById('toc-drawer').hidePopover()"
+              >
+                {item}
+              </a>
+            </li>
+          ))}
+        </ul>
+      </nav>
+    </>,
     { title: PAGE_TITLE, head },
   );
 });
