@@ -1,4 +1,10 @@
-import { createSeireki, type Seireki, type SeirekiInput } from '../date/seireki.js';
+import {
+  compareSeirekis,
+  createSeireki,
+  GREGORIAN_START_IN_JAPAN,
+  type Seireki,
+  type SeirekiInput,
+} from '../date/seireki.js';
 
 const RAW_ERAS = [
   {
@@ -51,7 +57,11 @@ export interface Era {
   readonly abbreviation: string;
   readonly start: Seireki;
   readonly end: Seireki | null;
+  /** 変換を受け付ける最初の日。明治はグレゴリオ暦施行前の旧暦の期間を除く */
+  readonly convertibleFrom: Seireki;
 }
+
+const gregorianStart = createSeireki(GREGORIAN_START_IN_JAPAN);
 
 export const ERAS = RAW_ERAS.map((e, i) => ({
   name: e.name,
@@ -60,12 +70,13 @@ export const ERAS = RAW_ERAS.map((e, i) => ({
   abbreviation: e.abbreviation,
   start: createSeireki(e.start),
   end: i > 0 ? createSeireki(RAW_ERAS[i - 1]!.start) : null,
+  convertibleFrom:
+    compareSeirekis(createSeireki(e.start), gregorianStart) < 0
+      ? gregorianStart
+      : createSeireki(e.start),
 })) satisfies readonly Era[];
 
 export type EraName = Era['name'];
-
-/** 変換できる最も古い日付（明治の始まり） */
-export const EARLIEST_ERA_START: Seireki = ERAS.at(-1)!.start;
 
 export class InvalidEraError extends Error {
   constructor(message: string = '不明な元号です') {

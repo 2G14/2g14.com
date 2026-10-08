@@ -20,7 +20,7 @@ export function warekiToSeireki(wareki: Wareki): Seireki {
  */
 export function seirekiToWareki(date: Seireki): Wareki | null {
   for (const era of ERAS) {
-    if (compareSeirekis(date, era.start) >= 0) {
+    if (compareSeirekis(date, era.convertibleFrom) >= 0) {
       return createWareki({
         era: era.name,
         year: date.year - (era.start.year - 1),
@@ -29,6 +29,6 @@ export function seirekiToWareki(date: Seireki): Wareki | null {
       });
     }
   }
-  // 明治以前はnull
+  // 明治6年(グレゴリオ暦施行)より前は null
   return null;
 }

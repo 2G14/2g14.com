@@ -1,5 +1,5 @@
 import { formatMonthDay } from '../date/format.js';
-import { InvalidSeirekiError, isValidDate } from '../date/seireki.js';
+import { GREGORIAN_START_IN_JAPAN, InvalidSeirekiError, isValidDate } from '../date/seireki.js';
 import { ERAS, type EraName, InvalidEraError } from './era.js';
 import { formatWarekiEraYear } from './format.js';
 
@@ -38,6 +38,16 @@ export function createWareki({ era, year, month, day }: WarekiInput): Wareki {
     throw new InvalidEraError(`不明な元号です: ${era}`);
   }
 
+  const seirekiYear = eraEntry.start.year - 1 + year;
+  const from = GREGORIAN_START_IN_JAPAN;
+  // 月日が西暦と一致しない旧暦の期間は、存在しない日付とは別に扱う
+  if (
+    seirekiYear < from.year ||
+    (seirekiYear === from.year && (month < from.month || (month === from.month && day < from.day)))
+  ) {
+    throw new InvalidWarekiError('明治6年1月1日より前は旧暦のため変換できません');
+  }
+
   // 元年の場合、元号の開始日より前の月日が指定されているかは
   // 西暦に変換せずとも判定可能なので先にチェックする
   if (year === 1) {
@@ -49,7 +59,6 @@ export function createWareki({ era, year, month, day }: WarekiInput): Wareki {
     }
   }
 
-  const seirekiYear = eraEntry.start.year - 1 + year;
   // 月日自体が有効かは（閏年判定を含めて）西暦年で検証する
   if (!isValidDate(seirekiYear, month, day)) {
     throw new InvalidSeirekiError(`無効な日付: ${seirekiYear}-${month}-${day}`);

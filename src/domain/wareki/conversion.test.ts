@@ -17,8 +17,8 @@ const ERAS: ReadonlyArray<{
 ];
 
 describe('conversion (warekiToSeireki / seirekiToWareki)', () => {
-  it('warekiToSeireki: 各元号の開始日は有効', () => {
-    for (const era of ERAS) {
+  it('warekiToSeireki: 明治以外の各元号の開始日は有効', () => {
+    for (const era of ERAS.filter((e) => e.name !== '明治')) {
       const w = createWareki({
         era: era.name,
         year: 1,
@@ -70,6 +70,26 @@ describe('conversion (warekiToSeireki / seirekiToWareki)', () => {
     const date = createSeireki({ year: 2019, month: 5, day: 1 });
     const w = seirekiToWareki(date);
     expect(w).toEqual({ era: '令和', year: 1, month: 5, day: 1 });
+  });
+
+  it('グレゴリオ暦が施行された明治6年1月1日から変換できる', () => {
+    const gregorianStart = createSeireki({ year: 1873, month: 1, day: 1 });
+    expect(seirekiToWareki(gregorianStart)).toEqual({ era: '明治', year: 6, month: 1, day: 1 });
+    expect(warekiToSeireki(createWareki({ era: '明治', year: 6, month: 1, day: 1 }))).toEqual(
+      gregorianStart,
+    );
+  });
+
+  it('それより前の旧暦の期間は変換しない', () => {
+    expect(seirekiToWareki(createSeireki({ year: 1872, month: 12, day: 31 }))).toBeNull();
+    expect(seirekiToWareki(createSeireki({ year: 1870, month: 5, day: 1 }))).toBeNull();
+    // 明治5年12月は旧暦で 2 日までしかなく、3 日が明治6年1月1日になった
+    expect(() => createWareki({ era: '明治', year: 5, month: 12, day: 31 })).toThrow(
+      InvalidWarekiError,
+    );
+    expect(() => createWareki({ era: '明治', year: 1, month: 9, day: 8 })).toThrow(
+      InvalidWarekiError,
+    );
   });
 
   it('seirekiToWareki: 明治以前は null', () => {
