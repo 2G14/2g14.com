@@ -75,17 +75,20 @@ export default function WarekiCalendar({
 
   useEffect(() => {
     const eraEntry = findEra(era);
-    if (
-      eraEntry &&
-      isInteger(year) &&
-      year >= firstWarekiYear(eraEntry) &&
-      isInteger(month) &&
-      month >= 1 &&
-      month <= 12
-    ) {
+    if (!eraEntry) return;
+
+    const first = firstWarekiYear(eraEntry);
+    if (isInteger(year) && year >= first && isInteger(month) && month >= 1 && month <= 12) {
       setViewEra(eraEntry);
       setViewWarekiYear(year);
       setViewMonth(month);
+      return;
+    }
+    // 元号だけは必ず追従させる。残すと日付を押したときに古い元号でフォームを上書きする
+    if (eraEntry.name !== viewEra.name) {
+      setViewEra(eraEntry);
+      setViewWarekiYear(first);
+      setViewMonth(eraEntry.convertibleFrom.month);
     }
   }, [era, year, month]);
 
