@@ -4,6 +4,7 @@ import CalendarFrame from '#app/components/calendar-frame.js';
 import CalendarGrid from '#app/components/calendar-grid.js';
 import EditableYear from '#app/components/editable-year.js';
 import { isInteger } from '#app/lib/date-input.js';
+import { daysInMonth } from '#src/domain/date/seireki.js';
 import { ERAS, type Era } from '#src/domain/wareki/era.js';
 import { formatWarekiYear } from '#src/domain/wareki/format.js';
 import { todayInJST } from '#src/lib/date.js';
@@ -16,6 +17,10 @@ function findEra(name: string): Era | undefined {
 
 function warekiToSeirekiYear(era: Era, warekiYear: number): number {
   return era.start.year - 1 + warekiYear;
+}
+
+function firstWarekiYear(era: Era): number {
+  return era.convertibleFrom.year - era.start.year + 1;
 }
 
 function getLastMonth(era: Era): { seirekiYear: number; month: number } {
@@ -32,14 +37,13 @@ function getLastMonth(era: Era): { seirekiYear: number; month: number } {
 
 function getDisabledDays(seirekiYear: number, month: number, era: Era): Set<number> {
   const disabled = new Set<number>();
-  const start = era.start;
+  const start = era.convertibleFrom;
   if (seirekiYear === start.year && month === start.month) {
     for (let d = 1; d < start.day; d++) disabled.add(d);
   }
   const end = era.end;
   if (end && seirekiYear === end.year && month === end.month) {
-    const daysInMonth = new Date(seirekiYear, month, 0).getDate();
-    for (let d = end.day; d <= daysInMonth; d++) disabled.add(d);
+    for (let d = end.day; d <= daysInMonth(seirekiYear, month); d++) disabled.add(d);
   }
   return disabled;
 }
@@ -63,27 +67,37 @@ export default function WarekiCalendar({
 
   const [viewEra, setViewEra] = useState(() => findEra(era) ?? defaultEra);
   const [viewWarekiYear, setViewWarekiYear] = useState(() =>
-    isInteger(year) && year >= 1 ? year : 1,
+    isInteger(year) && year >= firstWarekiYear(viewEra) ? year : firstWarekiYear(viewEra),
   );
   const [viewMonth, setViewMonth] = useState(() =>
-    isInteger(month) && month >= 1 && month <= 12 ? month : viewEra.start.month,
+    isInteger(month) && month >= 1 && month <= 12 ? month : viewEra.convertibleFrom.month,
   );
 
   useEffect(() => {
     const eraEntry = findEra(era);
-    if (eraEntry && isInteger(year) && year >= 1 && isInteger(month) && month >= 1 && month <= 12) {
+    if (!eraEntry) return;
+
+    const first = firstWarekiYear(eraEntry);
+    if (isInteger(year) && year >= first && isInteger(month) && month >= 1 && month <= 12) {
       setViewEra(eraEntry);
       setViewWarekiYear(year);
       setViewMonth(month);
+      return;
+    }
+    // 元号だけは必ず追従させる。残すと日付を押したときに古い元号でフォームを上書きする
+    if (eraEntry.name !== viewEra.name) {
+      setViewEra(eraEntry);
+      setViewWarekiYear(first);
+      setViewMonth(eraEntry.convertibleFrom.month);
     }
   }, [era, year, month]);
 
   const viewSeirekiYear = warekiToSeirekiYear(viewEra, viewWarekiYear);
   const lastMonth = getLastMonth(viewEra);
 
+  const from = viewEra.convertibleFrom;
   const canGoPrevMonth =
-    viewSeirekiYear > viewEra.start.year ||
-    (viewSeirekiYear === viewEra.start.year && viewMonth > viewEra.start.month);
+    viewSeirekiYear > from.year || (viewSeirekiYear === from.year && viewMonth > from.month);
 
   const canGoNextMonth =
     viewSeirekiYear < lastMonth.seirekiYear ||
@@ -113,16 +127,16 @@ export default function WarekiCalendar({
     const eraEntry = findEra(eraName);
     if (!eraEntry) return;
     setViewEra(eraEntry);
-    setViewWarekiYear(1);
-    setViewMonth(eraEntry.start.month);
+    setViewWarekiYear(firstWarekiYear(eraEntry));
+    setViewMonth(eraEntry.convertibleFrom.month);
   };
 
   const handleYearInput = (v: number) => {
     const seireki = warekiToSeirekiYear(viewEra, v);
-    if (seireki > lastMonth.seirekiYear) return;
+    if (seireki > lastMonth.seirekiYear || seireki < from.year) return;
     setViewWarekiYear(v);
-    if (v === 1 && viewMonth < viewEra.start.month) {
-      setViewMonth(viewEra.start.month);
+    if (seireki === from.year && viewMonth < from.month) {
+      setViewMonth(from.month);
     }
     if (seireki === lastMonth.seirekiYear && viewMonth > lastMonth.month) {
       setViewMonth(lastMonth.month);
@@ -156,7 +170,7 @@ export default function WarekiCalendar({
           {viewEra.name}
           <EditableYear
             value={viewWarekiYear}
-            min={1}
+            min={firstWarekiYear(viewEra)}
             widthClass="w-16"
             displayLabel={yearLabel}
             onYearInput={handleYearInput}

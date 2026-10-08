@@ -18,6 +18,10 @@ describe('warekiYearLabel', () => {
     expect(warekiYearLabel(1868)).toBe('明治元年');
   });
 
+  it('日付の変換ができない明治5年以前も年単位では返す', () => {
+    expect(warekiYearLabel(1870)).toBe('明治3年');
+  });
+
   it('明治以前の年は null を返す', () => {
     expect(warekiYearLabel(1867)).toBeNull();
   });

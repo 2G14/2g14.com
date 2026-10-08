@@ -7,9 +7,8 @@ import { isInteger, parseDateInput } from '#app/lib/date-input.js';
 import { dateQueryString, parseQueryNumber } from '#app/lib/date-query.js';
 import { replaceUrlQuery } from '#app/lib/url.js';
 import { type ConvertResult, reverseToolUrl } from '#app/lib/wareki/convert-result.js';
-import { createSeireki } from '#src/domain/date/seireki.js';
+import { createSeireki, GREGORIAN_START_IN_JAPAN } from '#src/domain/date/seireki.js';
 import { seirekiToWareki } from '#src/domain/wareki/conversion.js';
-import { EARLIEST_ERA_START } from '#src/domain/wareki/era.js';
 import { formatWareki } from '#src/domain/wareki/format.js';
 import { todayInJST } from '#src/lib/date.js';
 
@@ -21,7 +20,10 @@ function tryConvert(year: number | null, month: number | null, day: number | nul
     const seireki = createSeireki(parsed.date);
     const wareki = seirekiToWareki(seireki);
     if (!wareki) {
-      return { kind: 'error', message: '明治以前の日付は変換できません。' };
+      return {
+        kind: 'error',
+        message: '1873年（明治6年）1月1日より前は旧暦のため変換できません。',
+      };
     }
     return {
       kind: 'ok',
@@ -76,7 +78,7 @@ export default function SeirekiToWarekiConverter({ initialYear, initialMonth, in
           year={year}
           month={month}
           day={day}
-          min={EARLIEST_ERA_START}
+          min={GREGORIAN_START_IN_JAPAN}
           onDateSelect={(y, m, d) => {
             setYear(y);
             setMonth(m);
