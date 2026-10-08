@@ -1,4 +1,4 @@
-import { createSeireki, type Seireki, type SeirekiInput } from './seireki.js';
+import { createSeireki, type Seireki, type SeirekiInput } from '../date/seireki.js';
 
 const RAW_ERAS = [
   {
@@ -63,6 +63,9 @@ export const ERAS = RAW_ERAS.map((e, i) => ({
 })) satisfies readonly Era[];
 
 export type EraName = Era['name'];
+
+/** 変換できる最も古い日付（明治の始まり） */
+export const EARLIEST_ERA_START: Seireki = ERAS.at(-1)!.start;
 
 export class InvalidEraError extends Error {
   constructor(message: string = '不明な元号です') {

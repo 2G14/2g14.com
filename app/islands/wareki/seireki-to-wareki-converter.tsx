@@ -1,15 +1,16 @@
 import { useEffect, useState } from 'hono/jsx';
 
 import DateField from '#app/components/date-field.js';
+import SeirekiCalendar from '#app/components/seireki-calendar.js';
 import ConverterView from '#app/components/wareki/converter-view.js';
-import SeirekiCalendar from '#app/components/wareki/seireki-calendar.js';
 import { isInteger, parseDateInput } from '#app/lib/date-input.js';
+import { dateQueryString, parseQueryNumber } from '#app/lib/date-query.js';
 import { replaceUrlQuery } from '#app/lib/url.js';
 import { type ConvertResult, reverseToolUrl } from '#app/lib/wareki/convert-result.js';
-import { dateQueryString, parseQueryNumber } from '#app/lib/wareki/date-query.js';
+import { createSeireki } from '#src/domain/date/seireki.js';
 import { seirekiToWareki } from '#src/domain/wareki/conversion.js';
+import { EARLIEST_ERA_START } from '#src/domain/wareki/era.js';
 import { formatWareki } from '#src/domain/wareki/format.js';
-import { createSeireki } from '#src/domain/wareki/seireki.js';
 import { todayInJST } from '#src/lib/date.js';
 
 function tryConvert(year: number | null, month: number | null, day: number | null): ConvertResult {
@@ -75,6 +76,7 @@ export default function SeirekiToWarekiConverter({ initialYear, initialMonth, in
           year={year}
           month={month}
           day={day}
+          min={EARLIEST_ERA_START}
           onDateSelect={(y, m, d) => {
             setYear(y);
             setMonth(m);

@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
-import { compareSeirekis, createSeireki, InvalidSeirekiError } from './seireki.js';
+import { compareSeirekis, createSeireki, daysInMonth, InvalidSeirekiError } from './seireki.js';
 
 describe('seireki', () => {
   it('createSeireki: 正常な日付を作成できる（閏年を含む）', () => {
@@ -32,5 +32,15 @@ describe('seireki', () => {
     expect(compareSeirekis(b, a)).toBeGreaterThan(0);
     expect(compareSeirekis(a, a)).toBe(0);
     expect(compareSeirekis(b, c)).toBeLessThan(0);
+  });
+});
+
+describe('daysInMonth', () => {
+  it('月の日数を返し、2 月はうるう年で 29 日になる', () => {
+    expect(daysInMonth(2026, 1)).toBe(31);
+    expect(daysInMonth(2026, 2)).toBe(28);
+    expect(daysInMonth(2024, 2)).toBe(29);
+    expect(daysInMonth(1900, 2)).toBe(28);
+    expect(daysInMonth(2000, 2)).toBe(29);
   });
 });
