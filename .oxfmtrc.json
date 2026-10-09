@@ -4,5 +4,5 @@
   "sortTailwindcss": {
     "stylesheet": "./app/style.css"
   },
-  "ignorePatterns": [".claude"]
+  "ignorePatterns": [".claude", "worker-configuration.d.ts"]
 }
