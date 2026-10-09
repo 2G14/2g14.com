@@ -8,6 +8,7 @@ Claude Code を Docker Sandbox (clone mode) で、承認プロンプト付きで
 | ファイル         | 役割                                                                                                                                               |
 | ---------------- | -------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `../sbxenv.yaml` | workload を clone mode で起動する environment file                                                                                                 |
+| `run.sh`         | `npm run sbx` の実体。起動のたびに新しい名前で `sbx env run` し、独立したサンドボックスを作る                                                      |
 | `claude-2g14/`   | workload。`claude-code-minimal` ベースに claude・mise 経由の node / npm / gh・apt の git を入れて起動する。node / npm の版はこのリポに合わせている |
 
 `claude-2g14/` は公式の
@@ -61,7 +62,7 @@ balanced で許可されている。ホストのエージェントに鍵を登�
 リポ直下で実行する:
 
 ```bash
-sbx env run
+npm run sbx
 ```
 
 初回は作成内容のプランが表示されるので承認する。続いて、kit に Anthropic と GitHub の
@@ -69,7 +70,7 @@ sbx env run
 ホストの `~/.config/sbx/credentials.yaml` に保存され、ほかのサンドボックスでも使われるので、
 すでに許可したことのあるサービスは聞かれない。非対話で起動すると拒否扱いになり、
 `no binding authorizes ...` と表示されて認証情報が注入されない。
-2回目以降は既存のサンドボックスにアタッチする。削除は `sbx env rm`。
+起動のたびに新しいサンドボックスができる(詳しくは下の「複数のサンドボックスで並列に作業する」)。
 
 kit はサンドボックスの作成時にビルドされ、変更がなければ再利用される。
 `sbx env` は Experimental で、コマンドやファイル形式が変わる可能性がある。
@@ -77,7 +78,7 @@ kit はサンドボックスの作成時にビルドされ、変更がなけれ�
 - clone には `node_modules` が無い。必要になったらエージェントが `npm ci` する
   (承認プロンプトが出る)。起動時に自動で入れないのは、承認なしで依存パッケージの
   インストールスクリプトを走らせないため
-- エージェントのコミットはホスト側の `sandbox-claude-2g14` git リモートから取り込める。
+- エージェントのコミットはホスト側の `sandbox-<サンドボックス名>` git リモートから取り込める。
   `.sandbox/` や `sbxenv.yaml` の変更が含まれていたら必ず中身を確認する(サンドボックスの
   権限や通信の許可を広げられるため)
 - `ls` のような読み取り専用コマンドは承認なしで実行される。YOLO が外れているかは
@@ -95,26 +96,30 @@ kit はサンドボックスの作成時にビルドされ、変更がなけれ�
 ## 複数のサンドボックスで並列に作業する
 
 clone mode ではサンドボックスごとに専用の clone が作られるので、同じディレクトリから
-複数起動して別々のブランチで作業できる。2つ目以降は名前を変えて起動し、その
-サンドボックスに対する `sbx env` のコマンドには毎回同じ `--name` を付ける:
+複数起動して別々のブランチで作業できる。`npm run sbx`(`run.sh`)は起動のたびに
+時刻から新しい名前を付けて `sbx env run --name` するので、そのまま並列になる。
+名前を渡すと既存のサンドボックスに戻る。そのサンドボックスに対する `sbx env` の
+コマンドには毎回同じ `--name` を付ける:
 
 ```bash
-sbx env run --name claude-2g14-b
-git fetch sandbox-claude-2g14-b
-sbx env rm --name claude-2g14-b
+npm run sbx
+npm run sbx -- claude-2g14-1010-153045
+git fetch sandbox-claude-2g14-1010-153045
+sbx env rm --name claude-2g14-1010-153045
 ```
 
-`--name` を付け忘れると、既定のサンドボックス(`claude-2g14`)に対する操作になる。
+`sbx env run` を `--name` なしで実行すると、`sbxenv.yaml` で固定した既定の
+サンドボックス(`claude-2g14`)に毎回入る。
 
 ## kit を変更したとき
 
-kit の変更は、サンドボックスを作り直したときにだけ反映される。作り直すと clone ごと
-消えるので、エージェントのコミットを先に取り込んでおく:
+kit の変更は、新しく作るサンドボックスにだけ反映される。既存のサンドボックスを
+作り直すと clone ごと消えるので、エージェントのコミットを先に取り込んでおく:
 
 ```bash
-git fetch sandbox-claude-2g14
-sbx env rm
-sbx env run
+git fetch sandbox-claude-2g14-1010-153045
+sbx env rm --name claude-2g14-1010-153045
+npm run sbx
 ```
 
 ## sbxenv.yaml の書き方について

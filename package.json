@@ -21,7 +21,8 @@
     "format:check": "oxfmt --check .",
     "test": "vitest",
     "coverage": "vitest run --coverage",
-    "generate-types": "wrangler types"
+    "generate-types": "wrangler types",
+    "sbx": ".sandbox/run.sh"
   },
   "dependencies": {
     "@fontsource-variable/inter": "^5.2.8",
