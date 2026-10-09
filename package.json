@@ -34,7 +34,7 @@
     "@tailwindcss/vite": "^4.3.1",
     "@tsconfig/strictest": "^2.0.8",
     "@types/node": "^26.0.1",
-    "@vitest/coverage-v8": "^4.1.9",
+    "@vitest/coverage-v8": "^5.0.3",
     "daisyui": "^5.6.3",
     "jscpd": "^5.0.12",
     "knip": "^6.26.0",
@@ -44,8 +44,8 @@
     "tailwindcss": "^4.3.1",
     "typescript": "^6.0.3",
     "vite": "^8.1.0",
-    "vitest": "^4.1.9",
-    "wrangler": "^4.120.0"
+    "vitest": "^5.0.3",
+    "wrangler": "^4.131.1"
   },
   "engines": {
     "node": ">=24.18.0",
