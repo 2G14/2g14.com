@@ -39,13 +39,13 @@
     "jscpd": "^5.0.12",
     "knip": "^6.26.0",
     "lefthook": "^2.1.10",
-    "oxfmt": "^0.56.0",
+    "oxfmt": "^0.72.0",
     "oxlint": "^1.71.0",
     "tailwindcss": "^4.3.1",
     "typescript": "^6.0.3",
     "vite": "^8.1.0",
     "vitest": "^5.0.3",
-    "wrangler": "^4.131.1"
+    "wrangler": "^4.149.0"
   },
   "engines": {
     "node": ">=24.18.0",
