@@ -38,7 +38,7 @@
     "@vitest/coverage-v8": "^5.0.3",
     "daisyui": "^5.7.47",
     "jscpd": "^5.0.12",
-    "knip": "^6.26.0",
+    "knip": "^6.40.0",
     "lefthook": "^2.2.1",
     "oxfmt": "^0.72.0",
     "oxlint": "^1.87.0",
