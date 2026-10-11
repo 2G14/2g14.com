@@ -54,6 +54,7 @@
   },
   "allowScripts": {
     "esbuild": true,
+    "fsevents": false,
     "lefthook": true,
     "workerd": true
   }
