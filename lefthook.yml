@@ -1,4 +1,4 @@
-min_version: 2.1.10
+min_version: 2.2.1
 
 pre-commit:
   skip:
