@@ -18,7 +18,9 @@ RUN case "$TARGETARCH" in \
 
 # git は mise のレジストリに存在しないため apt で最新化する。
 # ベースが apt で入れている gh は消す。残すと PATH 次第で mise の gh と入れ替わるため
-RUN apt-get update && apt-get install -y --only-upgrade git && apt-get purge -y gh \
+# libatomic1 は node 26 の linux-arm64 バイナリが動的リンクしているが、ベースに無いため入れる
+RUN apt-get update && apt-get install -y --only-upgrade git \
+ && apt-get install -y --no-install-recommends libatomic1 && apt-get purge -y gh \
  && rm -rf /var/lib/apt/lists/*
 
 USER agent
