@@ -3,6 +3,9 @@
   "extends": ["config:recommended"],
   "rangeStrategy": "bump",
   "minimumReleaseAge": "3 days",
+  "mise": {
+    "managerFilePatterns": ["/(^|/)mise-config\\.toml$/"]
+  },
   "packageRules": [
     {
       "matchDepTypes": ["engines"],
