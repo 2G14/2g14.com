@@ -1,12 +1,19 @@
 import { createSeireki, type Seireki } from '#src/domain/date/seireki.js';
 
 import type { NoResult } from './result.js';
-import { MIN_YEAR } from './year-input.js';
+import { MAX_YEAR, MIN_YEAR } from './year-input.js';
 
 interface DateInput {
   year: number;
   month: number;
   day: number;
+}
+
+/** 入力欄の値。未入力や数値として読めない欄は null */
+export interface DateInputValues {
+  year: number | null;
+  month: number | null;
+  day: number | null;
 }
 
 export type ParsedDateInput = NoResult | { kind: 'ok'; date: DateInput };
@@ -32,7 +39,7 @@ export function parseDateInput(
 export type ParsedSeirekiInput = NoResult | { kind: 'ok'; seireki: Seireki };
 
 /**
- * 年月日の入力を、入力欄の下限（1 年）以降の実在する日付として読む。
+ * 年月日の入力を、入力欄の範囲（1〜9999 年）の実在する日付として読む。
  */
 export function parseSeirekiInput(
   year: number | null,
@@ -41,8 +48,9 @@ export function parseSeirekiInput(
 ): ParsedSeirekiInput {
   const parsed = parseDateInput(year, month, day);
   if (parsed.kind !== 'ok') return parsed;
-  if (parsed.date.year < MIN_YEAR) {
-    return { kind: 'error', message: `年は${MIN_YEAR}以上で入力してください。` };
+  // 入力欄の max は入力そのものを止めないため、巨大な年もここで弾く
+  if (parsed.date.year < MIN_YEAR || parsed.date.year > MAX_YEAR) {
+    return { kind: 'error', message: `年は ${MIN_YEAR}〜${MAX_YEAR} の範囲で入力してください。` };
   }
 
   try {

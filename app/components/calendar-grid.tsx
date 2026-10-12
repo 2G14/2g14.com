@@ -1,8 +1,7 @@
 import { dayOfWeek } from '#src/domain/date/day-count.js';
+import { WEEKDAY_LABELS } from '#src/domain/date/format.js';
 import { createSeireki, daysInMonth } from '#src/domain/date/seireki.js';
 import { todayInJST } from '#src/lib/date.js';
-
-const WEEKDAY_LABELS = ['日', '月', '火', '水', '木', '金', '土'] as const;
 
 interface CalendarGridProps {
   seirekiYear: number;

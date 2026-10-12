@@ -41,8 +41,10 @@ describe('parseSeirekiInput', () => {
     expect(parseSeirekiInput(null, null, null)).toEqual({ kind: 'empty' });
   });
 
-  it('1 年より前や存在しない日付はエラーを返す', () => {
+  it('1〜9999 年の範囲外や存在しない日付はエラーを返す', () => {
     expect(parseSeirekiInput(0, 1, 1)).toMatchObject({ kind: 'error' });
+    expect(parseSeirekiInput(10000, 1, 1)).toMatchObject({ kind: 'error' });
+    expect(parseSeirekiInput(1e308, 1, 1)).toMatchObject({ kind: 'error' });
     expect(parseSeirekiInput(2026, 2, 30)).toMatchObject({ kind: 'error' });
   });
 });

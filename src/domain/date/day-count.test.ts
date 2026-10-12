@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
-import { dayOfWeek, diffDays, toDayNumber } from './day-count.js';
+import { dayOfWeek, diffDays, fromDayNumber, toDayNumber } from './day-count.js';
 import { createSeireki } from './seireki.js';
 
 const d = (year: number, month: number, day: number) => createSeireki({ year, month, day });
@@ -50,5 +50,24 @@ describe('dayOfWeek', () => {
   it('エポックより前や 100 年未満の年でも求まる', () => {
     expect(dayOfWeek(d(1969, 12, 28))).toBe(0);
     expect(dayOfWeek(d(1, 1, 1))).toBe(1);
+  });
+});
+
+describe('fromDayNumber', () => {
+  it('0 は 1970-01-01、-1 は 1969-12-31', () => {
+    expect(fromDayNumber(0)).toEqual(d(1970, 1, 1));
+    expect(fromDayNumber(-1)).toEqual(d(1969, 12, 31));
+  });
+
+  it('toDayNumber の逆変換になる', () => {
+    for (const date of [
+      d(1, 1, 1),
+      d(1600, 2, 29),
+      d(1900, 3, 1),
+      d(2000, 2, 29),
+      d(9999, 12, 31),
+    ]) {
+      expect(fromDayNumber(toDayNumber(date))).toEqual(date);
+    }
   });
 });
