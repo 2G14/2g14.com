@@ -1,10 +1,6 @@
-import { useEffect, useState } from 'hono/jsx';
-
 import DateField from '#app/components/date-field.js';
-import { isInteger } from '#app/lib/date-input.js';
-import { parseQueryNumber } from '#app/lib/date-query.js';
 import { lookupEto } from '#app/lib/eto/eto-result.js';
-import { replaceUrlQuery } from '#app/lib/url.js';
+import { useYearQuery } from '#app/lib/use-year-query.js';
 import { warekiYearLabel } from '#src/domain/wareki/year-label.js';
 import { todayInJST } from '#src/lib/date.js';
 
@@ -13,14 +9,7 @@ interface Props {
 }
 
 export default function EtoYearSearch({ initialYear }: Props) {
-  const [year, setYear] = useState<number | null>(
-    parseQueryNumber(initialYear) ?? todayInJST().year,
-  );
-
-  useEffect(() => {
-    if (!isInteger(year)) return;
-    replaceUrlQuery(new URLSearchParams({ year: String(year) }).toString());
-  }, [year]);
+  const [year, setYear] = useYearQuery(initialYear, todayInJST().year);
 
   const result = lookupEto(year);
 
