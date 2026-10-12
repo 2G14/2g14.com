@@ -19,7 +19,7 @@ export const CHOJU_LIST = [
     reading: 'ろくじゅ',
     kazoedoshi: 66,
     fullAge: 66,
-    origin: '「66（ろくろく）」の語呂合わせ。2002 年に日本百貨店協会が提唱',
+    origin: '「緑緑寿（ろくろくじゅ）」の略で、66（ろくろく）にかけた語呂合わせから',
   },
   {
     name: '古希',
@@ -89,7 +89,8 @@ export const CHOJU_LIST = [
     reading: 'こうじゅ',
     kazoedoshi: 111,
     fullAge: 111,
-    origin: '「皇」の字を「白」（99）と「王」（十と二で 12）に分けると 111 になることから',
+    origin:
+      '「皇」の字を分解すると「白」（99）と「一・十・一」（12）になり、合わせて 111 になることから',
   },
   {
     name: '大還暦',
