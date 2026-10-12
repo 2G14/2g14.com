@@ -5,7 +5,7 @@ import ToolIndex from '#app/components/tool-index.js';
 
 const PAGE_TITLE = '年齢計算ツール';
 const META_DESCRIPTION =
-  '生年月日からの年齢計算（満年齢・数え年・次の誕生日・生後日数）や年齢早見表など、年齢に関する各種ツールを提供します。';
+  '生年月日からの年齢計算（満年齢・数え年・次の誕生日・生後日数）・年齢早見表・厄年早見表など、年齢に関する各種ツールを提供します。';
 
 const PAGES = [
   {
@@ -17,6 +17,11 @@ const PAGES = [
     href: '/contents/age/chart',
     label: '年齢早見表',
     description: '生まれ年ごとの満年齢・数え年・和暦・干支の一覧表',
+  },
+  {
+    href: '/contents/age/yakudoshi',
+    label: '厄年早見表',
+    description: '今年の厄年の生まれ年と、生まれ年ごとの本厄・前厄・後厄',
   },
 ] as const;
 
