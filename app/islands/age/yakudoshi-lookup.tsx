@@ -3,8 +3,7 @@ import { useEffect, useState } from 'hono/jsx';
 import YakudoshiTable from '#app/components/age/yakudoshi-table.js';
 import DateField from '#app/components/date-field.js';
 import { lookupYakudoshi } from '#app/lib/age/yakudoshi-result.js';
-import { isInteger } from '#app/lib/date-input.js';
-import { parseQueryNumber } from '#app/lib/date-query.js';
+import { parseQueryNumber, yearQueryString } from '#app/lib/date-query.js';
 import { replaceUrlQuery } from '#app/lib/url.js';
 import { todayInJST } from '#src/lib/date.js';
 
@@ -16,8 +15,9 @@ export default function YakudoshiLookup({ initialYear }: Props) {
   const [year, setYear] = useState<number | null>(parseQueryNumber(initialYear));
 
   useEffect(() => {
-    if (!isInteger(year)) return;
-    replaceUrlQuery(new URLSearchParams({ year: String(year) }).toString());
+    // 空欄にしたのに year が残ると、再読み込みで消したはずの結果が戻ってしまう
+    const query = yearQueryString(year);
+    if (query !== null) replaceUrlQuery(query);
   }, [year]);
 
   const result = lookupYakudoshi(year);

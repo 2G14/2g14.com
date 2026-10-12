@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
-import { dateQueryString, dateToolUrl, parseQueryNumber } from './date-query.js';
+import { dateQueryString, dateToolUrl, parseQueryNumber, yearQueryString } from './date-query.js';
 
 describe('parseQueryNumber', () => {
   it('整数の文字列を数値にする', () => {
@@ -53,5 +53,19 @@ describe('dateToolUrl', () => {
 
   it('値が null なら base をそのまま返す', () => {
     expect(dateToolUrl('/base', null)).toBe('/base');
+  });
+});
+
+describe('yearQueryString', () => {
+  it('整数の年を year クエリにする', () => {
+    expect(yearQueryString(1985)).toBe('year=1985');
+  });
+
+  it('空欄ならクエリを消すため空文字を返す', () => {
+    expect(yearQueryString(null)).toBe('');
+  });
+
+  it('整数でなければ URL を変えないため null を返す', () => {
+    expect(yearQueryString(1985.5)).toBeNull();
   });
 });
