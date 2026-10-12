@@ -11,6 +11,16 @@ export function parseQueryNumber(raw?: string): number | null {
   return Number.isInteger(value) ? value : null;
 }
 
+/**
+ * 年の入力値を URL クエリにする。空欄なら空文字（クエリを消す）、
+ * 整数でなければ null（URL を変えない）を返す。
+ */
+export function yearQueryString(year: number | null): string | null {
+  if (year === null) return '';
+  if (!Number.isInteger(year)) return null;
+  return new URLSearchParams({ year: String(year) }).toString();
+}
+
 export function dateQueryString(values: DateQueryValues): string {
   const params = new URLSearchParams();
   if (values.era) params.set('era', values.era);
