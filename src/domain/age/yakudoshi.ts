@@ -16,7 +16,7 @@ const HONYAKU_AGES = {
 
 const TAIYAKU_AGES = { male: 42, female: 33 } as const satisfies Record<Sex, number>;
 
-export interface Yaku {
+interface Yaku {
   readonly kind: YakuKind;
   readonly kazoedoshi: number;
   readonly year: number;
