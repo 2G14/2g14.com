@@ -46,14 +46,30 @@ export interface SekkiDate {
   readonly date: Seireki;
 }
 
+// 節気は毎月 2 つずつ、おおむね 5 日前後と 20 日前後に来るので、そこから探す
+function sekkiDate(year: number, index: number): SekkiDate {
+  const sekki = SEKKI_LIST[index]!;
+  const near = createSeireki({
+    year,
+    month: Math.floor(index / 2) + 1,
+    day: index % 2 === 0 ? 5 : 20,
+  });
+  return { sekki, date: jdeToJstDate(solarLongitudeTime(sekki.longitude, jstNoonJde(near))) };
+}
+
 /**
  * 二十四節気の日付（日本時間）を、その年の 1 月から順に返す。
  */
 export function sekkiOfYear(year: number): SekkiDate[] {
   assertKoyomiYear(year);
-  return SEKKI_LIST.map((sekki, i) => {
-    // 節気はおおむね毎月 5 日前後と 20 日前後に来るので、そこから探す
-    const near = createSeireki({ year, month: Math.floor(i / 2) + 1, day: i % 2 === 0 ? 5 : 20 });
-    return { sekki, date: jdeToJstDate(solarLongitudeTime(sekki.longitude, jstNoonJde(near))) };
-  });
+  return SEKKI_LIST.map((_, i) => sekkiDate(year, i));
+}
+
+/**
+ * その月にある 2 つの節気（月の前半の節と後半の中気）の日付。
+ * 月のカレンダーで 1 年分の 24 回の探索をしないで済むようにする。
+ */
+export function sekkiOfMonth(year: number, month: number): SekkiDate[] {
+  assertKoyomiYear(year);
+  return [sekkiDate(year, (month - 1) * 2), sekkiDate(year, (month - 1) * 2 + 1)];
 }

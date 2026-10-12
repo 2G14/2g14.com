@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 
 import { OutOfKoyomiRangeError } from './range.js';
-import { sekkiOfYear } from './sekki.js';
+import { sekkiOfMonth, sekkiOfYear } from './sekki.js';
 
 describe('sekkiOfYear', () => {
   it('2026 年の二十四節気の日付が国立天文台の暦要項と一致する', () => {
@@ -50,5 +50,21 @@ describe('sekkiOfYear', () => {
   it('対応範囲（1901〜2100 年）外の年はエラーになる', () => {
     expect(() => sekkiOfYear(1900)).toThrow(OutOfKoyomiRangeError);
     expect(() => sekkiOfYear(2101)).toThrow(OutOfKoyomiRangeError);
+  });
+});
+
+describe('sekkiOfMonth', () => {
+  it('その月の節と中気を返し、1 年分を求めた結果と一致する', () => {
+    const year = sekkiOfYear(2026);
+
+    for (let month = 1; month <= 12; month++) {
+      const days = sekkiOfMonth(2026, month);
+      expect(days).toEqual(year.slice((month - 1) * 2, month * 2));
+      expect(days.every((d) => d.date.month === month)).toBe(true);
+    }
+  });
+
+  it('対応範囲（1901〜2100 年）外の年はエラーになる', () => {
+    expect(() => sekkiOfMonth(1900, 1)).toThrow(OutOfKoyomiRangeError);
   });
 });

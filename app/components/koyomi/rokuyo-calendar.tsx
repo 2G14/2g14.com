@@ -3,7 +3,7 @@ import { WEEKDAY_LABELS } from '#src/domain/date/format.js';
 import { createSeireki, daysInMonth } from '#src/domain/date/seireki.js';
 import { toKyurekiDays } from '#src/domain/koyomi/kyureki.js';
 import { rokuyoOf } from '#src/domain/koyomi/rokuyo.js';
-import { sekkiOfYear } from '#src/domain/koyomi/sekki.js';
+import { sekkiOfMonth } from '#src/domain/koyomi/sekki.js';
 
 interface RokuyoCalendarProps {
   year: number;
@@ -16,11 +16,7 @@ const WEEKDAY_COLORS = ['text-error', '', '', '', '', '', 'text-info'] as const;
 export default function RokuyoCalendar({ year, month, today }: RokuyoCalendarProps) {
   const first = createSeireki({ year, month, day: 1 });
   const kyurekiDays = toKyurekiDays(first, daysInMonth(year, month));
-  const sekkiByDay = new Map(
-    sekkiOfYear(year)
-      .filter((s) => s.date.month === month)
-      .map((s) => [s.date.day, s.sekki.name]),
-  );
+  const sekkiByDay = new Map(sekkiOfMonth(year, month).map((s) => [s.date.day, s.sekki.name]));
   const leading = dayOfWeek(first);
 
   return (
