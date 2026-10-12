@@ -1,7 +1,6 @@
 import { useEffect, useState } from 'hono/jsx';
 
-import { isInteger } from './date-input.js';
-import { dateQueryString } from './date-query.js';
+import { dateInputQueryString } from './date-query.js';
 import { replaceUrlQuery } from './url.js';
 
 interface DateValues {
@@ -23,9 +22,8 @@ export function useDateQuery(initial: DateValues): DateValues & {
   const [day, setDay] = useState<number | null>(initial.day);
 
   useEffect(() => {
-    // 読み戻せない値を URL に残すと、リロード時に欠けた分が初期値で埋まってしまう
-    if (!isInteger(year) || !isInteger(month) || !isInteger(day)) return;
-    replaceUrlQuery(dateQueryString({ year, month, day }));
+    const query = dateInputQueryString({ year, month, day });
+    if (query !== null) replaceUrlQuery(query);
   }, [year, month, day]);
 
   return { year, month, day, setYear, setMonth, setDay };
