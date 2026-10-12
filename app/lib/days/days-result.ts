@@ -17,6 +17,10 @@ export type DaysBetweenResult =
     };
 
 function parseDate(label: string, values: DateInputValues) {
+  // 年から順に入力している途中でエラーを出さないよう、欠けた欄があるうちは未入力として扱う
+  if (values.year === null || values.month === null || values.day === null) {
+    return { kind: 'empty' } as const;
+  }
   const parsed = parseSeirekiInput(values.year, values.month, values.day);
   return parsed.kind === 'error' ? { ...parsed, message: `${label}: ${parsed.message}` } : parsed;
 }

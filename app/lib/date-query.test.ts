@@ -2,9 +2,13 @@ import { describe, expect, it } from 'vitest';
 
 import {
   dateInputQueryString,
+  dateParamString,
+  dateParamValue,
   dateQueryString,
   dateToolUrl,
-  dateParamString,
+  initialDateParam,
+  initialNumberParam,
+  numberParamValue,
   parseDateParam,
   parseQueryNumber,
   yearQueryString,
@@ -119,5 +123,54 @@ describe('parseDateParam', () => {
     expect(parseDateParam()).toBeNull();
     expect(parseDateParam('20260701')).toBeNull();
     expect(parseDateParam('2026-07-01x')).toBeNull();
+  });
+});
+
+describe('dateParamValue', () => {
+  it('年月日がそろえば YYYY-MM-DD にする', () => {
+    expect(dateParamValue({ year: 2026, month: 10, day: 12 })).toBe('2026-10-12');
+  });
+
+  it('欠けた欄があれば空文字を返す', () => {
+    expect(dateParamValue({ year: 2026, month: null, day: null })).toBe('');
+  });
+
+  it('整数でない値があれば URL を変えないため null を返す', () => {
+    expect(dateParamValue({ year: 2026, month: 1.5, day: null })).toBeNull();
+  });
+});
+
+describe('initialDateParam', () => {
+  const today = { year: 2026, month: 10, day: 12 };
+
+  it('クエリが無ければ fallback を返す', () => {
+    expect(initialDateParam(undefined, today)).toBe(today);
+  });
+
+  it('日付が載っていればその日付を返す', () => {
+    expect(initialDateParam('2026-12-25', today)).toEqual({ year: 2026, month: 12, day: 25 });
+  });
+
+  it('空や読めない値なら未入力を返す', () => {
+    const empty = { year: null, month: null, day: null };
+    expect(initialDateParam('', today)).toEqual(empty);
+    expect(initialDateParam('abc', today)).toEqual(empty);
+  });
+});
+
+describe('numberParamValue', () => {
+  it('整数はそのまま、空欄は空文字、整数でなければ null を返す', () => {
+    expect(numberParamValue(100)).toBe('100');
+    expect(numberParamValue(null)).toBe('');
+    expect(numberParamValue(1.5)).toBeNull();
+  });
+});
+
+describe('initialNumberParam', () => {
+  it('クエリが無ければ fallback、空や読めない値なら null を返す', () => {
+    expect(initialNumberParam(undefined, 100)).toBe(100);
+    expect(initialNumberParam('-30', 100)).toBe(-30);
+    expect(initialNumberParam('', 100)).toBeNull();
+    expect(initialNumberParam('abc', 100)).toBeNull();
   });
 });

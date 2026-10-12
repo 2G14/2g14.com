@@ -1,8 +1,8 @@
 import { useEffect, useState } from 'hono/jsx';
 
 import DateFields from '#app/components/date-fields.js';
-import { type DateInputValues, isInteger } from '#app/lib/date-input.js';
-import { dateParamString, parseDateParam } from '#app/lib/date-query.js';
+import type { DateInputValues } from '#app/lib/date-input.js';
+import { dateParamValue, initialDateParam } from '#app/lib/date-query.js';
 import { calculateDaysBetween } from '#app/lib/days/days-result.js';
 import { replaceUrlQuery } from '#app/lib/url.js';
 import { formatSeirekiWithWeekday } from '#src/domain/date/format.js';
@@ -10,26 +10,21 @@ import { todayInJST } from '#src/lib/date.js';
 
 const EMPTY: DateInputValues = { year: null, month: null, day: null };
 
-function isComplete(
-  values: DateInputValues,
-): values is { year: number; month: number; day: number } {
-  return isInteger(values.year) && isInteger(values.month) && isInteger(values.day);
-}
-
 interface Props {
   initialFrom?: string | undefined;
   initialTo?: string | undefined;
 }
 
 export default function DaysBetween({ initialFrom, initialTo }: Props) {
-  const [from, setFrom] = useState<DateInputValues>(parseDateParam(initialFrom) ?? todayInJST());
-  const [to, setTo] = useState<DateInputValues>(parseDateParam(initialTo) ?? EMPTY);
+  const [from, setFrom] = useState<DateInputValues>(initialDateParam(initialFrom, todayInJST()));
+  const [to, setTo] = useState<DateInputValues>(initialDateParam(initialTo, EMPTY));
 
   useEffect(() => {
-    if (!isComplete(from) || !isComplete(to)) return;
-    replaceUrlQuery(
-      new URLSearchParams({ from: dateParamString(from), to: dateParamString(to) }).toString(),
-    );
+    // 空にした欄も空の値で残し、再読み込みで初期値（今日）に戻らないようにする
+    const fromParam = dateParamValue(from);
+    const toParam = dateParamValue(to);
+    if (fromParam === null || toParam === null) return;
+    replaceUrlQuery(new URLSearchParams({ from: fromParam, to: toParam }).toString());
   }, [from, to]);
 
   const result = calculateDaysBetween(from, to);

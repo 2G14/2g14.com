@@ -19,8 +19,21 @@ describe('calculateDaysBetween', () => {
     });
   });
 
-  it('どちらかが未入力なら empty を返す', () => {
+  it('どちらかが未入力、または入力の途中なら empty を返す', () => {
     expect(calculateDaysBetween(v(2026, 10, 12), v(null, null, null))).toEqual({ kind: 'empty' });
+    expect(calculateDaysBetween(v(2026, 10, 12), v(2026, null, null))).toEqual({ kind: 'empty' });
+    expect(calculateDaysBetween(v(2026, null, 12), v(2026, 12, 25))).toEqual({ kind: 'empty' });
+  });
+
+  it('1〜9999 年の範囲外の年はどちらの日付かを添えてエラーを返す', () => {
+    expect(calculateDaysBetween(v(1e308, 1, 1), v(1e308, 1, 2))).toMatchObject({
+      kind: 'error',
+      message: expect.stringMatching(/^開始日: 年は 1〜9999/u),
+    });
+    expect(calculateDaysBetween(v(2026, 1, 1), v(10000, 1, 1))).toMatchObject({
+      kind: 'error',
+      message: expect.stringMatching(/^終了日: 年は 1〜9999/u),
+    });
   });
 
   it('不正な日付はどちらの日付かを添えてエラーを返す', () => {
@@ -53,6 +66,17 @@ describe('calculateDateAfter', () => {
   it('日数が未入力なら empty、整数でなければエラーを返す', () => {
     expect(calculateDateAfter(v(2026, 10, 12), null)).toEqual({ kind: 'empty' });
     expect(calculateDateAfter(v(2026, 10, 12), 1.5)).toMatchObject({ kind: 'error' });
+  });
+
+  it('基準日が 1〜9999 年の範囲外なら、基準日のエラーを返す', () => {
+    expect(calculateDateAfter(v(10000, 1, 1), -1)).toMatchObject({
+      kind: 'error',
+      message: expect.stringMatching(/^基準日: 年は 1〜9999/u),
+    });
+  });
+
+  it('基準日が入力の途中なら empty を返す', () => {
+    expect(calculateDateAfter(v(2026, null, null), 100)).toEqual({ kind: 'empty' });
   });
 
   it('結果が 1〜9999 年を超えるとエラーを返す', () => {

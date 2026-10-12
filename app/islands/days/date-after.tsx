@@ -2,8 +2,13 @@ import { useEffect, useState } from 'hono/jsx';
 
 import DateFields from '#app/components/date-fields.js';
 import Field from '#app/components/field.js';
-import { type DateInputValues, isInteger } from '#app/lib/date-input.js';
-import { dateParamString, parseDateParam, parseQueryNumber } from '#app/lib/date-query.js';
+import type { DateInputValues } from '#app/lib/date-input.js';
+import {
+  dateParamValue,
+  initialDateParam,
+  initialNumberParam,
+  numberParamValue,
+} from '#app/lib/date-query.js';
 import { calculateDateAfter } from '#app/lib/days/days-result.js';
 import { replaceUrlQuery } from '#app/lib/url.js';
 import { formatSeirekiWithWeekday } from '#src/domain/date/format.js';
@@ -19,18 +24,15 @@ interface Props {
 }
 
 export default function DateAfter({ initialBase, initialDays }: Props) {
-  const [base, setBase] = useState<DateInputValues>(parseDateParam(initialBase) ?? todayInJST());
-  const [days, setDays] = useState<number | null>(parseQueryNumber(initialDays) ?? 100);
+  const [base, setBase] = useState<DateInputValues>(initialDateParam(initialBase, todayInJST()));
+  const [days, setDays] = useState<number | null>(initialNumberParam(initialDays, 100));
 
   useEffect(() => {
-    const { year, month, day } = base;
-    if (!isInteger(year) || !isInteger(month) || !isInteger(day) || !isInteger(days)) return;
-    replaceUrlQuery(
-      new URLSearchParams({
-        base: dateParamString({ year, month, day }),
-        days: String(days),
-      }).toString(),
-    );
+    // 空にした欄も空の値で残し、再読み込みで初期値に戻らないようにする
+    const baseParam = dateParamValue(base);
+    const daysParam = numberParamValue(days);
+    if (baseParam === null || daysParam === null) return;
+    replaceUrlQuery(new URLSearchParams({ base: baseParam, days: daysParam }).toString());
   }, [base, days]);
 
   const result = calculateDateAfter(base, days);
