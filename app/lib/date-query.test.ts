@@ -4,8 +4,8 @@ import {
   dateInputQueryString,
   dateQueryString,
   dateToolUrl,
-  isoDateString,
-  parseIsoDate,
+  dateParamString,
+  parseDateParam,
   parseQueryNumber,
   yearQueryString,
 } from './date-query.js';
@@ -93,21 +93,31 @@ describe('dateInputQueryString', () => {
   });
 });
 
-describe('isoDateString', () => {
+describe('dateParamString', () => {
   it('年月日をゼロ埋めした YYYY-MM-DD にする', () => {
-    expect(isoDateString({ year: 2026, month: 7, day: 1 })).toBe('2026-07-01');
-    expect(isoDateString({ year: 1, month: 1, day: 1 })).toBe('0001-01-01');
+    expect(dateParamString({ year: 2026, month: 7, day: 1 })).toBe('2026-07-01');
+    expect(dateParamString({ year: 1, month: 1, day: 1 })).toBe('0001-01-01');
   });
 });
 
-describe('parseIsoDate', () => {
+describe('parseDateParam', () => {
   it('YYYY-MM-DD を年月日にする', () => {
-    expect(parseIsoDate('2026-07-01')).toEqual({ year: 2026, month: 7, day: 1 });
+    expect(parseDateParam('2026-07-01')).toEqual({ year: 2026, month: 7, day: 1 });
+  });
+
+  it('範囲外や存在しない日付も、書き出した値をそのまま読み戻す', () => {
+    for (const values of [
+      { year: 10000, month: 1, day: 1 },
+      { year: 0, month: 13, day: 0 },
+      { year: -1, month: -2, day: 32 },
+    ]) {
+      expect(parseDateParam(dateParamString(values))).toEqual(values);
+    }
   });
 
   it('クエリに無い、または形式が違えば null を返す', () => {
-    expect(parseIsoDate()).toBeNull();
-    expect(parseIsoDate('2026-7-1')).toBeNull();
-    expect(parseIsoDate('20260701')).toBeNull();
+    expect(parseDateParam()).toBeNull();
+    expect(parseDateParam('20260701')).toBeNull();
+    expect(parseDateParam('2026-07-01x')).toBeNull();
   });
 });

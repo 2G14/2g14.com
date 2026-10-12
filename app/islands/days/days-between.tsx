@@ -2,7 +2,7 @@ import { useEffect, useState } from 'hono/jsx';
 
 import DateFields from '#app/components/date-fields.js';
 import { type DateInputValues, isInteger } from '#app/lib/date-input.js';
-import { isoDateString, parseIsoDate } from '#app/lib/date-query.js';
+import { dateParamString, parseDateParam } from '#app/lib/date-query.js';
 import { calculateDaysBetween } from '#app/lib/days/days-result.js';
 import { replaceUrlQuery } from '#app/lib/url.js';
 import { formatSeirekiWithWeekday } from '#src/domain/date/format.js';
@@ -22,13 +22,13 @@ interface Props {
 }
 
 export default function DaysBetween({ initialFrom, initialTo }: Props) {
-  const [from, setFrom] = useState<DateInputValues>(parseIsoDate(initialFrom) ?? todayInJST());
-  const [to, setTo] = useState<DateInputValues>(parseIsoDate(initialTo) ?? EMPTY);
+  const [from, setFrom] = useState<DateInputValues>(parseDateParam(initialFrom) ?? todayInJST());
+  const [to, setTo] = useState<DateInputValues>(parseDateParam(initialTo) ?? EMPTY);
 
   useEffect(() => {
     if (!isComplete(from) || !isComplete(to)) return;
     replaceUrlQuery(
-      new URLSearchParams({ from: isoDateString(from), to: isoDateString(to) }).toString(),
+      new URLSearchParams({ from: dateParamString(from), to: dateParamString(to) }).toString(),
     );
   }, [from, to]);
 
@@ -70,19 +70,19 @@ export default function DaysBetween({ initialFrom, initialTo }: Props) {
                   ? '同じ日です'
                   : `${Math.abs(result.days).toLocaleString()} 日${result.days > 0 ? '後' : '前'}`}
               </p>
-              {result.days !== 0 && (
-                <ul class="list-inside list-disc text-sm">
+              <ul class="list-inside list-disc text-sm">
+                {result.days !== 0 && (
                   <li>
                     {Math.floor(Math.abs(result.days) / 7).toLocaleString()} 週と{' '}
                     {Math.abs(result.days) % 7} 日
                   </li>
-                  <li>
-                    両端の日を含めて数えると {(Math.abs(result.days) + 1).toLocaleString()} 日
-                    {result.days > 0 && '（開始日を 1 日目とすると、終了日は '}
-                    {result.days > 0 && `${(result.days + 1).toLocaleString()} 日目）`}
-                  </li>
-                </ul>
-              )}
+                )}
+                <li>
+                  両端の日を含めて数えると {(Math.abs(result.days) + 1).toLocaleString()} 日
+                  {result.days >= 0 &&
+                    `（開始日を 1 日目とすると、終了日は ${(result.days + 1).toLocaleString()} 日目）`}
+                </li>
+              </ul>
             </div>
           )}
         </div>

@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
-import { addDays, dayOfWeek, diffDays, fromDayNumber, toDayNumber } from './day-count.js';
+import { dayOfWeek, diffDays, fromDayNumber, toDayNumber } from './day-count.js';
 import { createSeireki } from './seireki.js';
 
 const d = (year: number, month: number, day: number) => createSeireki({ year, month, day });
@@ -69,22 +69,5 @@ describe('fromDayNumber', () => {
     ]) {
       expect(fromDayNumber(toDayNumber(date))).toEqual(date);
     }
-  });
-});
-
-describe('addDays', () => {
-  it('月末・年末をまたいで日を進める', () => {
-    expect(addDays(d(2026, 1, 31), 1)).toEqual(d(2026, 2, 1));
-    expect(addDays(d(2026, 12, 31), 1)).toEqual(d(2027, 1, 1));
-  });
-
-  it('閏年の 2 月 29 日を数える', () => {
-    expect(addDays(d(2024, 2, 28), 1)).toEqual(d(2024, 2, 29));
-    expect(addDays(d(2023, 2, 28), 1)).toEqual(d(2023, 3, 1));
-  });
-
-  it('負の日数で日をさかのぼる', () => {
-    expect(addDays(d(2026, 3, 1), -1)).toEqual(d(2026, 2, 28));
-    expect(addDays(d(2026, 10, 12), -100)).toEqual(d(2026, 7, 4));
   });
 });

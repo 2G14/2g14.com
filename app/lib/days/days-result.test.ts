@@ -59,4 +59,20 @@ describe('calculateDateAfter', () => {
     expect(calculateDateAfter(v(9999, 12, 31), 1)).toMatchObject({ kind: 'error' });
     expect(calculateDateAfter(v(1, 1, 1), -1)).toMatchObject({ kind: 'error' });
   });
+
+  it('範囲を大きく超える日数も、例外にせずエラーを返す', () => {
+    expect(calculateDateAfter(v(2026, 10, 12), 1.7e23)).toMatchObject({ kind: 'error' });
+    expect(calculateDateAfter(v(2026, 10, 12), -1.7e23)).toMatchObject({ kind: 'error' });
+  });
+
+  it('範囲の端の日付ちょうどまでは計算できる', () => {
+    expect(calculateDateAfter(v(9999, 12, 30), 1)).toMatchObject({
+      kind: 'ok',
+      date: { year: 9999, month: 12, day: 31 },
+    });
+    expect(calculateDateAfter(v(1, 1, 2), -1)).toMatchObject({
+      kind: 'ok',
+      date: { year: 1, month: 1, day: 1 },
+    });
+  });
 });

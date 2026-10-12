@@ -31,10 +31,6 @@ export function fromDayNumber(dayNumber: number): Seireki {
   return createSeireki({ year, month, day });
 }
 
-export function addDays(date: Seireki, days: number): Seireki {
-  return fromDayNumber(toDayNumber(date) + days);
-}
-
 export function diffDays(from: Seireki, to: Seireki): number {
   return toDayNumber(to) - toDayNumber(from);
 }

@@ -54,16 +54,21 @@ export function dateToolUrl(base: string, values: DateQueryValues | null): strin
 }
 
 function pad(n: number, width: number): string {
-  return String(n).padStart(width, '0');
+  // 負の値に 0 を詰めると「00-1」のように読み戻せない文字列になる
+  return n < 0 ? String(n) : String(n).padStart(width, '0');
 }
 
-// 日付を 2 つ以上クエリに載せるページは、year/month/day の組を使えないため 1 つの値にまとめる
-export function isoDateString(values: { year: number; month: number; day: number }): string {
+/**
+ * 日付を 2 つ以上クエリに載せるページは year/month/day の組を使えないため、
+ * 1 つの値にまとめる。正しい日付なら YYYY-MM-DD になる。
+ * 範囲外の年や存在しない月日も、再読み込みで同じエラーを出せるようそのまま載せる。
+ */
+export function dateParamString(values: { year: number; month: number; day: number }): string {
   return `${pad(values.year, 4)}-${pad(values.month, 2)}-${pad(values.day, 2)}`;
 }
 
-export function parseIsoDate(raw?: string): { year: number; month: number; day: number } | null {
-  const match = raw?.match(/^(\d{4})-(\d{2})-(\d{2})$/u);
+export function parseDateParam(raw?: string): { year: number; month: number; day: number } | null {
+  const match = raw?.match(/^(-?\d+)-(-?\d+)-(-?\d+)$/u);
   if (!match) return null;
   return { year: Number(match[1]), month: Number(match[2]), day: Number(match[3]) };
 }

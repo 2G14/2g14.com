@@ -3,7 +3,7 @@ import { useEffect, useState } from 'hono/jsx';
 import DateFields from '#app/components/date-fields.js';
 import Field from '#app/components/field.js';
 import { type DateInputValues, isInteger } from '#app/lib/date-input.js';
-import { isoDateString, parseIsoDate, parseQueryNumber } from '#app/lib/date-query.js';
+import { dateParamString, parseDateParam, parseQueryNumber } from '#app/lib/date-query.js';
 import { calculateDateAfter } from '#app/lib/days/days-result.js';
 import { replaceUrlQuery } from '#app/lib/url.js';
 import { formatSeirekiWithWeekday } from '#src/domain/date/format.js';
@@ -19,7 +19,7 @@ interface Props {
 }
 
 export default function DateAfter({ initialBase, initialDays }: Props) {
-  const [base, setBase] = useState<DateInputValues>(parseIsoDate(initialBase) ?? todayInJST());
+  const [base, setBase] = useState<DateInputValues>(parseDateParam(initialBase) ?? todayInJST());
   const [days, setDays] = useState<number | null>(parseQueryNumber(initialDays) ?? 100);
 
   useEffect(() => {
@@ -27,7 +27,7 @@ export default function DateAfter({ initialBase, initialDays }: Props) {
     if (!isInteger(year) || !isInteger(month) || !isInteger(day) || !isInteger(days)) return;
     replaceUrlQuery(
       new URLSearchParams({
-        base: isoDateString({ year, month, day }),
+        base: dateParamString({ year, month, day }),
         days: String(days),
       }).toString(),
     );
