@@ -17,7 +17,7 @@ import { etoFromYear, type Kanshi } from '#src/domain/eto/eto.js';
 import { seirekiToWareki } from '#src/domain/wareki/conversion.js';
 import type { Wareki } from '#src/domain/wareki/wareki.js';
 
-import { parseDateInput } from '../date-input.js';
+import { parseSeirekiInput } from '../date-input.js';
 import type { NoResult } from '../result.js';
 
 interface AgeSummary {
@@ -32,9 +32,6 @@ interface AgeSummary {
   japaneseCalendar: { wareki: Wareki; eto: Kanshi } | null;
 }
 
-// 入力欄の下限に合わせる。西暦 0 年や紀元前はグレゴリオ暦の年番号として扱わない
-const MIN_YEAR = 1;
-
 export type AgeResult = NoResult | ({ kind: 'ok' } & AgeSummary);
 
 export function calculateAgeResult(
@@ -43,14 +40,11 @@ export function calculateAgeResult(
   day: number | null,
   today: Seireki,
 ): AgeResult {
-  const parsed = parseDateInput(year, month, day);
+  const parsed = parseSeirekiInput(year, month, day);
   if (parsed.kind !== 'ok') return parsed;
-  if (parsed.date.year < MIN_YEAR) {
-    return { kind: 'error', message: `年は${MIN_YEAR}以上で入力してください。` };
-  }
+  const birth = parsed.seireki;
 
   try {
-    const birth = createSeireki(parsed.date);
     const wareki = seirekiToWareki(birth);
     // それより前の日本は旧暦で、和暦の月日も干支が切り替わる正月もグレゴリオ暦と合わない
     const usesJapaneseGregorian =

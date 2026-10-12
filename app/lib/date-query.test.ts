@@ -1,6 +1,12 @@
 import { describe, expect, it } from 'vitest';
 
-import { dateQueryString, dateToolUrl, parseQueryNumber, yearQueryString } from './date-query.js';
+import {
+  dateInputQueryString,
+  dateQueryString,
+  dateToolUrl,
+  parseQueryNumber,
+  yearQueryString,
+} from './date-query.js';
 
 describe('parseQueryNumber', () => {
   it('整数の文字列を数値にする', () => {
@@ -67,5 +73,20 @@ describe('yearQueryString', () => {
 
   it('整数でなければ URL を変えないため null を返す', () => {
     expect(yearQueryString(1985.5)).toBeNull();
+  });
+});
+
+describe('dateInputQueryString', () => {
+  it('年月日がそろえば year/month/day クエリにする', () => {
+    expect(dateInputQueryString({ year: 2019, month: 4, day: 2 })).toBe('year=2019&month=4&day=2');
+  });
+
+  it('欠けた欄があればクエリを消すため空文字を返す', () => {
+    expect(dateInputQueryString({ year: 2019, month: 4, day: null })).toBe('');
+    expect(dateInputQueryString({ year: null, month: null, day: null })).toBe('');
+  });
+
+  it('整数でない値があれば URL を変えないため null を返す', () => {
+    expect(dateInputQueryString({ year: 2019, month: 4.5, day: null })).toBeNull();
   });
 });
