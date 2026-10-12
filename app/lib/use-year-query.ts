@@ -1,7 +1,6 @@
 import { useEffect, useState } from 'hono/jsx';
 
-import { isInteger } from './date-input.js';
-import { parseQueryNumber } from './date-query.js';
+import { parseQueryNumber, yearQueryString } from './date-query.js';
 import { replaceUrlQuery } from './url.js';
 
 /**
@@ -14,8 +13,9 @@ export function useYearQuery(
   const [year, setYear] = useState<number | null>(parseQueryNumber(initialYear) ?? fallback);
 
   useEffect(() => {
-    if (!isInteger(year)) return;
-    replaceUrlQuery(new URLSearchParams({ year: String(year) }).toString());
+    // 空欄にしたのに year が残ると、再読み込みで消したはずの結果が戻ってしまう
+    const query = yearQueryString(year);
+    if (query !== null) replaceUrlQuery(query);
   }, [year]);
 
   return [year, setYear];
