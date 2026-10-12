@@ -1,12 +1,11 @@
-import { useEffect, useState } from 'hono/jsx';
+import { useState } from 'hono/jsx';
 
 import CalendarToggleButton from '#app/components/calendar-toggle-button.js';
 import DateField from '#app/components/date-field.js';
 import SeirekiCalendar from '#app/components/seireki-calendar.js';
 import { calculateAgeResult } from '#app/lib/age/age-result.js';
-import { isInteger } from '#app/lib/date-input.js';
-import { dateQueryString, dateToolUrl, parseQueryNumber } from '#app/lib/date-query.js';
-import { replaceUrlQuery } from '#app/lib/url.js';
+import { dateToolUrl, parseQueryNumber } from '#app/lib/date-query.js';
+import { useDateQuery } from '#app/lib/use-date-query.js';
 import { formatSeireki } from '#src/domain/date/format.js';
 import { createSeireki } from '#src/domain/date/seireki.js';
 import { formatWareki } from '#src/domain/wareki/format.js';
@@ -25,15 +24,12 @@ export default function AgeCalculator({ initialYear, initialMonth, initialDay }:
   const initialYearValue = parseQueryNumber(initialYear);
   // 年だけクエリで渡された場合（干支検索からの遷移など）は 1/1 を初期値にする
   const fallback = initialYearValue === null ? null : 1;
-  const [year, setYear] = useState<number | null>(initialYearValue);
-  const [month, setMonth] = useState<number | null>(parseQueryNumber(initialMonth) ?? fallback);
-  const [day, setDay] = useState<number | null>(parseQueryNumber(initialDay) ?? fallback);
+  const { year, month, day, setYear, setMonth, setDay } = useDateQuery({
+    year: initialYearValue,
+    month: parseQueryNumber(initialMonth) ?? fallback,
+    day: parseQueryNumber(initialDay) ?? fallback,
+  });
   const [calendarOpen, setCalendarOpen] = useState(false);
-
-  useEffect(() => {
-    if (!isInteger(year) || !isInteger(month) || !isInteger(day)) return;
-    replaceUrlQuery(dateQueryString({ year, month, day }));
-  }, [year, month, day]);
 
   const result = calculateAgeResult(year, month, day, createSeireki(todayInJST()));
 

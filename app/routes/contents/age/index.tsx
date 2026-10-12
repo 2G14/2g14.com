@@ -5,7 +5,7 @@ import ToolIndex from '#app/components/tool-index.js';
 
 const PAGE_TITLE = '年齢計算ツール';
 const META_DESCRIPTION =
-  '生年月日からの年齢計算（満年齢・数え年・次の誕生日・生後日数）・年齢早見表・厄年早見表・長寿祝い一覧など、年齢に関する各種ツールを提供します。';
+  '生年月日からの年齢計算（満年齢・数え年・次の誕生日・生後日数）・年齢早見表・厄年早見表・長寿祝い一覧・学年早見表など、年齢に関する各種ツールを提供します。';
 
 const PAGES = [
   {
@@ -27,6 +27,11 @@ const PAGES = [
     href: '/contents/age/choju',
     label: '長寿祝い一覧',
     description: '還暦・古希・喜寿・米寿などの年齢と、今年祝いを迎える生まれ年',
+  },
+  {
+    href: '/contents/age/school-year',
+    label: '学年早見表',
+    description: '学年ごとの生年月日と、生年月日から入学・卒業の年',
   },
 ] as const;
 
