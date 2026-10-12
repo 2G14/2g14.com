@@ -1,5 +1,6 @@
-import { YAKU_KIND_LABELS, type Yaku, type YakudoshiPeriod } from '#src/domain/age/yakudoshi.js';
-import { warekiYearLabel } from '#src/domain/wareki/year-label.js';
+import { YAKU_KIND_LABELS, type YakudoshiPeriod } from '#src/domain/age/yakudoshi.js';
+
+import YearCell from './year-cell.js';
 
 interface YakudoshiTableProps {
   caption: string;
@@ -16,18 +17,6 @@ export default function YakudoshiTable({
   show,
   highlightYear,
 }: YakudoshiTableProps) {
-  const cell = (yaku: Yaku) => {
-    const year = yaku[show];
-    const wareki = warekiYearLabel(year);
-    const highlighted = yaku.year === highlightYear;
-    return (
-      <td class={`whitespace-nowrap ${highlighted ? 'bg-primary/10 font-bold' : ''}`}>
-        <p>{year}年</p>
-        {wareki && <p class="text-xs text-base-content/60">{wareki}</p>}
-      </td>
-    );
-  };
-
   return (
     <div class="overflow-x-auto">
       <table class="table">
@@ -47,7 +36,9 @@ export default function YakudoshiTable({
                 {period.honyakuAge} 歳
                 {period.taiyaku && <span class="ml-1 badge badge-sm badge-error">大厄</span>}
               </th>
-              {period.yakus.map(cell)}
+              {period.yakus.map((yaku) => (
+                <YearCell year={yaku[show]} highlighted={yaku.year === highlightYear} />
+              ))}
             </tr>
           ))}
         </tbody>
