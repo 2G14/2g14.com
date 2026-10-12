@@ -4,6 +4,8 @@ import {
   dateInputQueryString,
   dateQueryString,
   dateToolUrl,
+  isoDateString,
+  parseIsoDate,
   parseQueryNumber,
   yearQueryString,
 } from './date-query.js';
@@ -88,5 +90,24 @@ describe('dateInputQueryString', () => {
 
   it('整数でない値があれば URL を変えないため null を返す', () => {
     expect(dateInputQueryString({ year: 2019, month: 4.5, day: null })).toBeNull();
+  });
+});
+
+describe('isoDateString', () => {
+  it('年月日をゼロ埋めした YYYY-MM-DD にする', () => {
+    expect(isoDateString({ year: 2026, month: 7, day: 1 })).toBe('2026-07-01');
+    expect(isoDateString({ year: 1, month: 1, day: 1 })).toBe('0001-01-01');
+  });
+});
+
+describe('parseIsoDate', () => {
+  it('YYYY-MM-DD を年月日にする', () => {
+    expect(parseIsoDate('2026-07-01')).toEqual({ year: 2026, month: 7, day: 1 });
+  });
+
+  it('クエリに無い、または形式が違えば null を返す', () => {
+    expect(parseIsoDate()).toBeNull();
+    expect(parseIsoDate('2026-7-1')).toBeNull();
+    expect(parseIsoDate('20260701')).toBeNull();
   });
 });

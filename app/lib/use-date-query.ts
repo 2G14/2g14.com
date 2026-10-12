@@ -1,18 +1,13 @@
 import { useEffect, useState } from 'hono/jsx';
 
+import type { DateInputValues } from './date-input.js';
 import { dateInputQueryString } from './date-query.js';
 import { replaceUrlQuery } from './url.js';
-
-interface DateValues {
-  year: number | null;
-  month: number | null;
-  day: number | null;
-}
 
 /**
  * 年月日の入力値を `?year=&month=&day=` クエリと同期させる。
  */
-export function useDateQuery(initial: DateValues): DateValues & {
+export function useDateQuery(initial: DateInputValues): DateInputValues & {
   setYear: (year: number | null) => void;
   setMonth: (month: number | null) => void;
   setDay: (day: number | null) => void;

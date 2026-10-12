@@ -52,3 +52,18 @@ export function dateToolUrl(base: string, values: DateQueryValues | null): strin
   const qs = dateQueryString(values);
   return qs ? `${base}?${qs}` : base;
 }
+
+function pad(n: number, width: number): string {
+  return String(n).padStart(width, '0');
+}
+
+// 日付を 2 つ以上クエリに載せるページは、year/month/day の組を使えないため 1 つの値にまとめる
+export function isoDateString(values: { year: number; month: number; day: number }): string {
+  return `${pad(values.year, 4)}-${pad(values.month, 2)}-${pad(values.day, 2)}`;
+}
+
+export function parseIsoDate(raw?: string): { year: number; month: number; day: number } | null {
+  const match = raw?.match(/^(\d{4})-(\d{2})-(\d{2})$/u);
+  if (!match) return null;
+  return { year: Number(match[1]), month: Number(match[2]), day: Number(match[3]) };
+}

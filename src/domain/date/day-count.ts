@@ -1,4 +1,4 @@
-import type { Seireki } from './seireki.js';
+import { createSeireki, type Seireki } from './seireki.js';
 
 /**
  * グレゴリオ暦の日付を通算日番号に変換する（Howard Hinnant の days-from-civil）。
@@ -11,6 +11,28 @@ export function toDayNumber(date: Seireki): number {
   const doy = Math.floor((153 * (date.month + (date.month > 2 ? -3 : 9)) + 2) / 5) + date.day - 1;
   const doe = yoe * 365 + Math.floor(yoe / 4) - Math.floor(yoe / 100) + doy;
   return era * 146097 + doe - 719468;
+}
+
+/**
+ * 通算日番号をグレゴリオ暦の日付に戻す（Howard Hinnant の civil-from-days）。
+ */
+export function fromDayNumber(dayNumber: number): Seireki {
+  const z = dayNumber + 719468;
+  const era = Math.floor(z / 146097);
+  const doe = z - era * 146097;
+  const yoe = Math.floor(
+    (doe - Math.floor(doe / 1460) + Math.floor(doe / 36524) - Math.floor(doe / 146096)) / 365,
+  );
+  const doy = doe - (365 * yoe + Math.floor(yoe / 4) - Math.floor(yoe / 100));
+  const mp = Math.floor((5 * doy + 2) / 153);
+  const day = doy - Math.floor((153 * mp + 2) / 5) + 1;
+  const month = mp < 10 ? mp + 3 : mp - 9;
+  const year = yoe + era * 400 + (month <= 2 ? 1 : 0);
+  return createSeireki({ year, month, day });
+}
+
+export function addDays(date: Seireki, days: number): Seireki {
+  return fromDayNumber(toDayNumber(date) + days);
 }
 
 export function diffDays(from: Seireki, to: Seireki): number {

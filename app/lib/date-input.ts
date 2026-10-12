@@ -9,6 +9,13 @@ interface DateInput {
   day: number;
 }
 
+/** 入力欄の値。未入力や数値として読めない欄は null */
+export interface DateInputValues {
+  year: number | null;
+  month: number | null;
+  day: number | null;
+}
+
 export type ParsedDateInput = NoResult | { kind: 'ok'; date: DateInput };
 
 export function isInteger(value: number | null): value is number {
