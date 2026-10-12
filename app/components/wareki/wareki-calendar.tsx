@@ -179,7 +179,7 @@ export default function WarekiCalendar({
         </>
       }
       headerExtra={
-        <div role="tablist" class="tabs-boxed tabs mb-3">
+        <div role="tablist" class="tabs tabs-box mb-3">
           {ERAS_DISPLAY.map((e) => (
             <button
               type="button"
