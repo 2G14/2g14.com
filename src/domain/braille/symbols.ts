@@ -59,8 +59,9 @@ const LETTERS = [
 ] as const satisfies readonly (readonly [string, readonly Dot[]])[];
 
 /**
- * 日本語の文中のアルファベットは外字符の後に続ける。外字符は数符と同じく続く文字の並び全体に効き、
- * 大文字はその文字の前に大文字符を置く
+ * 日本語の文中で文字や略称を書くときは外字符の後に続ける。外字符は数符と同じく続く文字の並び全体に効き、
+ * 大文字はその文字の前に大文字符を置く。大文字が続くときの二重大文字符と、英単語・英文を囲む
+ * 外国語引用符は、1 文字ずつの対応表に収まらないため一覧に含めない
  */
 export const ALPHABET: readonly BrailleEntry[] = [
   createBrailleEntry('外字符', [FOREIGN_LETTER_SIGN]),
