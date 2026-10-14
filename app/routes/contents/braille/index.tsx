@@ -11,7 +11,7 @@ const PAGES = [
   {
     href: '/contents/braille/list',
     label: '点字一覧表',
-    description: '五十音・濁音・拗音・数字・句読点の点字と、点字の仕組み',
+    description: '五十音・濁音・拗音・特殊音・数字・アルファベット・句読点の点字と、点字の仕組み',
   },
 ] as const;
 
