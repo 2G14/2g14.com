@@ -30,9 +30,9 @@ const SECTIONS = {
   yoon: { id: 'yoon', label: '拗音' },
   extended: { id: 'extended', label: '特殊音' },
   special: { id: 'special', label: '撥音・促音・長音' },
+  punctuation: { id: 'punctuation', label: '句読点など' },
   numerals: { id: 'numerals', label: '数字' },
   alphabet: { id: 'alphabet', label: 'アルファベット' },
-  punctuation: { id: 'punctuation', label: '句読点など' },
 } as const satisfies Record<string, TocItem>;
 
 // JSX のテキストを改行で折り返すと日本語の文中に空白が入るため、文字列として持つ
@@ -126,6 +126,15 @@ export default createRoute((c) => {
         <BrailleGrid entries={SPECIAL_KANA} columnsClass="grid-cols-3" />
       </Section>
 
+      <Section section={SECTIONS.punctuation}>
+        <Note>
+          {
+            '句点・疑問符・感嘆符が文の終わりに来るときは後ろを 2 マス、読点・中点の後ろは 1 マスあけます。'
+          }
+        </Note>
+        <BrailleGrid entries={PUNCTUATION} columnsClass="grid-cols-3 sm:grid-cols-5" />
+      </Section>
+
       <Section section={SECTIONS.numerals}>
         <Note>
           {
@@ -142,15 +151,6 @@ export default createRoute((c) => {
           }
         </Note>
         <BrailleGrid entries={ALPHABET} columnsClass="grid-cols-4 sm:grid-cols-6" />
-      </Section>
-
-      <Section section={SECTIONS.punctuation}>
-        <Note>
-          {
-            '句点・疑問符・感嘆符が文の終わりに来るときは後ろを 2 マス、読点・中点の後ろは 1 マスあけます。'
-          }
-        </Note>
-        <BrailleGrid entries={PUNCTUATION} columnsClass="grid-cols-3 sm:grid-cols-5" />
       </Section>
     </TocPageLayout>,
     { title: PAGE_TITLE, head },
