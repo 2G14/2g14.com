@@ -1,4 +1,4 @@
-import { ALL_DOTS, type Cell, cellToUnicode, dotsLabel } from '#src/domain/braille/braille.js';
+import { ALL_DOTS, type Cell, cellToUnicode, dotsLabel } from '#src/domain/braille/cell.js';
 
 interface BrailleCellsProps {
   cells: readonly Cell[];
@@ -26,7 +26,7 @@ export default function BrailleCells({
           {ALL_DOTS.map((dot) => (
             <span
               class={`flex items-center justify-center rounded-full ${dotClass} ${
-                cell.includes(dot)
+                cell.dots.includes(dot)
                   ? 'bg-base-content text-base-100'
                   : 'border border-base-content/20 text-base-content/40'
               }`}

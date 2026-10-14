@@ -1,19 +1,8 @@
 import { describe, expect, it } from 'vitest';
 
-import {
-  ALPHABET,
-  type BrailleEntry,
-  cellToUnicode,
-  DAKUON_ROWS,
-  dotsLabel,
-  EXTENDED_KANA,
-  type KanaRow,
-  NUMERALS,
-  PUNCTUATION,
-  SEION_ROWS,
-  SPECIAL_KANA,
-  YOON_ROWS,
-} from './braille.js';
+import { cellToUnicode } from './cell.js';
+import type { BrailleEntry, KanaRow } from './entry.js';
+import { DAKUON_ROWS, EXTENDED_KANA, SEION_ROWS, SPECIAL_KANA, YOON_ROWS } from './kana.js';
 
 function entriesOf(rows: readonly KanaRow[]): BrailleEntry[] {
   return rows.flat().filter((entry) => entry !== null);
@@ -26,21 +15,6 @@ function find(entries: readonly BrailleEntry[], label: string): BrailleEntry | u
 function unicodeOf(entry: BrailleEntry | null): string {
   return entry === null ? '' : entry.cells.map((c) => cellToUnicode(c)).join('');
 }
-
-describe('cellToUnicode', () => {
-  it('点の組み合わせを Unicode の点字パターンにする', () => {
-    expect(cellToUnicode([])).toBe('⠀');
-    expect(cellToUnicode([1])).toBe('⠁');
-    expect(cellToUnicode([1, 2, 3, 4, 5, 6])).toBe('⠿');
-    expect(cellToUnicode([3, 4, 5, 6])).toBe('⠼');
-  });
-});
-
-describe('dotsLabel', () => {
-  it('点番号を中点でつなぐ', () => {
-    expect(dotsLabel([1, 2, 4])).toBe('1・2・4');
-  });
-});
 
 describe('SEION_ROWS', () => {
   it.each([
@@ -75,14 +49,14 @@ describe('DAKUON_ROWS', () => {
   const entries = entriesOf(DAKUON_ROWS);
 
   it('濁音は濁点（5 の点）の後に清音を置く', () => {
-    expect(find(entries, 'が')?.cells).toEqual([[5], [1, 6]]);
-    expect(find(entries, 'ぢ')?.cells).toEqual([[5], [1, 2, 3, 5]]);
-    expect(find(entries, 'ぼ')?.cells).toEqual([[5], [2, 3, 4, 6]]);
+    expect(find(entries, 'が')?.cells.map((c) => c.dots)).toEqual([[5], [1, 6]]);
+    expect(find(entries, 'ぢ')?.cells.map((c) => c.dots)).toEqual([[5], [1, 2, 3, 5]]);
+    expect(find(entries, 'ぼ')?.cells.map((c) => c.dots)).toEqual([[5], [2, 3, 4, 6]]);
   });
 
   it('半濁音は半濁点（6 の点）の後に清音を置く', () => {
-    expect(find(entries, 'ぱ')?.cells).toEqual([[6], [1, 3, 6]]);
-    expect(find(entries, 'ぽ')?.cells).toEqual([[6], [2, 3, 4, 6]]);
+    expect(find(entries, 'ぱ')?.cells.map((c) => c.dots)).toEqual([[6], [1, 3, 6]]);
+    expect(find(entries, 'ぽ')?.cells.map((c) => c.dots)).toEqual([[6], [2, 3, 4, 6]]);
   });
 
   it('が行・ざ行・だ行・ば行・ぱ行の 25 文字', () => {
@@ -96,21 +70,21 @@ describe('YOON_ROWS', () => {
   const entries = entriesOf(YOON_ROWS);
 
   it('拗音は拗音符（4 の点）の後に同じ行のア段・ウ段・オ段を置く', () => {
-    expect(find(entries, 'きゃ')?.cells).toEqual([[4], [1, 6]]);
-    expect(find(entries, 'しゅ')?.cells).toEqual([[4], [1, 4, 5, 6]]);
-    expect(find(entries, 'りょ')?.cells).toEqual([[4], [2, 4, 5]]);
+    expect(find(entries, 'きゃ')?.cells.map((c) => c.dots)).toEqual([[4], [1, 6]]);
+    expect(find(entries, 'しゅ')?.cells.map((c) => c.dots)).toEqual([[4], [1, 4, 5, 6]]);
+    expect(find(entries, 'りょ')?.cells.map((c) => c.dots)).toEqual([[4], [2, 4, 5]]);
   });
 
   it('拗濁音は 4・5 の点、拗半濁音は 4・6 の点を前に置く', () => {
-    expect(find(entries, 'ぎゃ')?.cells).toEqual([
+    expect(find(entries, 'ぎゃ')?.cells.map((c) => c.dots)).toEqual([
       [4, 5],
       [1, 6],
     ]);
-    expect(find(entries, 'ぢょ')?.cells).toEqual([
+    expect(find(entries, 'ぢょ')?.cells.map((c) => c.dots)).toEqual([
       [4, 5],
       [2, 3, 4, 5],
     ]);
-    expect(find(entries, 'ぴゅ')?.cells).toEqual([
+    expect(find(entries, 'ぴゅ')?.cells.map((c) => c.dots)).toEqual([
       [4, 6],
       [1, 3, 4, 6],
     ]);
@@ -124,35 +98,6 @@ describe('YOON_ROWS', () => {
 describe('SPECIAL_KANA', () => {
   it('撥音・促音・長音の点字', () => {
     expect(SPECIAL_KANA.map((entry) => unicodeOf(entry)).join('')).toBe('⠴⠂⠒');
-  });
-});
-
-describe('NUMERALS', () => {
-  it('数字は数符の後に 1〜0 の形を続ける', () => {
-    expect(NUMERALS.slice(1).map((entry) => entry.label)).toEqual([
-      '1',
-      '2',
-      '3',
-      '4',
-      '5',
-      '6',
-      '7',
-      '8',
-      '9',
-      '0',
-    ]);
-    expect(
-      NUMERALS.slice(1)
-        .map((entry) => unicodeOf(entry).slice(1))
-        .join(''),
-    ).toBe('⠁⠃⠉⠙⠑⠋⠛⠓⠊⠚');
-    expect(NUMERALS.every((entry) => cellToUnicode(entry.cells[0]) === '⠼')).toBe(true);
-  });
-});
-
-describe('PUNCTUATION', () => {
-  it('句点・読点・疑問符・感嘆符・中点の点字', () => {
-    expect(PUNCTUATION.map((entry) => unicodeOf(entry)).join('')).toBe('⠲⠰⠢⠖⠐');
   });
 });
 
@@ -202,25 +147,10 @@ describe('EXTENDED_KANA', () => {
     ['ヴョ', [4, 5, 6], [3, 4, 5]],
     ['ヴ', [5], [1, 4]],
   ])('%s は前置符号 %j の後に %j を置く', (label, sign, base) => {
-    expect(find(EXTENDED_KANA, label)?.cells).toEqual([sign, base]);
+    expect(find(EXTENDED_KANA, label)?.cells.map((c) => c.dots)).toEqual([sign, base]);
   });
 
   it('43 文字', () => {
     expect(EXTENDED_KANA).toHaveLength(43);
-  });
-});
-
-describe('ALPHABET', () => {
-  it('a〜z は外字符（5・6 の点）の後に文字の形を続ける', () => {
-    const letters = ALPHABET.slice(2);
-    expect(letters.map((entry) => entry.label).join('')).toBe('abcdefghijklmnopqrstuvwxyz');
-    expect(letters.every((entry) => cellToUnicode(entry.cells[0]) === '⠰')).toBe(true);
-    expect(letters.map((entry) => unicodeOf(entry).slice(1)).join('')).toBe(
-      '⠁⠃⠉⠙⠑⠋⠛⠓⠊⠚⠅⠇⠍⠝⠕⠏⠟⠗⠎⠞⠥⠧⠺⠭⠽⠵',
-    );
-  });
-
-  it('大文字符は 6 の点', () => {
-    expect(find(ALPHABET, '大文字符')?.cells).toEqual([[6]]);
   });
 });

@@ -5,17 +5,15 @@ import BrailleCells from '#app/components/braille/braille-cells.js';
 import BrailleGrid from '#app/components/braille/braille-grid.js';
 import PageHead from '#app/components/page-head.js';
 import TocPageLayout, { type TocItem } from '#app/components/toc-page-layout.js';
+import { ALL_DOTS, createBrailleCell } from '#src/domain/braille/cell.js';
 import {
-  ALL_DOTS,
-  ALPHABET,
   DAKUON_ROWS,
   EXTENDED_KANA,
-  NUMERALS,
-  PUNCTUATION,
   SEION_ROWS,
   SPECIAL_KANA,
   YOON_ROWS,
-} from '#src/domain/braille/braille.js';
+} from '#src/domain/braille/kana.js';
+import { ALPHABET, NUMERALS, PUNCTUATION } from '#src/domain/braille/symbols.js';
 
 const PAGE_TITLE = '点字一覧表 - 五十音・濁音・拗音・特殊音・数字・アルファベット';
 const META_DESCRIPTION =
@@ -85,7 +83,7 @@ export default createRoute((c) => {
       <Section section={SECTIONS.basics}>
         <div class="flex flex-col gap-6 sm:flex-row sm:items-center">
           <div class="flex shrink-0 justify-center">
-            <BrailleCells cells={[ALL_DOTS]} size="lg" showDotNumbers />
+            <BrailleCells cells={[createBrailleCell(ALL_DOTS)]} size="lg" showDotNumbers />
           </div>
           <ul class="list-disc space-y-1 pl-5 text-sm">
             {BASICS.map((text) => (

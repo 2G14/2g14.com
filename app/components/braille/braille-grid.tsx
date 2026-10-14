@@ -1,4 +1,4 @@
-import type { BrailleEntry } from '#src/domain/braille/braille.js';
+import type { BrailleEntry } from '#src/domain/braille/entry.js';
 
 import BrailleCells from './braille-cells.js';
 
