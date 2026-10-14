@@ -1,8 +1,8 @@
 import { describe, expect, it } from 'vitest';
 
-import { cellToUnicode } from './cell.js';
-import type { BrailleEntry } from './entry.js';
-import { ALPHABET, NUMERALS, PUNCTUATION } from './symbols.js';
+import { cellToUnicode } from '#src/domain/braille/cell.js';
+import type { BrailleEntry } from '#src/domain/braille/entry.js';
+import { ALPHABET, NUMERALS, PUNCTUATION } from '#src/domain/braille/symbols.js';
 
 const unicodeOf = (entry: BrailleEntry): string =>
   entry.cells.map((c) => cellToUnicode(c)).join('');

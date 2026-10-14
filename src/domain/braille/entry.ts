@@ -1,4 +1,4 @@
-import { type Cell, createBrailleCell } from './cell.js';
+import { type Cell, createBrailleCell } from '#src/domain/braille/cell.js';
 
 const brand = Symbol('BrailleEntry');
 

@@ -1,5 +1,9 @@
-import { createBrailleCell, type Dot } from './cell.js';
-import { type BrailleEntry, createBrailleEntry, entryFromDots as entry } from './entry.js';
+import { createBrailleCell, type Dot } from '#src/domain/braille/cell.js';
+import {
+  type BrailleEntry,
+  createBrailleEntry,
+  entryFromDots as entry,
+} from '#src/domain/braille/entry.js';
 
 const NUMERAL_SIGN = createBrailleCell([3, 4, 5, 6]);
 

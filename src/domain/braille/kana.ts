@@ -1,10 +1,10 @@
-import { type Cell, createBrailleCell } from './cell.js';
+import { type Cell, createBrailleCell } from '#src/domain/braille/cell.js';
 import {
   type BrailleEntry,
   createBrailleEntry,
   entryFromDots as entry,
   type KanaRow,
-} from './entry.js';
+} from '#src/domain/braille/entry.js';
 
 export const SEION_ROWS: readonly KanaRow[] = [
   [

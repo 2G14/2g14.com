@@ -1,8 +1,14 @@
 import { describe, expect, it } from 'vitest';
 
-import { cellToUnicode } from './cell.js';
-import type { BrailleEntry, KanaRow } from './entry.js';
-import { DAKUON_ROWS, EXTENDED_KANA, SEION_ROWS, SPECIAL_KANA, YOON_ROWS } from './kana.js';
+import { cellToUnicode } from '#src/domain/braille/cell.js';
+import type { BrailleEntry, KanaRow } from '#src/domain/braille/entry.js';
+import {
+  DAKUON_ROWS,
+  EXTENDED_KANA,
+  SEION_ROWS,
+  SPECIAL_KANA,
+  YOON_ROWS,
+} from '#src/domain/braille/kana.js';
 
 function entriesOf(rows: readonly KanaRow[]): BrailleEntry[] {
   return rows.flat().filter((entry) => entry !== null);

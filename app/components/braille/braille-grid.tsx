@@ -1,6 +1,5 @@
+import BrailleCells from '#app/components/braille/braille-cells.js';
 import type { BrailleEntry } from '#src/domain/braille/entry.js';
-
-import BrailleCells from './braille-cells.js';
 
 interface BrailleGridProps {
   /** null は仮名の無い段で、位置を揃えるための空きマスとして描く */

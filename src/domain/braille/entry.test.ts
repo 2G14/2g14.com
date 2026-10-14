@@ -1,7 +1,11 @@
 import { describe, expect, it } from 'vitest';
 
-import { createBrailleCell, InvalidBrailleCellError } from './cell.js';
-import { createBrailleEntry, entryFromDots, InvalidBrailleEntryError } from './entry.js';
+import { createBrailleCell, InvalidBrailleCellError } from '#src/domain/braille/cell.js';
+import {
+  createBrailleEntry,
+  entryFromDots,
+  InvalidBrailleEntryError,
+} from '#src/domain/braille/entry.js';
 
 describe('createBrailleEntry', () => {
   it('墨字の表記とマスの組を作る', () => {

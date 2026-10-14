@@ -1,6 +1,6 @@
 import type { Child } from 'hono/jsx';
 
-import ToolPageLayout from './tool-page-layout.js';
+import ToolPageLayout from '#app/components/tool-page-layout.js';
 
 export interface TocItem {
   /** 見出しを含む section の id */

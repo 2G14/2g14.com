@@ -18,9 +18,9 @@ import { ALPHABET, NUMERALS, PUNCTUATION } from '#src/domain/braille/symbols.js'
 
 const PAGE_TITLE = '点字一覧表 - 五十音・濁音・拗音・特殊音・数字・アルファベット';
 const META_DESCRIPTION =
-  '日本語の点字（六点点字）の一覧表。五十音・濁音・半濁音・拗音・特殊音・撥音・促音・長音・数字・アルファベット・句読点の点の位置と、点字の仕組みを紹介します。';
+  '日本語の点字（六点点字）の一覧表。五十音・濁音・半濁音・拗音・特殊音・撥音・促音・長音・句読点・数字・アルファベットの点の位置と、点字の仕組みを紹介します。';
 const OG_DESCRIPTION =
-  '五十音・濁音・拗音・特殊音・数字・アルファベット・句読点の点字一覧表と、点字の仕組み。';
+  '五十音・濁音・拗音・特殊音・句読点・数字・アルファベットの点字一覧表と、点字の仕組み。';
 
 const SECTIONS = {
   basics: { id: 'basics', label: '点字の仕組み' },
@@ -59,7 +59,7 @@ export default createRoute((c) => {
 
   return c.render(
     <TocPageLayout title="点字一覧表" tocItems={Object.values(SECTIONS)}>
-      <TocSection section={SECTIONS.basics}>
+      <TocSection item={SECTIONS.basics}>
         <div class="flex flex-col gap-6 sm:flex-row sm:items-center">
           <div class="flex shrink-0 justify-center">
             <BrailleCells cells={[createBrailleCell(ALL_DOTS)]} size="lg" showDotNumbers />
@@ -72,16 +72,16 @@ export default createRoute((c) => {
         </div>
       </TocSection>
 
-      <TocSection section={SECTIONS.seion}>
+      <TocSection item={SECTIONS.seion}>
         <BrailleGrid entries={SEION_ROWS.flat()} columnsClass="grid-cols-5" />
       </TocSection>
 
-      <TocSection section={SECTIONS.dakuon}>
+      <TocSection item={SECTIONS.dakuon}>
         <Note>濁音は濁点（5 の点）、半濁音は半濁点（6 の点）を清音の前に置きます。</Note>
         <BrailleGrid entries={DAKUON_ROWS.flat()} columnsClass="grid-cols-5" />
       </TocSection>
 
-      <TocSection section={SECTIONS.yoon}>
+      <TocSection item={SECTIONS.yoon}>
         <Note>
           {
             '拗音符（4 の点）の後に、同じ行のア段・ウ段・オ段の仮名を置きます（きゃ = 拗音符＋か）。拗濁音は 4・5 の点、拗半濁音は 4・6 の点を前に置きます。'
@@ -90,7 +90,7 @@ export default createRoute((c) => {
         <BrailleGrid entries={YOON_ROWS.flat()} columnsClass="grid-cols-3" />
       </TocSection>
 
-      <TocSection section={SECTIONS.extended}>
+      <TocSection item={SECTIONS.extended}>
         <Note>
           {
             '主に外来語に使う音です。拗音符などの前置符号の後に、母音や子音の近い清音を置きます（ティ = 拗音符＋ち、ファ = 合拗音符＋は）。合拗音符は 2・6 の点で、濁音には 2・5・6 の点を使います。'
@@ -99,11 +99,11 @@ export default createRoute((c) => {
         <BrailleGrid entries={EXTENDED_KANA} columnsClass="grid-cols-3 sm:grid-cols-6" />
       </TocSection>
 
-      <TocSection section={SECTIONS.special}>
+      <TocSection item={SECTIONS.special}>
         <BrailleGrid entries={SPECIAL_KANA} columnsClass="grid-cols-3" />
       </TocSection>
 
-      <TocSection section={SECTIONS.punctuation}>
+      <TocSection item={SECTIONS.punctuation}>
         <Note>
           {
             '句点・疑問符・感嘆符が文の終わりに来るときは後ろを 2 マス、読点・中点の後ろは 1 マスあけます。'
@@ -112,7 +112,7 @@ export default createRoute((c) => {
         <BrailleGrid entries={PUNCTUATION} columnsClass="grid-cols-3 sm:grid-cols-5" />
       </TocSection>
 
-      <TocSection section={SECTIONS.numerals}>
+      <TocSection item={SECTIONS.numerals}>
         <Note>
           {
             '数字は数符（3・4・5・6 の点）の後に数字の形を続けます。2019 のように数字が続く場合も、数符は先頭に 1 回だけ置きます。'
@@ -121,7 +121,7 @@ export default createRoute((c) => {
         <BrailleGrid entries={NUMERALS} columnsClass="grid-cols-3 sm:grid-cols-6" />
       </TocSection>
 
-      <TocSection section={SECTIONS.alphabet}>
+      <TocSection item={SECTIONS.alphabet}>
         <Note>
           {
             '日本語の文中で a・SNS・A4 のような文字や略称を書くときは、外字符（5・6 の点）の後に続けます。外字符は数符と同じく先頭に 1 回だけ置きます。大文字はその文字の前に大文字符（6 の点）を置き、SNS のように大文字が続くときは先頭に二重大文字符（6・6 の点）を 1 回置きます。英単語や英文は外国語引用符（2・3・6 の点と 3・5・6 の点）で囲みます。'

@@ -1,6 +1,11 @@
 import { describe, expect, it } from 'vitest';
 
-import { cellToUnicode, createBrailleCell, dotsLabel, InvalidBrailleCellError } from './cell.js';
+import {
+  cellToUnicode,
+  createBrailleCell,
+  dotsLabel,
+  InvalidBrailleCellError,
+} from '#src/domain/braille/cell.js';
 
 describe('createBrailleCell', () => {
   it('点番号を昇順に並べたマスを作る', () => {
