@@ -1,6 +1,8 @@
 import { createRoute } from 'honox/factory';
 
 import PageHead from '#app/components/page-head.js';
+import type { TocItem } from '#app/components/toc-page-layout.js';
+import TocSection from '#app/components/toc-section.js';
 import ToolPageLayout from '#app/components/tool-page-layout.js';
 import { etoFromYear, JUNISHI, yearsForJunishi } from '#src/domain/eto/eto.js';
 import { todayInJST } from '#src/lib/date.js';
@@ -9,6 +11,11 @@ const PAGE_TITLE = '干支一覧表 - 十二支と六十干支の一覧';
 const META_DESCRIPTION =
   '十二支（子・丑・寅…）と六十干支（甲子・乙丑…）の一覧表。それぞれの読み方と直近の該当する西暦年を確認できます。';
 const OG_DESCRIPTION = '十二支と六十干支の一覧表。読み方と該当する西暦年を確認できます。';
+
+const SECTIONS = {
+  junishi: { id: 'junishi', label: '十二支' },
+  kanshi: { id: 'kanshi', label: '六十干支' },
+} as const satisfies Record<string, TocItem>;
 
 export default createRoute((c) => {
   const url = new URL(c.req.url);
@@ -33,79 +40,65 @@ export default createRoute((c) => {
   return c.render(
     <ToolPageLayout title="干支一覧表">
       <main class="grid grid-cols-1 items-start gap-8">
-        <section id="junishi" class="scroll-mt-12">
-          <h2 class="sticky top-12 z-20 rounded-xl bg-base-100/70 px-2 py-2 text-xl font-semibold backdrop-blur-md">
-            十二支
-          </h2>
-          <div class="card mt-2 bg-base-100 shadow">
-            <div class="card-body p-0">
-              <div class="overflow-x-auto">
-                <table class="table table-zebra">
-                  <caption class="sr-only">十二支の一覧表</caption>
-                  <thead>
-                    <tr>
-                      <th>順番</th>
-                      <th>十二支</th>
-                      <th>読み</th>
-                      <th>動物</th>
-                      <th>直近の該当年</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {JUNISHI.map((junishi, i) => (
-                      <tr class="hover:bg-base-200">
-                        <td>{i + 1}</td>
-                        <td class="font-bold">{junishi.kanji}</td>
-                        <td>{junishi.kana}</td>
-                        <td>
-                          {junishi.animal} {junishi.emoji}
-                        </td>
-                        <td>
-                          {yearsForJunishi(i, currentYear - 48, currentYear)
-                            .map((y) => `${y}年`)
-                            .join('、')}
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
-            </div>
+        <TocSection item={SECTIONS.junishi} flush>
+          <div class="overflow-x-auto">
+            <table class="table table-zebra">
+              <caption class="sr-only">十二支の一覧表</caption>
+              <thead>
+                <tr>
+                  <th>順番</th>
+                  <th>十二支</th>
+                  <th>読み</th>
+                  <th>動物</th>
+                  <th>直近の該当年</th>
+                </tr>
+              </thead>
+              <tbody>
+                {JUNISHI.map((junishi, i) => (
+                  <tr class="hover:bg-base-200">
+                    <td>{i + 1}</td>
+                    <td class="font-bold">{junishi.kanji}</td>
+                    <td>{junishi.kana}</td>
+                    <td>
+                      {junishi.animal} {junishi.emoji}
+                    </td>
+                    <td>
+                      {yearsForJunishi(i, currentYear - 48, currentYear)
+                        .map((y) => `${y}年`)
+                        .join('、')}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
           </div>
-        </section>
+        </TocSection>
 
-        <section id="kanshi" class="scroll-mt-12">
-          <h2 class="sticky top-12 z-20 rounded-xl bg-base-100/70 px-2 py-2 text-xl font-semibold backdrop-blur-md">
-            六十干支
-          </h2>
-          <div class="card mt-2 bg-base-100 shadow">
-            <div class="card-body p-0">
-              <div class="overflow-x-auto">
-                <table class="table table-zebra">
-                  <caption class="sr-only">六十干支の一覧表</caption>
-                  <thead>
-                    <tr>
-                      <th>番号</th>
-                      <th>干支</th>
-                      <th>読み</th>
-                      <th>直近の該当年</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {kanshiRows.map(({ year, eto }) => (
-                      <tr class="hover:bg-base-200">
-                        <td>{eto.kanshiNumber}</td>
-                        <td class="font-bold">{eto.kanji}</td>
-                        <td>{eto.reading}</td>
-                        <td>{year}年</td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
-            </div>
+        <TocSection item={SECTIONS.kanshi} flush>
+          <div class="overflow-x-auto">
+            <table class="table table-zebra">
+              <caption class="sr-only">六十干支の一覧表</caption>
+              <thead>
+                <tr>
+                  <th>番号</th>
+                  <th>干支</th>
+                  <th>読み</th>
+                  <th>直近の該当年</th>
+                </tr>
+              </thead>
+              <tbody>
+                {kanshiRows.map(({ year, eto }) => (
+                  <tr class="hover:bg-base-200">
+                    <td>{eto.kanshiNumber}</td>
+                    <td class="font-bold">{eto.kanji}</td>
+                    <td>{eto.reading}</td>
+                    <td>{year}年</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
           </div>
-        </section>
+        </TocSection>
       </main>
     </ToolPageLayout>,
     { title: PAGE_TITLE, head },
