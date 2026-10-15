@@ -1,6 +1,6 @@
 import { createRoute } from 'honox/factory';
 
-import MorseGrid from '#app/components/morse/morse-grid.js';
+import MorseGrid, { KANA_COLUMNS_CLASS } from '#app/components/morse/morse-grid.js';
 import Note from '#app/components/note.js';
 import PageHead from '#app/components/page-head.js';
 import TocPageLayout, { type TocItem } from '#app/components/toc-page-layout.js';
@@ -59,23 +59,26 @@ export default createRoute((c) => {
             '濁音・半濁音は、仮名の後に濁点・半濁点の符号を続けます（ガ = カ＋濁点）。ャ・ッなどの小さい仮名は、大きい仮名と同じ符号で送ります。'
           }
         </Note>
-        <MorseGrid entries={WABUN_KANA_ROWS.flat()} columnsClass="grid-cols-2 sm:grid-cols-5" />
-        <MorseGrid entries={WABUN_SIGNS} columnsClass="grid-cols-2 sm:grid-cols-4" />
+        <MorseGrid entries={WABUN_KANA_ROWS.flat()} columnsClass={KANA_COLUMNS_CLASS} />
+        <MorseGrid entries={WABUN_SIGNS} columnsClass="grid-cols-2 @[34rem]:grid-cols-4" />
       </TocSection>
 
       <TocSection item={SECTIONS.obun}>
         <Note>大文字と小文字の区別はありません。</Note>
-        <MorseGrid entries={OBUN_LETTERS} columnsClass="grid-cols-3 sm:grid-cols-6" />
+        <MorseGrid
+          entries={OBUN_LETTERS}
+          columnsClass="grid-cols-3 @[25rem]:grid-cols-4 @[38rem]:grid-cols-6"
+        />
       </TocSection>
 
       <TocSection item={SECTIONS.numerals}>
         <Note>数字の符号は和文・欧文で共通です。</Note>
-        <MorseGrid entries={NUMERALS} columnsClass="grid-cols-2 sm:grid-cols-5" />
+        <MorseGrid entries={NUMERALS} columnsClass="grid-cols-2 @[43rem]:grid-cols-5" />
       </TocSection>
 
       <TocSection item={SECTIONS.symbols}>
         <Note>乗算記号（×）は X と同じ符号です。</Note>
-        <MorseGrid entries={OBUN_SYMBOLS} columnsClass="grid-cols-2 sm:grid-cols-4" />
+        <MorseGrid entries={OBUN_SYMBOLS} columnsClass="grid-cols-2 @[34rem]:grid-cols-4" />
       </TocSection>
     </TocPageLayout>,
     { title: PAGE_TITLE, head },
