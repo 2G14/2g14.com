@@ -83,7 +83,7 @@ export const WABUN_SIGNS: readonly MorseEntry[] = [
   entryFromPattern('゜（半濁点）', '..--.'),
   entryFromPattern('ー（長音）', '.--.-'),
   entryFromPattern('、（区切点）', '.-.-.-'),
-  entryFromPattern('段落', '.-.-..'),
+  entryFromPattern('」（段落）', '.-.-..'),
   entryFromPattern('左括弧（', '-.--.-'),
   entryFromPattern('右括弧）', '.-..-.'),
 ];

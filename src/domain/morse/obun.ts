@@ -55,7 +55,7 @@ export const OBUN_SYMBOLS: readonly MorseEntry[] = [
   entryFromPattern('左括弧 (', '-.--.'),
   entryFromPattern('右括弧 )', '-.--.-'),
   entryFromPattern('"（引用符）', '.-..-.'),
-  entryFromPattern('=（二重線）', '-...-'),
+  entryFromPattern('=（二重線・イコール）', '-...-'),
   entryFromPattern('+（加算記号）', '.-.-.'),
   entryFromPattern('×（乗算記号）', '-..-'),
   entryFromPattern('@（アットマーク）', '.--.-.'),
