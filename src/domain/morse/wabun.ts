@@ -1,7 +1,7 @@
 import { entryFromPattern, type MorseEntry } from '#src/domain/morse/entry.js';
 
 /** 段の位置を揃えるため、該当する仮名が無い段は null にする */
-export type KanaRow = readonly (MorseEntry | null)[];
+type KanaRow = readonly (MorseEntry | null)[];
 
 /** 和文モールス符号（無線局運用規則 別表第一号）の仮名を五十音順に並べたもの */
 export const WABUN_KANA_ROWS: readonly KanaRow[] = [

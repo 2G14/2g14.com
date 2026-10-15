@@ -5,7 +5,8 @@ import Note from '#app/components/note.js';
 import PageHead from '#app/components/page-head.js';
 import TocPageLayout, { type TocItem } from '#app/components/toc-page-layout.js';
 import TocSection from '#app/components/toc-section.js';
-import { NUMERALS, OBUN_LETTERS, OBUN_SYMBOLS } from '#src/domain/morse/obun.js';
+import { NUMERALS } from '#src/domain/morse/numerals.js';
+import { OBUN_LETTERS, OBUN_SYMBOLS } from '#src/domain/morse/obun.js';
 import { WABUN_KANA_ROWS, WABUN_SIGNS } from '#src/domain/morse/wabun.js';
 
 const PAGE_TITLE = 'モールス信号一覧表 - 和文・欧文・数字・記号';

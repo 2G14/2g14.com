@@ -2,7 +2,8 @@ import { describe, expect, it } from 'vitest';
 
 import { morseCodeToText } from '#src/domain/morse/code.js';
 import type { MorseEntry } from '#src/domain/morse/entry.js';
-import { NUMERALS, OBUN_LETTERS, OBUN_SYMBOLS } from '#src/domain/morse/obun.js';
+import { NUMERALS } from '#src/domain/morse/numerals.js';
+import { OBUN_LETTERS, OBUN_SYMBOLS } from '#src/domain/morse/obun.js';
 
 const textOf = (entry: MorseEntry): string => morseCodeToText(entry.code);
 
@@ -36,23 +37,6 @@ describe('OBUN_LETTERS', () => {
       '－・・－',
       '－・－－',
       '－－・・',
-    ]);
-  });
-});
-
-describe('NUMERALS', () => {
-  it('1〜9・0 の符号', () => {
-    expect(NUMERALS.map((entry) => `${entry.label}${textOf(entry)}`)).toEqual([
-      '1・－－－－',
-      '2・・－－－',
-      '3・・・－－',
-      '4・・・・－',
-      '5・・・・・',
-      '6－・・・・',
-      '7－－・・・',
-      '8－－－・・',
-      '9－－－－・',
-      '0－－－－－',
     ]);
   });
 });

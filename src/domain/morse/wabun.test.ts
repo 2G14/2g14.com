@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest';
 
 import { morseCodeToText } from '#src/domain/morse/code.js';
 import type { MorseEntry } from '#src/domain/morse/entry.js';
+import { NUMERALS } from '#src/domain/morse/numerals.js';
 import { WABUN_KANA_ROWS, WABUN_SIGNS } from '#src/domain/morse/wabun.js';
 
 const kanaEntries: MorseEntry[] = WABUN_KANA_ROWS.flat().filter((entry) => entry !== null);
@@ -86,20 +87,22 @@ describe('WABUN_KANA_ROWS', () => {
 
 describe('WABUN_SIGNS', () => {
   it('ン・濁点・半濁点・長音・区切点・段落・括弧の符号', () => {
-    expect(WABUN_SIGNS.map((entry) => morseCodeToText(entry.code))).toEqual([
-      '・－・－・',
-      '・・',
-      '・・－－・',
-      '・－－・－',
-      '・－・－・－',
-      '・－・－・・',
-      '－・－－・－',
-      '・－・・－・',
+    expect(WABUN_SIGNS.map((entry) => [entry.label, morseCodeToText(entry.code)])).toEqual([
+      ['ン', '・－・－・'],
+      ['゛（濁点）', '・・'],
+      ['゜（半濁点）', '・・－－・'],
+      ['ー（長音）', '・－－・－'],
+      ['、（区切点）', '・－・－・－'],
+      ['」（段落）', '・－・－・・'],
+      ['左括弧（', '－・－－・－'],
+      ['右括弧）', '・－・・－・'],
     ]);
   });
 
-  it('和文の仮名と記号の符号はすべて異なる', () => {
-    const codes = [...kanaEntries, ...WABUN_SIGNS].map((entry) => morseCodeToText(entry.code));
+  it('和文で使う仮名・記号・数字の符号はすべて異なる', () => {
+    const codes = [...kanaEntries, ...WABUN_SIGNS, ...NUMERALS].map((entry) =>
+      morseCodeToText(entry.code),
+    );
     expect(new Set(codes).size).toBe(codes.length);
   });
 });
