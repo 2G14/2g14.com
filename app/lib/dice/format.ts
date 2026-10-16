@@ -1,4 +1,5 @@
-import { fractionToNumber, reduceFraction } from '#src/lib/fraction.js';
+import { probabilityOf } from '#src/domain/dice/probability.js';
+import { reduceFraction } from '#src/lib/fraction.js';
 
 const SUPERSCRIPT_DIGITS: Readonly<Record<string, string>> = {
   '-': '⁻',
@@ -29,7 +30,7 @@ const SMALL_PERCENT = new Intl.NumberFormat('ja-JP', {
 });
 
 export function formatPercent(ways: bigint, total: bigint): string {
-  const percent = fractionToNumber(ways, total) * 100;
+  const percent = probabilityOf(ways, total) * 100;
   if (percent === 0 || percent >= 0.01) return `${PERCENT.format(percent)}%`;
   // 0.000001% より小さいと 0 が並びすぎて桁を読み取れない
   if (percent >= 1e-6) return `${SMALL_PERCENT.format(percent)}%`;
@@ -38,7 +39,7 @@ export function formatPercent(ways: bigint, total: bigint): string {
 
 /**
  * 桁が多すぎると読めないため、出目の組み合わせの総数が 12 桁以下のときだけ既約分数で書く。確率 1 は「1」。
- * 総数が大きいと約分しても分母はまず縮まらないうえ、200 桁の数の約分は表全体で 0.5 秒ほどかかる
+ * 総数が大きいと約分しても分母はまず縮まらないうえ、200 桁の数の約分は時間がかかる
  */
 export function formatFraction(ways: bigint, total: bigint): string | null {
   if (total.toString().length > 12) return null;

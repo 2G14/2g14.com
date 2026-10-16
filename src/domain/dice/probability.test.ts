@@ -5,6 +5,7 @@ import {
   allSameWays,
   expectedSum,
   faceCountDistribution,
+  probabilityOf,
   sumDistribution,
 } from '#src/domain/dice/probability.js';
 
@@ -85,9 +86,9 @@ describe('allSameWays', () => {
 describe('faceCountDistribution', () => {
   it('2 個の 6 面で特定の目が 0・1・2 個出る通り数', () => {
     expect(faceCountDistribution(createDiceSet(2, 6))).toEqual([
-      { count: 0, ways: 25n, atLeastWays: 36n },
-      { count: 1, ways: 10n, atLeastWays: 11n },
-      { count: 2, ways: 1n, atLeastWays: 1n },
+      { count: 0, ways: 25n, atLeastWays: 36n, atMostWays: 25n },
+      { count: 1, ways: 10n, atLeastWays: 11n, atMostWays: 35n },
+      { count: 2, ways: 1n, atLeastWays: 1n, atMostWays: 36n },
     ]);
   });
 
@@ -105,5 +106,18 @@ describe('faceCountDistribution', () => {
     expect(rows).toHaveLength(count + 1);
     expect(rows.reduce((sum, row) => sum + row.ways, 0n)).toBe(totalOutcomes(dice));
     expect(rows[0]?.atLeastWays).toBe(totalOutcomes(dice));
+    expect(rows.at(-1)?.atMostWays).toBe(totalOutcomes(dice));
+  });
+});
+
+describe('probabilityOf', () => {
+  it('通り数の比を確率にする', () => {
+    expect(probabilityOf(1n, 4n)).toBe(0.25);
+    expect(probabilityOf(36n, 36n)).toBe(1);
+  });
+
+  it('100 面 100 個の総数が分母でも桁あふれしない', () => {
+    expect(probabilityOf(3n, 10n ** 200n)).toBeCloseTo(3e-200, 213);
+    expect(probabilityOf(10n ** 199n, 10n ** 200n)).toBeCloseTo(0.1, 15);
   });
 });

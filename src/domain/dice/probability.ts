@@ -8,11 +8,12 @@ export interface SumWays {
   readonly atMostWays: bigint;
 }
 
-/** 特定の目（たとえば 6 の目）がちょうど count 個出る通り数と、count 個以上出る通り数 */
+/** 特定の目（たとえば 6 の目）がちょうど count 個出る通り数と、count 個以上・count 個以下出る通り数 */
 export interface FaceCountWays {
   readonly count: number;
   readonly ways: bigint;
   readonly atLeastWays: bigint;
+  readonly atMostWays: bigint;
 }
 
 function withAtLeastAndAtMost(dice: DiceSet, waysByOffset: readonly bigint[]): SumWays[] {
@@ -71,12 +72,19 @@ export function faceCountDistribution(dice: DiceSet): FaceCountWays[] {
     exact.push(binomial * others ** BigInt(dice.count - k));
     binomial = (binomial * BigInt(dice.count - k)) / BigInt(k + 1);
   }
-  let atLeastWays = 0n;
-  return exact
-    .toReversed()
-    .map((ways, i) => {
-      atLeastWays += ways;
-      return { count: dice.count - i, ways, atLeastWays };
-    })
-    .toReversed();
+  const total = totalOutcomes(dice);
+  let atMostWays = 0n;
+  return exact.map((ways, count) => {
+    const atLeastWays = total - atMostWays;
+    atMostWays += ways;
+    return { count, ways, atLeastWays, atMostWays };
+  });
+}
+
+/**
+ * 通り数の比を Number の確率にする。通り数は最大でも 100 面 100 個の 10^200 で、Number の上限
+ * （約 1.8×10^308）に収まるため、BigInt を Number にしてから割っても桁あふれしない
+ */
+export function probabilityOf(ways: bigint, total: bigint): number {
+  return Number(ways) / Number(total);
 }

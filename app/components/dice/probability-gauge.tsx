@@ -1,5 +1,5 @@
 import { formatFraction, formatPercent } from '#app/lib/dice/format.js';
-import { fractionToNumber } from '#src/lib/fraction.js';
+import { probabilityOf } from '#src/domain/dice/probability.js';
 
 interface ProbabilityGaugeProps {
   title: string;
@@ -15,7 +15,7 @@ export default function ProbabilityGauge({
   ways,
   total,
 }: ProbabilityGaugeProps) {
-  const percent = fractionToNumber(ways, total) * 100;
+  const percent = probabilityOf(ways, total) * 100;
   const fraction = formatFraction(ways, total);
   return (
     <div class="flex items-center gap-4 rounded-box bg-base-200 px-4 py-3">

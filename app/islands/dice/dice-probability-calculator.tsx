@@ -1,10 +1,8 @@
 import { useEffect, useState } from 'hono/jsx';
 
-import FaceCountTable from '#app/components/dice/face-count-table.js';
+import DistributionChart from '#app/components/dice/distribution-chart.js';
 import ProbabilityGauge from '#app/components/dice/probability-gauge.js';
 import StatTile from '#app/components/dice/stat-tile.js';
-import SumChart from '#app/components/dice/sum-chart.js';
-import SumTable from '#app/components/dice/sum-table.js';
 import NumberField from '#app/components/number-field.js';
 import TocSection from '#app/components/toc-section.js';
 import { parseDiceInput } from '#app/lib/dice/dice-input.js';
@@ -47,7 +45,6 @@ function DiceResult({ dice }: DiceResultProps) {
   const total = totalOutcomes(dice);
   const maxWays = rows.reduce((max, row) => (row.ways > max ? row.ways : max), 0n);
   const modes = rows.filter((row) => row.ways === maxWays).map((row) => row.sum);
-  const notation = `${dice.count}D${dice.faces}`;
   const modeFraction = formatFraction(maxWays, total);
   const atLeastOne = faceCounts[1]?.atLeastWays;
 
@@ -64,7 +61,6 @@ function DiceResult({ dice }: DiceResultProps) {
           />
           <StatTile title="出目の組み合わせ" value={formatWays(total)} description="通り" />
         </div>
-        <SumChart rows={rows} maxWays={maxWays} modes={modes} />
         <div class="grid grid-cols-1 gap-3 md:grid-cols-2">
           {dice.count >= 2 && (
             <ProbabilityGauge
@@ -85,23 +81,40 @@ function DiceResult({ dice }: DiceResultProps) {
         </div>
       </TocSection>
 
-      <TocSection item={DICE_SECTIONS.sum} flush>
-        <SumTable
-          caption={`${notation} の出目の合計の確率`}
-          rows={rows}
+      <TocSection item={DICE_SECTIONS.sum}>
+        <DistributionChart
+          points={rows.map(({ sum, ways, atLeastWays, atMostWays }) => ({
+            x: sum,
+            ways,
+            atLeastWays,
+            atMostWays,
+          }))}
           total={total}
-          maxWays={maxWays}
+          xName="合計"
+          xUnit=""
+          modeLabels={{ exact: 'その数', atLeast: 'その数以上', atMost: 'その数以下' }}
         />
       </TocSection>
 
-      <TocSection item={DICE_SECTIONS.faceCount} flush>
-        <p class="px-4 pt-4 text-sm text-base-content/70">
+      <TocSection item={DICE_SECTIONS.faceCount}>
+        <p class="text-sm text-base-content/70">
           {`${dice.count} 個のうち、特定の目（たとえば ${dice.faces} の目）が何個出るかの確率です。`}
         </p>
-        <FaceCountTable
-          caption={`${notation} で特定の目が出る個数の確率`}
-          rows={faceCounts}
+        <DistributionChart
+          points={faceCounts.map(({ count, ways, atLeastWays, atMostWays }) => ({
+            x: count,
+            ways,
+            atLeastWays,
+            atMostWays,
+          }))}
           total={total}
+          xName="個数"
+          xUnit=" 個"
+          modeLabels={{
+            exact: 'ちょうどその個数',
+            atLeast: 'その個数以上',
+            atMost: 'その個数以下',
+          }}
         />
       </TocSection>
     </>
