@@ -29,12 +29,28 @@ const SMALL_PERCENT = new Intl.NumberFormat('ja-JP', {
   maximumFractionDigits: 20,
 });
 
-export function formatPercent(ways: bigint, total: bigint): string {
-  const percent = probabilityOf(ways, total) * 100;
-  if (percent === 0 || percent >= 0.01) return `${PERCENT.format(percent)}%`;
+/** 0〜100 の間の % を、0 に丸めずに書く */
+function formatPercentValue(percent: number): string {
+  if (percent >= 0.01) return PERCENT.format(percent);
   // 0.000001% より小さいと 0 が並びすぎて桁を読み取れない
-  if (percent >= 1e-6) return `${SMALL_PERCENT.format(percent)}%`;
-  return `${formatScientific(percent)}%`;
+  if (percent >= 1e-6) return SMALL_PERCENT.format(percent);
+  return formatScientific(percent);
+}
+
+/**
+ * 確率を % で書く。0% と 100% はちょうど 0 と 1 のときだけにする。
+ * 1 にごく近い確率（100D6 で特定の目が 1 個以上出る 99.9999988% など）は、小数第 2 位で丸めると
+ * 100% になって「必ず起きる」と読めてしまうため、100% との差が分かる桁まで書く
+ */
+export function formatPercent(ways: bigint, total: bigint): string {
+  if (ways === 0n) return '0%';
+  if (ways === total) return '100%';
+  const rest = probabilityOf(total - ways, total) * 100;
+  if (rest >= 0.01) return `${formatPercentValue(probabilityOf(ways, total) * 100)}%`;
+  // 差が小さすぎると 100 から引いた値が Number の精度では 100 になってしまうため、差を書く
+  if (rest < 1e-6) return `100% − ${formatScientific(rest)}%`;
+  const digits = Math.ceil(-Math.log10(rest)) + 1;
+  return `${new Intl.NumberFormat('ja-JP', { maximumFractionDigits: digits }).format(100 - rest)}%`;
 }
 
 /**
@@ -47,8 +63,11 @@ export function formatFraction(ways: bigint, total: bigint): string | null {
   return denominator === 1n ? String(numerator) : `${numerator}/${denominator}`;
 }
 
-/** 通り数を書く。Number で正確に表せない 16 桁以上は「2.8×10¹⁹⁷」の形にする */
-export function formatWays(ways: bigint): string {
-  if (ways.toString().length <= 15) return Number(ways).toLocaleString('ja-JP');
+/**
+ * 通り数を書く。maxDigits 桁を超えると「2.8×10¹⁹⁷」の形にする。
+ * 既定の 15 桁は、それを超えると Number で正確に表せず下の桁が変わってしまう境目
+ */
+export function formatWays(ways: bigint, maxDigits = 15): string {
+  if (ways.toString().length <= maxDigits) return Number(ways).toLocaleString('ja-JP');
   return formatScientific(Number(ways));
 }

@@ -13,6 +13,21 @@ describe('formatPercent', () => {
     expect(formatPercent(1n, 6n ** 6n)).toBe('0.0021%');
   });
 
+  it('0% と 100% はちょうど 0 と 1 のときだけ', () => {
+    expect(formatPercent(0n, 36n)).toBe('0%');
+    expect(formatPercent(36n, 36n)).toBe('100%');
+  });
+
+  it('丸めると 100% になる確率は、100% との差が分かる桁まで書く', () => {
+    const total = 6n ** 100n;
+    expect(formatPercent(total - 5n ** 100n, total)).toBe('99.9999988%');
+    expect(formatPercent(99_996n, 100_000n)).toBe('99.996%');
+  });
+
+  it('100% との差が 0.000001% 未満なら差を指数で書く', () => {
+    expect(formatPercent(10n ** 200n - 1n, 10n ** 200n)).toBe('100% − 1.0×10⁻¹⁹⁸%');
+  });
+
   it('0.000001% 未満は指数で書く', () => {
     expect(formatPercent(1n, 20n ** 10n)).toBe('9.8×10⁻¹²%');
     expect(formatPercent(1n, 10n ** 200n)).toBe('1.0×10⁻¹⁹⁸%');
@@ -44,5 +59,10 @@ describe('formatWays', () => {
 
   it('16 桁以上は指数で書く', () => {
     expect(formatWays(10n ** 200n)).toBe('1.0×10²⁰⁰');
+  });
+
+  it('桁数の上限を指定できる', () => {
+    expect(formatWays(12_345_678n, 8)).toBe('12,345,678');
+    expect(formatWays(123_456_789n, 8)).toBe('1.2×10⁸');
   });
 });

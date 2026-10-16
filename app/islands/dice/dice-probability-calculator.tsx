@@ -59,7 +59,12 @@ function DiceResult({ dice }: DiceResultProps) {
             value={modes.join('・')}
             description={`${modes.length > 1 ? 'それぞれ ' : ''}${formatPercent(maxWays, total)}${modeFraction === null ? '' : `（${modeFraction}）`}`}
           />
-          <StatTile title="出目の組み合わせ" value={formatWays(total)} description="通り" />
+          <StatTile
+            title="出目の組み合わせ"
+            // 9 桁を超えるとタイルの幅に収まらないため、指数の形にする
+            value={formatWays(total, 8)}
+            description="通り"
+          />
         </div>
         <div class="grid grid-cols-1 gap-3 md:grid-cols-2">
           {dice.count >= 2 && (

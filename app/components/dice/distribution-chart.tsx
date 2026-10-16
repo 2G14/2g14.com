@@ -1,5 +1,6 @@
 import { useState } from 'hono/jsx';
 
+import { niceTicks } from '#app/lib/chart-ticks.js';
 import { formatFraction, formatPercent, formatWays } from '#app/lib/dice/format.js';
 import { probabilityOf } from '#src/domain/dice/probability.js';
 
@@ -58,6 +59,8 @@ export default function DistributionChart({
     .map((point, i) => `M${i} 100V${100 - probabilityOf(waysOf(point, mode), scale) * 100}h1V100z`)
     .join('');
   const hoveredPoint = hovered === null ? undefined : points[hovered];
+  const first = points[0]?.x ?? 0;
+  const ticks = niceTicks(first, points.at(-1)?.x ?? first, 6);
 
   const onPointer = (e: PointerEvent) => {
     const rect = (e.currentTarget as Element).getBoundingClientRect();
@@ -134,16 +137,20 @@ export default function DistributionChart({
             />
           )}
         </svg>
-        <div class="mt-1 flex justify-between text-xs text-base-content/60 tabular-nums">
-          <span>
-            {points[0]?.x}
-            {xUnit}
-          </span>
-          <span>{xName}</span>
-          <span>
-            {points.at(-1)?.x}
-            {xUnit}
-          </span>
+        <div class="relative h-5 text-xs text-base-content/60 tabular-nums" aria-hidden="true">
+          {ticks.map((tick) => (
+            <span
+              class="absolute top-0 flex -translate-x-1/2 flex-col items-center"
+              style={`left: ${((tick - first + 0.5) / points.length) * 100}%`}
+            >
+              <span class="h-1 w-px bg-base-content/40" />
+              <span>{tick}</span>
+            </span>
+          ))}
+        </div>
+        <div class="text-center text-xs text-base-content/60">
+          {xName}
+          {xUnit !== '' && `（${xUnit.trim()}）`}
         </div>
       </div>
     </div>
