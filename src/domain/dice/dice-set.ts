@@ -1,21 +1,14 @@
-/** TRPG などで一般的に使われる多面体サイコロの面数 */
-export const DICE_FACES = [4, 6, 8, 10, 12, 20] as const;
-
-type DiceFaces = (typeof DICE_FACES)[number];
-
-/**
- * 振るサイコロの最大個数。20 面 10 個でも出目の組み合わせは 20^10 ≈ 1.0×10^13 通りで
- * Number の安全な整数の範囲に収まるため、通り数を BigInt にしなくて済む
- */
-export const MAX_DICE_COUNT = 10;
+export const MIN_FACES = 2;
+export const MAX_FACES = 100;
+export const MAX_DICE_COUNT = 100;
 
 const brand = Symbol('DiceSet');
 
-/** 同じ面数のサイコロを何個か振る組 */
+/** 同じ面数のサイコロを何個か振る組。現実に無い面数のサイコロも、各面が同じ確率で出るものとして扱う */
 export interface DiceSet {
   readonly [brand]: unknown;
   readonly count: number;
-  readonly faces: DiceFaces;
+  readonly faces: number;
 }
 
 export class InvalidDiceSetError extends Error {
@@ -26,25 +19,28 @@ export class InvalidDiceSetError extends Error {
   }
 }
 
-function isDiceFaces(n: number): n is DiceFaces {
-  return DICE_FACES.some((faces) => faces === n);
+function isIntegerInRange(n: number, min: number, max: number): boolean {
+  return Number.isInteger(n) && n >= min && n <= max;
 }
 
 export function createDiceSet(count: number, faces: number): DiceSet {
-  if (!Number.isInteger(count) || count < 1 || count > MAX_DICE_COUNT) {
+  if (!isIntegerInRange(count, 1, MAX_DICE_COUNT)) {
     throw new InvalidDiceSetError(
       `サイコロの個数は 1〜${MAX_DICE_COUNT} の整数である必要があります: ${count}`,
     );
   }
-  if (!isDiceFaces(faces)) {
+  if (!isIntegerInRange(faces, MIN_FACES, MAX_FACES)) {
     throw new InvalidDiceSetError(
-      `サイコロの面数は ${DICE_FACES.join('・')} のいずれかである必要があります: ${faces}`,
+      `サイコロの面数は ${MIN_FACES}〜${MAX_FACES} の整数である必要があります: ${faces}`,
     );
   }
   return { count, faces } as DiceSet;
 }
 
-/** 出目の組み合わせ（どのサイコロがどの目かを区別した並び）の総数 */
-export function totalOutcomes(dice: DiceSet): number {
-  return dice.faces ** dice.count;
+/**
+ * 出目の組み合わせ（どのサイコロがどの目かを区別した並び）の総数。
+ * 100 面 100 個では 10^200 通りになり Number では正確に表せないため BigInt で数える
+ */
+export function totalOutcomes(dice: DiceSet): bigint {
+  return BigInt(dice.faces) ** BigInt(dice.count);
 }

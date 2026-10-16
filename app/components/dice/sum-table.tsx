@@ -1,16 +1,16 @@
-import { formatFraction, formatPercent } from '#app/lib/dice/format.js';
+import ProbabilityCell from '#app/components/dice/probability-cell.js';
+import { formatPercent, formatWays } from '#app/lib/dice/format.js';
 import type { SumWays } from '#src/domain/dice/probability.js';
 
 interface SumTableProps {
   caption: string;
   rows: readonly SumWays[];
   /** 出目の組み合わせの総数（確率の分母） */
-  total: number;
+  total: bigint;
+  maxWays: bigint;
 }
 
-export default function SumTable({ caption, rows, total }: SumTableProps) {
-  const maxWays = Math.max(...rows.map((row) => row.ways));
-
+export default function SumTable({ caption, rows, total, maxWays }: SumTableProps) {
   return (
     <div class="overflow-x-auto">
       <table class="table table-zebra">
@@ -28,21 +28,8 @@ export default function SumTable({ caption, rows, total }: SumTableProps) {
           {rows.map((row) => (
             <tr class="hover:bg-base-200">
               <th class="text-base">{row.sum}</th>
-              <td class="text-right tabular-nums">{row.ways.toLocaleString()}</td>
-              <td>
-                <div class="flex items-baseline justify-between gap-2 tabular-nums">
-                  <span class="font-semibold">{formatPercent(row.ways, total)}</span>
-                  <span class="text-xs text-base-content/60">
-                    {formatFraction(row.ways, total)}
-                  </span>
-                </div>
-                <div class="mt-1 h-1.5 rounded-full bg-base-300" aria-hidden="true">
-                  <div
-                    class="h-full rounded-full bg-primary"
-                    style={{ width: `${(row.ways / maxWays) * 100}%` }}
-                  />
-                </div>
-              </td>
+              <td class="text-right tabular-nums">{formatWays(row.ways)}</td>
+              <ProbabilityCell ways={row.ways} total={total} maxWays={maxWays} />
               <td class="text-right tabular-nums">{formatPercent(row.atLeastWays, total)}</td>
               <td class="text-right tabular-nums">{formatPercent(row.atMostWays, total)}</td>
             </tr>

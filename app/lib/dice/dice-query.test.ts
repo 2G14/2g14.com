@@ -1,28 +1,25 @@
 import { describe, expect, it } from 'vitest';
 
-import { diceQueryString, initialDiceSet } from '#app/lib/dice/dice-query.js';
+import { diceQueryString, initialDiceInput } from '#app/lib/dice/dice-query.js';
+import { createDiceSet } from '#src/domain/dice/dice-set.js';
 
-describe('initialDiceSet', () => {
-  it('クエリの個数と面数で作る', () => {
-    expect(initialDiceSet('3', '20')).toMatchObject({ count: 3, faces: 20 });
+describe('initialDiceInput', () => {
+  it('クエリの面数と個数を初期値にする', () => {
+    expect(initialDiceInput('100', '3')).toEqual({ faces: 100, count: 3 });
   });
 
-  it('クエリが無ければ 6 面 2 個', () => {
-    expect(initialDiceSet()).toMatchObject({ count: 2, faces: 6 });
+  it('クエリが無いか数でなければ 6 面 2 個', () => {
+    expect(initialDiceInput()).toEqual({ faces: 6, count: 2 });
+    expect(initialDiceInput('abc', '1.5')).toEqual({ faces: 6, count: 2 });
   });
 
-  it.each([
-    ['0', '6'],
-    ['11', '6'],
-    ['2', '7'],
-    ['abc', '6'],
-  ])('不正な count=%s faces=%s なら 6 面 2 個', (count, faces) => {
-    expect(initialDiceSet(count, faces)).toMatchObject({ count: 2, faces: 6 });
+  it('範囲外でも数ならそのまま残し、入力欄でエラーを見せる', () => {
+    expect(initialDiceInput('1000', '0')).toEqual({ faces: 1000, count: 0 });
   });
 });
 
 describe('diceQueryString', () => {
-  it('個数と面数のクエリにする', () => {
-    expect(diceQueryString(initialDiceSet('3', '8'))).toBe('count=3&faces=8');
+  it('面数と個数のクエリにする', () => {
+    expect(diceQueryString(createDiceSet(3, 8))).toBe('faces=8&count=3');
   });
 });

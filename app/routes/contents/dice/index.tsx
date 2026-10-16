@@ -4,13 +4,14 @@ import PageHead from '#app/components/page-head.js';
 import ToolIndex from '#app/components/tool-index.js';
 
 const PAGE_TITLE = 'サイコロ';
-const META_DESCRIPTION = 'サイコロの出目の合計の確率など、サイコロに関するツールを提供します。';
+const META_DESCRIPTION =
+  'サイコロの出目の合計やゾロ目の確率など、サイコロに関するツールを提供します。';
 
 const PAGES = [
   {
-    href: '/contents/dice/sum',
-    label: 'サイコロの合計の確率',
-    description: '2D6・3D6 などの出目の合計の確率分布と、その数以上・以下になる確率',
+    href: '/contents/dice/probability',
+    label: 'サイコロの確率計算',
+    description: '2D6・3D6・1D100 などの出目の合計・ゾロ目・特定の目が出る確率',
   },
 ] as const;
 

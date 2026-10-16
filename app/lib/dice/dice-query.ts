@@ -1,22 +1,20 @@
 import { parseQueryNumber } from '#app/lib/date-query.js';
-import { createDiceSet, type DiceSet, InvalidDiceSetError } from '#src/domain/dice/dice-set.js';
+import type { DiceSet } from '#src/domain/dice/dice-set.js';
 
-const DEFAULT_COUNT = 2;
 const DEFAULT_FACES = 6;
+const DEFAULT_COUNT = 2;
 
-/** `?count=&faces=` から初期のサイコロの組を作る。無いか不正なら 6 面 2 個にする */
-export function initialDiceSet(rawCount?: string, rawFaces?: string): DiceSet {
-  try {
-    return createDiceSet(
-      parseQueryNumber(rawCount) ?? DEFAULT_COUNT,
-      parseQueryNumber(rawFaces) ?? DEFAULT_FACES,
-    );
-  } catch (error) {
-    if (error instanceof InvalidDiceSetError) return createDiceSet(DEFAULT_COUNT, DEFAULT_FACES);
-    throw error;
-  }
+/** `?faces=&count=` から入力欄の初期値を作る。無いか数でなければ 6 面 2 個にする */
+export function initialDiceInput(
+  rawFaces?: string,
+  rawCount?: string,
+): { faces: number; count: number } {
+  return {
+    faces: parseQueryNumber(rawFaces) ?? DEFAULT_FACES,
+    count: parseQueryNumber(rawCount) ?? DEFAULT_COUNT,
+  };
 }
 
 export function diceQueryString(dice: DiceSet): string {
-  return new URLSearchParams({ count: String(dice.count), faces: String(dice.faces) }).toString();
+  return new URLSearchParams({ faces: String(dice.faces), count: String(dice.count) }).toString();
 }
