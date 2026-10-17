@@ -5,7 +5,6 @@ import {
   allSameWays,
   expectedSum,
   faceCountDistribution,
-  probabilityOf,
   sumDistribution,
 } from '#src/domain/dice/probability.js';
 
@@ -23,20 +22,23 @@ describe('sumDistribution', () => {
 
   it('2 個の 6 面は合計 2〜12 が 1・2・3・4・5・6・5・4・3・2・1 通り', () => {
     const rows = sumDistribution(createDiceSet(2, 6));
-    expect(rows.map((row) => row.sum)).toEqual([2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12]);
+    expect(rows.map((row) => row.value)).toEqual([2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12]);
     expect(rows.map((row) => Number(row.ways))).toEqual([1, 2, 3, 4, 5, 6, 5, 4, 3, 2, 1]);
   });
 
   it('3 個の 6 面は合計 10 と 11 が最も多い 27 通り', () => {
     const rows = sumDistribution(createDiceSet(3, 6));
-    expect(rows.find((row) => row.sum === 10)?.ways).toBe(27n);
-    expect(rows.find((row) => row.sum === 11)?.ways).toBe(27n);
+    expect(rows.find((row) => row.value === 10)?.ways).toBe(27n);
+    expect(rows.find((row) => row.value === 11)?.ways).toBe(27n);
     expect(rows.every((row) => row.ways <= 27n)).toBe(true);
   });
 
   it('以上・以下の通り数を積み上げる', () => {
     const rows = sumDistribution(createDiceSet(2, 6));
-    expect(rows.find((row) => row.sum === 8)).toMatchObject({ atLeastWays: 15n, atMostWays: 26n });
+    expect(rows.find((row) => row.value === 8)).toMatchObject({
+      atLeastWays: 15n,
+      atMostWays: 26n,
+    });
     expect(rows[0]).toMatchObject({ atLeastWays: 36n, atMostWays: 1n });
     expect(rows.at(-1)).toMatchObject({ atLeastWays: 1n, atMostWays: 36n });
   });
@@ -65,7 +67,9 @@ describe('sumDistribution', () => {
         }
       }
     }
-    expect(sumDistribution(dice).map((row) => [row.sum, row.ways])).toEqual([...counts.entries()]);
+    expect(sumDistribution(dice).map((row) => [row.value, row.ways])).toEqual([
+      ...counts.entries(),
+    ]);
   });
 });
 
@@ -86,9 +90,9 @@ describe('allSameWays', () => {
 describe('faceCountDistribution', () => {
   it('2 個の 6 面で特定の目が 0・1・2 個出る通り数', () => {
     expect(faceCountDistribution(createDiceSet(2, 6))).toEqual([
-      { count: 0, ways: 25n, atLeastWays: 36n, atMostWays: 25n },
-      { count: 1, ways: 10n, atLeastWays: 11n, atMostWays: 35n },
-      { count: 2, ways: 1n, atLeastWays: 1n, atMostWays: 36n },
+      { value: 0, ways: 25n, atLeastWays: 36n, atMostWays: 25n },
+      { value: 1, ways: 10n, atLeastWays: 11n, atMostWays: 35n },
+      { value: 2, ways: 1n, atLeastWays: 1n, atMostWays: 36n },
     ]);
   });
 
@@ -107,17 +111,5 @@ describe('faceCountDistribution', () => {
     expect(rows.reduce((sum, row) => sum + row.ways, 0n)).toBe(totalOutcomes(dice));
     expect(rows[0]?.atLeastWays).toBe(totalOutcomes(dice));
     expect(rows.at(-1)?.atMostWays).toBe(totalOutcomes(dice));
-  });
-});
-
-describe('probabilityOf', () => {
-  it('通り数の比を確率にする', () => {
-    expect(probabilityOf(1n, 4n)).toBe(0.25);
-    expect(probabilityOf(36n, 36n)).toBe(1);
-  });
-
-  it('100 面 100 個の総数が分母でも桁あふれしない', () => {
-    expect(probabilityOf(3n, 10n ** 200n)).toBeCloseTo(3e-200, 213);
-    expect(probabilityOf(10n ** 199n, 10n ** 200n)).toBeCloseTo(0.1, 15);
   });
 });

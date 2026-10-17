@@ -6,6 +6,7 @@ import {
   MAX_DICE_COUNT,
   MAX_FACES,
   MIN_FACES,
+  sumRange,
   totalOutcomes,
 } from '#src/domain/dice/dice-set.js';
 
@@ -42,5 +43,11 @@ describe('totalOutcomes', () => {
 
   it('100 面 100 個でも正確に数える', () => {
     expect(totalOutcomes(createDiceSet(100, 100))).toBe(10n ** 200n);
+  });
+});
+
+describe('sumRange', () => {
+  it('合計の最小は個数、最大は個数 × 面数', () => {
+    expect(sumRange(createDiceSet(3, 6))).toEqual({ min: 3, max: 18 });
   });
 });

@@ -1,5 +1,5 @@
 import { formatFraction, formatPercent } from '#app/lib/dice/format.js';
-import { probabilityOf } from '#src/domain/dice/probability.js';
+import { probabilityOf } from '#src/domain/dice/distribution.js';
 
 interface ProbabilityGaugeProps {
   title: string;

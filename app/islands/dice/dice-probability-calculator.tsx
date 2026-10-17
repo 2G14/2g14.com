@@ -14,21 +14,33 @@ import {
   type DiceSet,
   MAX_DICE_COUNT,
   MAX_FACES,
+  MIN_DICE_COUNT,
   MIN_FACES,
+  sumRange,
   totalOutcomes,
 } from '#src/domain/dice/dice-set.js';
+import { mostLikely } from '#src/domain/dice/distribution.js';
 import {
   allSameWays,
   expectedSum,
   faceCountDistribution,
   sumDistribution,
 } from '#src/domain/dice/probability.js';
+import { sameFaceDistribution } from '#src/domain/dice/same-face.js';
 
 /**
- * サーバーで描画する合計の種類数の上限。100 面 100 個（9,901 種類）を描画すると、Workers の
+ * サーバーで描画するサイコロの組の上限。100 面 100 個（合計 9,901 種類）などを描画すると、Workers の
  * リクエストあたりの CPU 時間の制限を超えるおそれがあるため、大きな組はブラウザでだけ計算する
  */
 const SERVER_RENDER_MAX_SUMS = 200;
+const SERVER_RENDER_MAX_COUNT = 20;
+
+function canRenderOnServer(dice: DiceSet): boolean {
+  const range = sumRange(dice);
+  return (
+    range.max - range.min + 1 <= SERVER_RENDER_MAX_SUMS && dice.count <= SERVER_RENDER_MAX_COUNT
+  );
+}
 
 interface Props {
   initialFaces?: string | undefined;
@@ -40,28 +52,29 @@ interface DiceResultProps {
 }
 
 function DiceResult({ dice }: DiceResultProps) {
-  const rows = sumDistribution(dice);
+  const sums = sumDistribution(dice);
   const faceCounts = faceCountDistribution(dice);
   const total = totalOutcomes(dice);
-  const maxWays = rows.reduce((max, row) => (row.ways > max ? row.ways : max), 0n);
-  const modes = rows.filter((row) => row.ways === maxWays).map((row) => row.sum);
-  const modeFraction = formatFraction(maxWays, total);
+  const range = sumRange(dice);
+  const peak = mostLikely(sums);
+  const peakFraction = formatFraction(peak.ways, total);
   const atLeastOne = faceCounts[1]?.atLeastWays;
 
   return (
     <>
       <TocSection item={DICE_SECTIONS.summary}>
         <div class="grid grid-cols-2 gap-3 lg:grid-cols-4">
-          <StatTile title="合計の範囲" value={`${dice.count}〜${dice.count * dice.faces}`} />
+          <StatTile title="合計の範囲" value={`${range.min}〜${range.max}`} />
           <StatTile title="合計の平均（期待値）" value={expectedSum(dice)} />
           <StatTile
             title="最も出やすい合計"
-            value={modes.join('・')}
-            description={`${modes.length > 1 ? 'それぞれ ' : ''}${formatPercent(maxWays, total)}${modeFraction === null ? '' : `（${modeFraction}）`}`}
+            // 1 個なら全ての合計が同じ確率で、並べると合計の数だけ値が並んでしまう
+            value={peak.values.length === sums.length ? 'すべて同じ' : peak.values.join('・')}
+            description={`${peak.values.length > 1 ? 'それぞれ ' : ''}${formatPercent(peak.ways, total)}${peakFraction === null ? '' : `（${peakFraction}）`}`}
           />
           <StatTile
             title="出目の組み合わせ"
-            // 9 桁を超えるとタイルの幅に収まらないため、指数の形にする
+            // 9 桁以上はタイルの幅に収まらないため、指数の形にする
             value={formatWays(total, 8)}
             description="通り"
           />
@@ -88,12 +101,7 @@ function DiceResult({ dice }: DiceResultProps) {
 
       <TocSection item={DICE_SECTIONS.sum}>
         <DistributionChart
-          points={rows.map(({ sum, ways, atLeastWays, atMostWays }) => ({
-            x: sum,
-            ways,
-            atLeastWays,
-            atMostWays,
-          }))}
+          rows={sums}
           total={total}
           xName="合計"
           xUnit=""
@@ -106,14 +114,26 @@ function DiceResult({ dice }: DiceResultProps) {
           {`${dice.count} 個のうち、特定の目（たとえば ${dice.faces} の目）が何個出るかの確率です。`}
         </p>
         <DistributionChart
-          points={faceCounts.map(({ count, ways, atLeastWays, atMostWays }) => ({
-            x: count,
-            ways,
-            atLeastWays,
-            atMostWays,
-          }))}
+          rows={faceCounts}
           total={total}
           xName="個数"
+          xUnit=" 個"
+          modeLabels={{
+            exact: 'ちょうどその個数',
+            atLeast: 'その個数以上',
+            atMost: 'その個数以下',
+          }}
+        />
+      </TocSection>
+
+      <TocSection item={DICE_SECTIONS.sameFace}>
+        <p class="text-sm text-base-content/70">
+          {`${dice.count} 個のうち、同じ目が最も多く出たのが何個かの確率です（目はどれでもよい）。${dice.count} 個ならゾロ目、1 個なら全部違う目です。`}
+        </p>
+        <DistributionChart
+          rows={sameFaceDistribution(dice)}
+          total={total}
+          xName="同じ目"
           xUnit=" 個"
           modeLabels={{
             exact: 'ちょうどその個数',
@@ -138,8 +158,7 @@ export default function DiceProbabilityCalculator({ initialFaces, initialCount }
   }, []);
 
   const dice = result.kind === 'ok' ? result.dice : null;
-  const pending =
-    dice !== null && !hydrated && dice.count * (dice.faces - 1) + 1 > SERVER_RENDER_MAX_SUMS;
+  const pending = dice !== null && !hydrated && !canRenderOnServer(dice);
 
   useEffect(() => {
     // 入力途中の空欄や範囲外の値で URL を書き換えると、再読み込みで結果が消えてしまう
@@ -161,9 +180,9 @@ export default function DiceProbabilityCalculator({ initialFaces, initialCount }
               onInput={setFaces}
             />
             <NumberField
-              label={`個数（1〜${MAX_DICE_COUNT}）`}
+              label={`個数（${MIN_DICE_COUNT}〜${MAX_DICE_COUNT}）`}
               value={count}
-              min={1}
+              min={MIN_DICE_COUNT}
               max={MAX_DICE_COUNT}
               widthClass="w-32"
               onInput={setCount}

@@ -11,25 +11,32 @@ function roundToStep(value: number, step: number): number {
   return Number(value.toFixed(decimals));
 }
 
+export interface Axis {
+  readonly top: number;
+  readonly ticks: readonly number[];
+}
+
 /**
- * first〜last の整数の範囲に、1・2・5×10^k 刻みのきりのよい目盛りを最大 maxCount 本ほど置く。
- * 範囲が 2〜12 でも 100〜10000 でも、ラベルが重ならない本数に収める
+ * first〜last の整数の範囲に、両端と、1・2・5×10^k 刻みのきりのよい目盛りを最大 maxCount 本ほど置く。
+ * 両端が無いと範囲が読み取れないため必ず置き、それと近すぎてラベルが重なるきりのよい目盛りは省く
  */
 export function niceTicks(first: number, last: number, maxCount: number): number[] {
   const range = last - first;
   if (range <= 0) return [first];
   // 横軸は整数なので、1 より細かい刻みにはしない
   const step = Math.max(1, niceStep(range, maxCount - 1));
-  const ticks: number[] = [];
-  for (let tick = Math.ceil(first / step) * step; tick <= last; tick += step) ticks.push(tick);
-  return ticks;
+  const inner: number[] = [];
+  for (let tick = Math.ceil(first / step) * step; tick <= last; tick += step) {
+    if (tick - first >= step / 2 && last - tick >= step / 2) inner.push(tick);
+  }
+  return [first, ...inner, last];
 }
 
 /**
  * 0〜max の縦軸を最大 maxIntervals 個の区間に分け、max 以上で最小のきりのよい値を上端にした目盛りを返す。
  * 上端を max ちょうどにすると、目盛りが上端に揃わず読みにくい
  */
-export function niceAxis(max: number, maxIntervals: number): { top: number; ticks: number[] } {
+export function niceAxis(max: number, maxIntervals: number): Axis {
   if (max <= 0) return { top: 1, ticks: [0, 1] };
   const step = niceStep(max, maxIntervals);
   const count = Math.ceil(roundToStep(max / step, 1e-9));

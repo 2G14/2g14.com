@@ -1,5 +1,6 @@
 export const MIN_FACES = 2;
 export const MAX_FACES = 100;
+export const MIN_DICE_COUNT = 1;
 export const MAX_DICE_COUNT = 100;
 
 const brand = Symbol('DiceSet');
@@ -11,6 +12,11 @@ export interface DiceSet {
   readonly faces: number;
 }
 
+export interface SumRange {
+  readonly min: number;
+  readonly max: number;
+}
+
 export class InvalidDiceSetError extends Error {
   constructor(message: string = '無効なサイコロの組です') {
     super(message);
@@ -19,17 +25,21 @@ export class InvalidDiceSetError extends Error {
   }
 }
 
-function isIntegerInRange(n: number, min: number, max: number): boolean {
-  return Number.isInteger(n) && n >= min && n <= max;
+export function isValidDiceFaces(faces: number): boolean {
+  return Number.isInteger(faces) && faces >= MIN_FACES && faces <= MAX_FACES;
+}
+
+export function isValidDiceCount(count: number): boolean {
+  return Number.isInteger(count) && count >= MIN_DICE_COUNT && count <= MAX_DICE_COUNT;
 }
 
 export function createDiceSet(count: number, faces: number): DiceSet {
-  if (!isIntegerInRange(count, 1, MAX_DICE_COUNT)) {
+  if (!isValidDiceCount(count)) {
     throw new InvalidDiceSetError(
-      `サイコロの個数は 1〜${MAX_DICE_COUNT} の整数である必要があります: ${count}`,
+      `サイコロの個数は ${MIN_DICE_COUNT}〜${MAX_DICE_COUNT} の整数である必要があります: ${count}`,
     );
   }
-  if (!isIntegerInRange(faces, MIN_FACES, MAX_FACES)) {
+  if (!isValidDiceFaces(faces)) {
     throw new InvalidDiceSetError(
       `サイコロの面数は ${MIN_FACES}〜${MAX_FACES} の整数である必要があります: ${faces}`,
     );
@@ -43,4 +53,9 @@ export function createDiceSet(count: number, faces: number): DiceSet {
  */
 export function totalOutcomes(dice: DiceSet): bigint {
   return BigInt(dice.faces) ** BigInt(dice.count);
+}
+
+/** 出目の合計がとりうる最小値と最大値 */
+export function sumRange(dice: DiceSet): SumRange {
+  return { min: dice.count, max: dice.count * dice.faces };
 }

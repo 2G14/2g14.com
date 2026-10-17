@@ -1,4 +1,4 @@
-import { probabilityOf } from '#src/domain/dice/probability.js';
+import { probabilityOf } from '#src/domain/dice/distribution.js';
 import { reduceFraction } from '#src/lib/fraction.js';
 
 const SUPERSCRIPT_DIGITS: Readonly<Record<string, string>> = {

@@ -1,30 +1,5 @@
 import { type DiceSet, totalOutcomes } from '#src/domain/dice/dice-set.js';
-
-/** 合計が sum になる出目の通り数と、sum 以上・sum 以下になる通り数 */
-export interface SumWays {
-  readonly sum: number;
-  readonly ways: bigint;
-  readonly atLeastWays: bigint;
-  readonly atMostWays: bigint;
-}
-
-/** 特定の目（たとえば 6 の目）がちょうど count 個出る通り数と、count 個以上・count 個以下出る通り数 */
-export interface FaceCountWays {
-  readonly count: number;
-  readonly ways: bigint;
-  readonly atLeastWays: bigint;
-  readonly atMostWays: bigint;
-}
-
-function withAtLeastAndAtMost(dice: DiceSet, waysByOffset: readonly bigint[]): SumWays[] {
-  const total = totalOutcomes(dice);
-  let atMostWays = 0n;
-  return waysByOffset.map((ways, offset) => {
-    const atLeastWays = total - atMostWays;
-    atMostWays += ways;
-    return { sum: dice.count + offset, ways, atLeastWays, atMostWays };
-  });
-}
+import { accumulate, type DistributionRow } from '#src/domain/dice/distribution.js';
 
 /**
  * 合計ごとの通り数を、サイコロを 1 個ずつ足しながら数える。
@@ -32,7 +7,7 @@ function withAtLeastAndAtMost(dice: DiceSet, waysByOffset: readonly bigint[]): S
  * 面数ぶん足し合わせる素直な方法では 100 面 100 個で約 1 億回の BigInt の足し算になり遅すぎる。
  * どの段階でも分布は左右対称なので、前半だけ数えて後半は反転して埋める
  */
-export function sumDistribution(dice: DiceSet): SumWays[] {
+export function sumDistribution(dice: DiceSet): DistributionRow[] {
   let waysByOffset: bigint[] = [1n];
   for (let i = 0; i < dice.count; i++) {
     const prefix = [0n];
@@ -47,7 +22,7 @@ export function sumDistribution(dice: DiceSet): SumWays[] {
     );
     waysByOffset = [...firstHalf, ...firstHalf.slice(0, Math.floor(length / 2)).toReversed()];
   }
-  return withAtLeastAndAtMost(dice, waysByOffset);
+  return accumulate(dice.count, waysByOffset, totalOutcomes(dice));
 }
 
 /** 合計の期待値（平均） */
@@ -61,10 +36,10 @@ export function allSameWays(dice: DiceSet): bigint {
 }
 
 /**
- * 特定の目が出る個数ごとの通り数。ちょうど k 個になるのは、どの k 個がその目かの選び方
- * （二項係数）に、残りが他の目になる通り数を掛けたもの
+ * 特定の目（たとえば 6 の目）が出る個数ごとの通り数。ちょうど k 個になるのは、どの k 個がその目かの
+ * 選び方（二項係数）に、残りが他の目になる通り数を掛けたもの
  */
-export function faceCountDistribution(dice: DiceSet): FaceCountWays[] {
+export function faceCountDistribution(dice: DiceSet): DistributionRow[] {
   const others = BigInt(dice.faces - 1);
   const exact: bigint[] = [];
   let binomial = 1n;
@@ -72,19 +47,5 @@ export function faceCountDistribution(dice: DiceSet): FaceCountWays[] {
     exact.push(binomial * others ** BigInt(dice.count - k));
     binomial = (binomial * BigInt(dice.count - k)) / BigInt(k + 1);
   }
-  const total = totalOutcomes(dice);
-  let atMostWays = 0n;
-  return exact.map((ways, count) => {
-    const atLeastWays = total - atMostWays;
-    atMostWays += ways;
-    return { count, ways, atLeastWays, atMostWays };
-  });
-}
-
-/**
- * 通り数の比を Number の確率にする。通り数は最大でも 100 面 100 個の 10^200 で、Number の上限
- * （約 1.8×10^308）に収まるため、BigInt を Number にしてから割っても桁あふれしない
- */
-export function probabilityOf(ways: bigint, total: bigint): number {
-  return Number(ways) / Number(total);
+  return accumulate(0, exact, totalOutcomes(dice));
 }
