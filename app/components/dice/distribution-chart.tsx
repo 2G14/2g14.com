@@ -1,12 +1,19 @@
 import { useMemo, useState } from 'hono/jsx';
 
-import { niceAxis, niceTicks } from '#app/lib/chart-ticks.js';
+import { niceAxis, niceTicks, type TickLabelSpace } from '#app/lib/chart-ticks.js';
 import { formatProbability, formatWays } from '#app/lib/dice/format.js';
 import { type DistributionRow, mostLikely, probabilityOf } from '#src/domain/dice/distribution.js';
 
 const MODES = ['exact', 'atLeast', 'atMost'] as const;
 
 type ChartMode = (typeof MODES)[number];
+
+/**
+ * 横軸の目盛りのラベルの大きさ。グラフの幅は、幅 360px のスマホで縦軸のラベル（w-12）と間（gap-2）を
+ * 除いた実測の 224px で、ラベルは text-xs の数字 1 桁が約 7px。実際の幅を測る方法では、サーバーで
+ * 描画する時点で目盛りを決められない
+ */
+const TICK_LABEL_SPACE: TickLabelSpace = { chartWidthPx: 224, digitWidthPx: 7, gapPx: 4 };
 
 /** 表示の切り替えごとに、使う通り数と、値に添える言葉 */
 interface ModeConfig {
@@ -70,7 +77,7 @@ export default function DistributionChart({
   );
   const first = rows[0]?.value ?? 0;
   const last = rows.at(-1)?.value ?? first;
-  const ticks = useMemo(() => niceTicks(first, last, 6), [first, last]);
+  const ticks = useMemo(() => niceTicks(first, last, 6, TICK_LABEL_SPACE), [first, last]);
   // ちょうどその値の確率は最大の棒に合わせて縦軸を伸び縮みさせ、以上・以下は 0〜100% で固定する
   const y = useMemo(
     () => niceAxis(mode === 'exact' ? probabilityOf(peak.ways, total) * 100 : 100, 5),
@@ -183,9 +190,12 @@ export default function DistributionChart({
             }}
             onPointerMove={onPointer}
             onPointerDown={onPointer}
-            // タッチでは指を離すと pointerleave が来るため、タップした値が見えるようマウスのときだけ消す
+            // タッチでは指を離すと pointerleave が来るため、タップした値が見えるようマウスのときだけ消す。
+            // キーボードで選んでいる最中にマウスが外れたときも、選んだ値を残す
             onPointerLeave={(e: PointerEvent) => {
-              if (e.pointerType === 'mouse') setSelection(null);
+              if (e.pointerType === 'mouse' && document.activeElement !== e.currentTarget) {
+                setSelection(null);
+              }
             }}
             onKeyDown={onKeyDown}
           >

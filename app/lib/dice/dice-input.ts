@@ -16,7 +16,6 @@ export type ParsedDiceInput = NoResult | { kind: 'ok'; dice: DiceSet };
 /** 入力欄の値。空欄は null */
 export type DiceInputValues = { readonly [K in keyof DiceSetSpec]: DiceSetSpec[K] | null };
 
-/** 面数と個数はどちらも数なので取り違えないよう、名前付きで受け取る */
 export function parseDiceInput({ faces, count }: DiceInputValues): ParsedDiceInput {
   if (faces === null || count === null) return { kind: 'empty' };
   if (!isValidDiceFaces(faces)) {

@@ -74,7 +74,7 @@ interface DiceResultProps {
 }
 
 function DiceResult({ dice }: DiceResultProps) {
-  // ホバーやトグルで再描画されても、同じサイコロの組なら分布を数え直さない
+  // 入力中は親が再描画されるが、確定した組が同じ参照のまま渡ってくる間は分布を数え直さない
   const sums = useMemo(() => sumDistribution(dice), [dice]);
   const faceCounts = useMemo(() => faceCountDistribution(dice), [dice]);
   const sameFaces = useMemo(() => (dice.count >= 2 ? sameFaceDistribution(dice) : null), [dice]);
@@ -157,23 +157,26 @@ function DiceResult({ dice }: DiceResultProps) {
   );
 }
 
-/** 入力が止まった時点の入力欄の値と、その検証結果 */
+/** 入力が止まった時点の入力欄の値と、その検証結果、最後に正しく入力されたサイコロの組 */
 interface SettledInput {
   readonly values: DiceInputValues;
   readonly result: ParsedDiceInput;
+  /** 計算に使う組。エラーや空欄のあいだも、前の結果を薄く残すために前の組を持ち続ける */
+  readonly dice: DiceSet | null;
 }
 
 export default function DiceProbabilityCalculator({ initialFaces, initialCount }: Props) {
-  const initial = initialDiceInput(initialFaces, initialCount);
+  const initial = initialDiceInput({ faces: initialFaces, count: initialCount });
   const [faces, setFaces] = useState<number | null>(initial.faces);
   const [count, setCount] = useState<number | null>(initial.count);
   const result = parseDiceInput({ faces, count });
   // 入力が止まってから、エラーの表示と計算に使うサイコロの組を更新する。「12」と打つ途中の「1」で
   // エラーを出したり結果を消したりしないよう、打っている間は前の結果を薄くして残す
-  const [settled, setSettled] = useState<SettledInput>({ values: { faces, count }, result });
-  const [committed, setCommitted] = useState<DiceSet | null>(
-    result.kind === 'ok' ? result.dice : null,
-  );
+  const [settled, setSettled] = useState<SettledInput>({
+    values: { faces, count },
+    result,
+    dice: result.kind === 'ok' ? result.dice : null,
+  });
   const [hydrated, setHydrated] = useState(false);
 
   useEffect(() => {
@@ -182,22 +185,21 @@ export default function DiceProbabilityCalculator({ initialFaces, initialCount }
 
   useEffect(() => {
     const timer = setTimeout(() => {
-      setSettled({ values: { faces, count }, result });
-      if (result.kind !== 'ok') return;
-      const { dice } = result;
-      // 同じ組なら前の参照を残し、分布を数え直さない
-      setCommitted((prev) => (prev !== null && isSameDiceSet(prev, dice) ? prev : dice));
-      replaceUrlQuery(diceQueryString(dice));
+      setSettled((prev) => {
+        if (result.kind !== 'ok') return { values: { faces, count }, result, dice: prev.dice };
+        // 同じ組なら前の参照を残し、分布を数え直さない
+        const same = prev.dice !== null && isSameDiceSet(prev.dice, result.dice);
+        return { values: { faces, count }, result, dice: same ? prev.dice : result.dice };
+      });
+      if (result.kind === 'ok') replaceUrlQuery(diceQueryString(result.dice));
     }, INPUT_SETTLE_MS);
     return () => clearTimeout(timer);
   }, [faces, count]);
 
   const typing = settled.values.faces !== faces || settled.values.count !== count;
-  const stale =
-    typing ||
-    settled.result.kind !== 'ok' ||
-    (committed !== null && !isSameDiceSet(committed, settled.result.dice));
-  const pending = committed !== null && !hydrated && !canRenderOnServer(committed);
+  const { dice } = settled;
+  const shown = settled.result.kind === 'ok' ? settled.result.dice : null;
+  const pending = dice !== null && !hydrated && !canRenderOnServer(dice);
 
   return (
     <>
@@ -221,9 +223,10 @@ export default function DiceProbabilityCalculator({ initialFaces, initialCount }
               widthClass="w-32"
               onInput={setCount}
             />
-            {result.kind === 'ok' && (
-              <p class="pb-3 text-2xl font-bold">
-                {result.dice.count}D{result.dice.faces}
+            {/* 打っている途中の値ではなく、下に表示している結果と同じ組を出す */}
+            {shown !== null && (
+              <p class={`pb-3 text-2xl font-bold ${typing ? 'opacity-50' : ''}`}>
+                {shown.count}D{shown.faces}
               </p>
             )}
           </div>
@@ -232,22 +235,22 @@ export default function DiceProbabilityCalculator({ initialFaces, initialCount }
               <span>{settled.result.message}</span>
             </div>
           )}
+          {!typing && settled.result.kind === 'empty' && (
+            <p class="text-sm text-base-content/70">面数と個数を入力すると確率を計算します。</p>
+          )}
           <p class="text-sm text-base-content/60">
             現実に無い面数も含め、どの目も同じ確率で出るサイコロとして、出目の組み合わせをすべて数えた正確な確率を計算します。
           </p>
         </div>
       </div>
 
-      {committed === null && (
-        <p class="text-center text-base-content/50">面数と個数を入力すると確率を計算します。</p>
-      )}
       {pending && <p class="text-center text-base-content/50">計算しています…</p>}
-      {committed !== null && !pending && (
+      {dice !== null && !pending && (
         <div
-          class={`flex flex-col gap-8 transition-opacity ${stale ? 'opacity-50' : ''}`}
+          class={`flex flex-col gap-8 transition-opacity ${shown === null || typing ? 'opacity-50' : ''}`}
           aria-busy={String(typing)}
         >
-          <DiceResult dice={committed} />
+          <DiceResult dice={dice} />
         </div>
       )}
     </>

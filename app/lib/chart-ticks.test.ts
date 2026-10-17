@@ -2,6 +2,8 @@ import { describe, expect, it } from 'vitest';
 
 import { niceAxis, niceTicks } from '#app/lib/chart-ticks.js';
 
+const SPACE = { chartWidthPx: 224, digitWidthPx: 7, gapPx: 4 };
+
 describe('niceTicks', () => {
   it.each([
     [2, 12, [2, 4, 6, 8, 10, 12]],
@@ -16,11 +18,11 @@ describe('niceTicks', () => {
     [65, 1625, [65, 500, 1000, 1625]],
     [9, 108, [9, 20, 40, 60, 80, 108]],
   ])('%i〜%i の目盛りは両端を含み、両端のラベルと重なる目盛りは省く', (first, last, expected) => {
-    expect(niceTicks(first, last, 6)).toEqual(expected);
+    expect(niceTicks(first, last, 6, SPACE)).toEqual(expected);
   });
 
   it('範囲が 1 点なら、その点だけ', () => {
-    expect(niceTicks(1, 1, 6)).toEqual([1]);
+    expect(niceTicks(1, 1, 6, SPACE)).toEqual([1]);
   });
 });
 

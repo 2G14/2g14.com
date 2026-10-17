@@ -16,13 +16,13 @@ export interface AxisScale {
   readonly ticks: readonly number[];
 }
 
-/**
- * 目盛りのラベルが重ならないかを見積もるための、グラフの最小の幅と 1 桁の幅。幅 360px のスマホでの
- * グラフの幅（実測 224px）に合わせる。実際の幅を測ると、サーバーで描画する時点では決められない
- */
-const MIN_CHART_WIDTH_PX = 224;
-const DIGIT_WIDTH_PX = 7;
-const LABEL_GAP_PX = 4;
+/** 目盛りのラベルが重ならないかを見積もるための、グラフの幅とラベルの文字の大きさ */
+export interface TickLabelSpace {
+  readonly chartWidthPx: number;
+  readonly digitWidthPx: number;
+  /** ラベルどうしの間に最低限あける幅 */
+  readonly gapPx: number;
+}
 
 function digitsOf(n: number): number {
   return String(n).length;
@@ -33,15 +33,21 @@ function digitsOf(n: number): number {
  * 両端が無いと範囲が読み取れないため必ず置き（ラベルは内側に寄せて描く）、両端のラベルと重なるほど近い
  * きりのよい目盛りだけ省く。省く距離は、両端のラベルの幅と、中央に描く目盛りのラベルの半分の幅から決める
  */
-export function niceTicks(first: number, last: number, maxCount: number): number[] {
+export function niceTicks(
+  first: number,
+  last: number,
+  maxCount: number,
+  space: TickLabelSpace,
+): number[] {
   const range = last - first;
   if (range <= 0) return [first];
   // 横軸は整数なので、1 より細かい刻みにはしない
   const step = Math.max(1, niceStep(range, maxCount - 1));
-  const pxOf = (distance: number) => (distance / range) * MIN_CHART_WIDTH_PX;
+  // 値 v の棒は横幅を range + 1 等分したうちの v - first 番目で、目盛りはその中央に描く
+  const pxOf = (distance: number) => (distance / (range + 1)) * space.chartWidthPx;
   const clearOf = (end: number, tick: number) =>
     pxOf(Math.abs(tick - end)) >=
-    digitsOf(end) * DIGIT_WIDTH_PX + (digitsOf(tick) * DIGIT_WIDTH_PX) / 2 + LABEL_GAP_PX;
+    digitsOf(end) * space.digitWidthPx + (digitsOf(tick) * space.digitWidthPx) / 2 + space.gapPx;
   const inner: number[] = [];
   for (let tick = Math.ceil(first / step) * step; tick <= last; tick += step) {
     if (tick !== first && tick !== last && clearOf(first, tick) && clearOf(last, tick)) {
