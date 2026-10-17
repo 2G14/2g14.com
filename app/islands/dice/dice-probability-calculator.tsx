@@ -10,7 +10,7 @@ import {
   type ParsedDiceInput,
   parseDiceInput,
 } from '#app/lib/dice/dice-input.js';
-import { diceQueryString, initialDiceInput } from '#app/lib/dice/dice-query.js';
+import { type DiceQuery, diceQueryString, initialDiceInput } from '#app/lib/dice/dice-query.js';
 import { formatProbability, formatWays } from '#app/lib/dice/format.js';
 import { DICE_SECTIONS } from '#app/lib/dice/sections.js';
 import { replaceUrlQuery } from '#app/lib/url.js';
@@ -65,8 +65,7 @@ function canRenderOnServer(dice: DiceSet): boolean {
 }
 
 interface Props {
-  initialFaces?: string | undefined;
-  initialCount?: string | undefined;
+  initialQuery: DiceQuery;
 }
 
 interface DiceResultProps {
@@ -165,8 +164,8 @@ interface SettledInput {
   readonly dice: DiceSet | null;
 }
 
-export default function DiceProbabilityCalculator({ initialFaces, initialCount }: Props) {
-  const initial = initialDiceInput({ faces: initialFaces, count: initialCount });
+export default function DiceProbabilityCalculator({ initialQuery }: Props) {
+  const initial = initialDiceInput(initialQuery);
   const [faces, setFaces] = useState<number | null>(initial.faces);
   const [count, setCount] = useState<number | null>(initial.count);
   const result = parseDiceInput({ faces, count });
@@ -185,20 +184,24 @@ export default function DiceProbabilityCalculator({ initialFaces, initialCount }
 
   useEffect(() => {
     const timer = setTimeout(() => {
-      setSettled((prev) => {
-        if (result.kind !== 'ok') return { values: { faces, count }, result, dice: prev.dice };
-        // 同じ組なら前の参照を残し、分布を数え直さない
-        const same = prev.dice !== null && isSameDiceSet(prev.dice, result.dice);
-        return { values: { faces, count }, result, dice: same ? prev.dice : result.dice };
-      });
-      if (result.kind === 'ok') replaceUrlQuery(diceQueryString(result.dice));
+      // settled はこのタイマーでしか変わらず、入力が変わるたびにこの effect ごと作り直されるため、
+      // ここで見る settled は常に直前に確定した値になる
+      const changed =
+        result.kind === 'ok' &&
+        (settled.dice === null || !isSameDiceSet(settled.dice, result.dice));
+      // 同じ組なら前の参照を残し、分布を数え直さない
+      const dice = changed && result.kind === 'ok' ? result.dice : settled.dice;
+      setSettled({ values: { faces, count }, result, dice });
+      // 開いただけや同じ組に戻しただけでは URL を書き換えない
+      if (changed && dice !== null) replaceUrlQuery(diceQueryString(dice));
     }, INPUT_SETTLE_MS);
     return () => clearTimeout(timer);
   }, [faces, count]);
 
   const typing = settled.values.faces !== faces || settled.values.count !== count;
+  // 打っている間と、エラーや空欄のまま止まった間は、下の結果と入力欄横の表記が今の入力と合っていない
+  const stale = typing || settled.result.kind !== 'ok';
   const { dice } = settled;
-  const shown = settled.result.kind === 'ok' ? settled.result.dice : null;
   const pending = dice !== null && !hydrated && !canRenderOnServer(dice);
 
   return (
@@ -224,9 +227,9 @@ export default function DiceProbabilityCalculator({ initialFaces, initialCount }
               onInput={setCount}
             />
             {/* 打っている途中の値ではなく、下に表示している結果と同じ組を出す */}
-            {shown !== null && (
-              <p class={`pb-3 text-2xl font-bold ${typing ? 'opacity-50' : ''}`}>
-                {shown.count}D{shown.faces}
+            {dice !== null && (
+              <p class={`pb-3 text-2xl font-bold ${stale ? 'opacity-50' : ''}`}>
+                {dice.count}D{dice.faces}
               </p>
             )}
           </div>
@@ -247,7 +250,7 @@ export default function DiceProbabilityCalculator({ initialFaces, initialCount }
       {pending && <p class="text-center text-base-content/50">計算しています…</p>}
       {dice !== null && !pending && (
         <div
-          class={`flex flex-col gap-8 transition-opacity ${shown === null || typing ? 'opacity-50' : ''}`}
+          class={`flex flex-col gap-8 transition-opacity ${stale ? 'opacity-50' : ''}`}
           aria-busy={String(typing)}
         >
           <DiceResult dice={dice} />

@@ -27,8 +27,7 @@ export default createRoute((c) => {
   return c.render(
     <TocPageLayout title="サイコロの確率計算" tocItems={Object.values(DICE_SECTIONS)}>
       <DiceProbabilityCalculator
-        initialFaces={c.req.query('faces')}
-        initialCount={c.req.query('count')}
+        initialQuery={{ faces: c.req.query('faces'), count: c.req.query('count') }}
       />
     </TocPageLayout>,
     { title: PAGE_TITLE, head },

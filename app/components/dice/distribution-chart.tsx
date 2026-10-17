@@ -191,12 +191,14 @@ export default function DistributionChart({
             onPointerMove={onPointer}
             onPointerDown={onPointer}
             // タッチでは指を離すと pointerleave が来るため、タップした値が見えるようマウスのときだけ消す。
-            // キーボードで選んでいる最中にマウスが外れたときも、選んだ値を残す
+            // キーボードで操作している（:focus-visible の）間は、マウスが外れても選んだ値を残す
             onPointerLeave={(e: PointerEvent) => {
-              if (e.pointerType === 'mouse' && document.activeElement !== e.currentTarget) {
+              const target = e.currentTarget as Element;
+              if (e.pointerType === 'mouse' && !target.matches(':focus-visible')) {
                 setSelection(null);
               }
             }}
+            onBlur={() => setSelection(null)}
             onKeyDown={onKeyDown}
           >
             {y.ticks.slice(1).map((tick) => (
