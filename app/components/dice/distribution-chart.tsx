@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'hono/jsx';
+import { useMemo, useState } from 'hono/jsx';
 
 import { niceAxis, niceTicks } from '#app/lib/chart-ticks.js';
 import { formatProbability, formatWays } from '#app/lib/dice/format.js';
@@ -9,25 +9,34 @@ const MODES = ['exact', 'atLeast', 'atMost'] as const;
 type ChartMode = (typeof MODES)[number];
 
 /** 表示の切り替えごとに、使う通り数と、値に添える言葉 */
-const MODE_CONFIG: Readonly<
-  Record<ChartMode, { key: 'ways' | 'atLeastWays' | 'atMostWays'; suffix: string }>
-> = {
+interface ModeConfig {
+  readonly key: keyof Omit<DistributionRow, 'value'>;
+  readonly suffix: string;
+}
+
+const MODE_CONFIG: Readonly<Record<ChartMode, ModeConfig>> = {
   exact: { key: 'ways', suffix: '' },
   atLeast: { key: 'atLeastWays', suffix: ' 以上' },
   atMost: { key: 'atMostWays', suffix: ' 以下' },
 };
 
 /** 横軸の名前と単位（単位が無ければ空文字） */
-export interface ChartAxis {
+export interface AxisLabel {
   readonly name: string;
   readonly unit: string;
+}
+
+/** 選んだ棒の位置と、それを選んだときの分布 */
+interface Selection {
+  readonly rows: readonly DistributionRow[];
+  readonly index: number;
 }
 
 interface DistributionChartProps {
   rows: readonly DistributionRow[];
   /** 出目の組み合わせの総数（確率の分母） */
   total: bigint;
-  axis: ChartAxis;
+  axis: AxisLabel;
   /** 切り替えボタンの文言 */
   modeLabels: Readonly<Record<ChartMode, string>>;
 }
@@ -49,12 +58,10 @@ export default function DistributionChart({
   modeLabels,
 }: DistributionChartProps) {
   const [mode, setMode] = useState<ChartMode>('exact');
-  const [selected, setSelected] = useState<number | null>(null);
-
-  // 個数や面数が変わると棒の数が変わり、前に選んだ位置が無い棒を指してしまう
-  useEffect(() => {
-    setSelected(null);
-  }, [rows]);
+  // 選んだ位置は、どの分布の上で選んだかと一緒に持つ。個数や面数が変わると棒の数が変わり、
+  // 前の位置のままだと別の棒や無い棒を指すため、分布が変わった時点でその場で無効にする
+  const [selection, setSelection] = useState<Selection | null>(null);
+  const selected = selection?.rows === rows ? selection.index : null;
 
   const peak = useMemo(() => mostLikely(rows), [rows]);
   const peakIndex = Math.max(
@@ -81,15 +88,21 @@ export default function DistributionChart({
     [rows, mode, total, y],
   );
 
+  const unit = axis.unit === '' ? '' : ` ${axis.unit}`;
+  const labelOf = (row: DistributionRow) =>
+    `${axis.name} ${row.value}${unit}${MODE_CONFIG[mode].suffix}`;
   const selectedRow = selected === null ? null : (rows[selected] ?? null);
   const selectedWays = selectedRow === null ? null : waysOf(selectedRow, mode);
-  const unit = axis.unit === '' ? '' : ` ${axis.unit}`;
-  const selectedLabel =
-    selectedRow === null
+  // 読み上げは、まだ選んでいなくても最頻値の値にしておく。フォーカスしてから選ぶまでの間に
+  // 何も読まれない時間ができないようにする
+  const spokenRow = selectedRow ?? rows[peakIndex] ?? null;
+  const spokenText =
+    spokenRow === null
       ? null
-      : `${axis.name} ${selectedRow.value}${unit}${MODE_CONFIG[mode].suffix}`;
+      : `${labelOf(spokenRow)}：${formatProbability(waysOf(spokenRow, mode), total)}、${formatWays(waysOf(spokenRow, mode))} 通り`;
 
-  const select = (index: number) => setSelected(Math.min(rows.length - 1, Math.max(0, index)));
+  const select = (index: number) =>
+    setSelection({ rows, index: Math.min(rows.length - 1, Math.max(0, index)) });
   const onPointer = (e: PointerEvent) => {
     const rect = (e.currentTarget as Element).getBoundingClientRect();
     select(Math.floor(((e.clientX - rect.left) / rect.width) * rows.length));
@@ -149,7 +162,7 @@ export default function DistributionChart({
             style={`left: clamp(5rem, ${(((selected ?? 0) + 0.5) / rows.length) * 100}%, calc(100% - 5rem))`}
             aria-hidden="true"
           >
-            <div class="font-bold">{selectedLabel}</div>
+            <div class="font-bold">{selectedRow !== null && labelOf(selectedRow)}</div>
             <div>{selectedWays !== null && formatProbability(selectedWays, total)}</div>
             <div>{selectedWays !== null && `${formatWays(selectedWays)} 通り`}</div>
           </div>
@@ -162,12 +175,8 @@ export default function DistributionChart({
             aria-label={`${axis.name}ごとの確率のグラフ。矢印キーで値を選べます`}
             aria-valuemin={first}
             aria-valuemax={last}
-            aria-valuenow={(selectedRow ?? rows[peakIndex])?.value ?? first}
-            aria-valuetext={
-              selectedLabel === null || selectedWays === null
-                ? undefined
-                : `${selectedLabel}：${formatProbability(selectedWays, total)}、${formatWays(selectedWays)} 通り`
-            }
+            aria-valuenow={spokenRow?.value ?? first}
+            aria-valuetext={spokenText ?? undefined}
             // フォーカスした時点で読み上げる値が無いと、確率を聞くにはまずキーを押す必要がある
             onFocus={() => {
               if (selected === null) select(peakIndex);
@@ -176,7 +185,7 @@ export default function DistributionChart({
             onPointerDown={onPointer}
             // タッチでは指を離すと pointerleave が来るため、タップした値が見えるようマウスのときだけ消す
             onPointerLeave={(e: PointerEvent) => {
-              if (e.pointerType === 'mouse') setSelected(null);
+              if (e.pointerType === 'mouse') setSelection(null);
             }}
             onKeyDown={onKeyDown}
           >
@@ -212,15 +221,24 @@ export default function DistributionChart({
             )}
           </svg>
           <div class="relative h-5 text-xs text-base-content/60 tabular-nums" aria-hidden="true">
-            {ticks.map((tick) => (
-              <span
-                class="absolute top-0 flex -translate-x-1/2 flex-col items-center"
-                style={`left: ${((tick - first + 0.5) / rows.length) * 100}%`}
-              >
-                <span class="h-1 w-px bg-base-content/40" />
-                <span>{tick}</span>
-              </span>
-            ))}
+            {ticks.map((tick) => {
+              // 両端のラベルは、グラフの外にはみ出さないよう内側に寄せて描く
+              const align =
+                tick === first && ticks.length > 1
+                  ? 'items-start'
+                  : tick === last && ticks.length > 1
+                    ? '-translate-x-full items-end'
+                    : '-translate-x-1/2 items-center';
+              return (
+                <span
+                  class={`absolute top-0 flex flex-col ${align}`}
+                  style={`left: ${((tick - first + 0.5) / rows.length) * 100}%`}
+                >
+                  <span class="h-1 w-px bg-base-content/40" />
+                  <span>{tick}</span>
+                </span>
+              );
+            })}
           </div>
           <div class="text-center text-xs text-base-content/60">
             {axis.name}

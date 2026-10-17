@@ -33,7 +33,13 @@ export function isValidDiceCount(count: number): boolean {
   return Number.isInteger(count) && count >= MIN_DICE_COUNT && count <= MAX_DICE_COUNT;
 }
 
-export function createDiceSet(count: number, faces: number): DiceSet {
+/** 面数と個数を指定するときの値。どちらも数なので取り違えないよう名前付きで渡す */
+export interface DiceSetSpec {
+  readonly count: number;
+  readonly faces: number;
+}
+
+export function createDiceSet({ count, faces }: DiceSetSpec): DiceSet {
   if (!isValidDiceCount(count)) {
     throw new InvalidDiceSetError(
       `サイコロの個数は ${MIN_DICE_COUNT}〜${MAX_DICE_COUNT} の整数である必要があります: ${count}`,
@@ -58,4 +64,8 @@ export function totalOutcomes(dice: DiceSet): bigint {
 /** 出目の合計がとりうる最小値と最大値 */
 export function sumRange(dice: DiceSet): SumRange {
   return { min: dice.count, max: dice.count * dice.faces };
+}
+
+export function isSameDiceSet(a: DiceSet, b: DiceSet): boolean {
+  return a.count === b.count && a.faces === b.faces;
 }

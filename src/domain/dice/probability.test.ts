@@ -11,7 +11,7 @@ import {
 
 describe('sumDistribution', () => {
   it('1 個なら各目が 1 通りずつ', () => {
-    expect(sumDistribution(createDiceSet(1, 6)).map((row) => row.ways)).toEqual([
+    expect(sumDistribution(createDiceSet({ count: 1, faces: 6 })).map((row) => row.ways)).toEqual([
       1n,
       1n,
       1n,
@@ -22,20 +22,20 @@ describe('sumDistribution', () => {
   });
 
   it('2 個の 6 面は合計 2〜12 が 1・2・3・4・5・6・5・4・3・2・1 通り', () => {
-    const rows = sumDistribution(createDiceSet(2, 6));
+    const rows = sumDistribution(createDiceSet({ count: 2, faces: 6 }));
     expect(rows.map((row) => row.value)).toEqual([2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12]);
     expect(rows.map((row) => Number(row.ways))).toEqual([1, 2, 3, 4, 5, 6, 5, 4, 3, 2, 1]);
   });
 
   it('3 個の 6 面は合計 10 と 11 が最も多い 27 通り', () => {
-    const rows = sumDistribution(createDiceSet(3, 6));
+    const rows = sumDistribution(createDiceSet({ count: 3, faces: 6 }));
     expect(rows.find((row) => row.value === 10)?.ways).toBe(27n);
     expect(rows.find((row) => row.value === 11)?.ways).toBe(27n);
     expect(rows.every((row) => row.ways <= 27n)).toBe(true);
   });
 
   it('以上・以下の通り数を積み上げる', () => {
-    const rows = sumDistribution(createDiceSet(2, 6));
+    const rows = sumDistribution(createDiceSet({ count: 2, faces: 6 }));
     expect(rows.find((row) => row.value === 8)).toMatchObject({
       atLeastWays: 15n,
       atMostWays: 26n,
@@ -51,7 +51,7 @@ describe('sumDistribution', () => {
     [10, 20],
     [100, 100],
   ])('%i 個の %i 面の通り数の合計は出目の組み合わせの総数に等しく、左右対称', (count, faces) => {
-    const dice = createDiceSet(count, faces);
+    const dice = createDiceSet({ count, faces });
     const ways = sumDistribution(dice).map((row) => row.ways);
     expect(ways).toHaveLength(count * (faces - 1) + 1);
     expect(ways.reduce((a, b) => a + b, 0n)).toBe(totalOutcomes(dice));
@@ -59,7 +59,7 @@ describe('sumDistribution', () => {
   });
 
   it('全ての出目を数えた結果と一致する', () => {
-    const dice = createDiceSet(3, 5);
+    const dice = createDiceSet({ count: 3, faces: 5 });
     const counts = new Map<number, bigint>();
     for (let a = 1; a <= 5; a++) {
       for (let b = 1; b <= 5; b++) {
@@ -76,21 +76,21 @@ describe('sumDistribution', () => {
 
 describe('expectedSum', () => {
   it('1 個の期待値（面数 + 1）/ 2 に個数を掛ける', () => {
-    expect(expectedSum(createDiceSet(2, 6))).toBe(7);
-    expect(expectedSum(createDiceSet(1, 20))).toBe(10.5);
+    expect(expectedSum(createDiceSet({ count: 2, faces: 6 }))).toBe(7);
+    expect(expectedSum(createDiceSet({ count: 1, faces: 20 }))).toBe(10.5);
   });
 });
 
 describe('allSameWays', () => {
   it('ゾロ目は面数と同じ通り数', () => {
-    expect(allSameWays(createDiceSet(2, 6))).toBe(6n);
-    expect(allSameWays(createDiceSet(3, 6))).toBe(6n);
+    expect(allSameWays(createDiceSet({ count: 2, faces: 6 }))).toBe(6n);
+    expect(allSameWays(createDiceSet({ count: 3, faces: 6 }))).toBe(6n);
   });
 });
 
 describe('faceCountDistribution', () => {
   it('2 個の 6 面で特定の目が 0・1・2 個出る通り数', () => {
-    expect(faceCountDistribution(createDiceSet(2, 6))).toEqual([
+    expect(faceCountDistribution(createDiceSet({ count: 2, faces: 6 }))).toEqual([
       { value: 0, ways: 25n, atLeastWays: 36n, atMostWays: 25n },
       { value: 1, ways: 10n, atLeastWays: 11n, atMostWays: 35n },
       { value: 2, ways: 1n, atLeastWays: 1n, atMostWays: 36n },
@@ -98,7 +98,7 @@ describe('faceCountDistribution', () => {
   });
 
   it('4 個の 6 面で 1 個以上出るのは 1296 - 625 = 671 通り', () => {
-    expect(faceCountDistribution(createDiceSet(4, 6))[1]?.atLeastWays).toBe(671n);
+    expect(faceCountDistribution(createDiceSet({ count: 4, faces: 6 }))[1]?.atLeastWays).toBe(671n);
   });
 
   it.each([
@@ -106,7 +106,7 @@ describe('faceCountDistribution', () => {
     [5, 6],
     [100, 100],
   ])('%i 個の %i 面で、個数ごとの通り数の合計は総数に等しい', (count, faces) => {
-    const dice = createDiceSet(count, faces);
+    const dice = createDiceSet({ count, faces });
     const rows = faceCountDistribution(dice);
     expect(rows).toHaveLength(count + 1);
     expect(rows.reduce((sum, row) => sum + row.ways, 0n)).toBe(totalOutcomes(dice));
@@ -117,13 +117,13 @@ describe('faceCountDistribution', () => {
 
 describe('atLeastOneWays', () => {
   it('特定の目が 1 個以上出る通り数', () => {
-    expect(atLeastOneWays(createDiceSet(1, 6))).toBe(1n);
-    expect(atLeastOneWays(createDiceSet(2, 6))).toBe(11n);
-    expect(atLeastOneWays(createDiceSet(4, 6))).toBe(671n);
+    expect(atLeastOneWays(createDiceSet({ count: 1, faces: 6 }))).toBe(1n);
+    expect(atLeastOneWays(createDiceSet({ count: 2, faces: 6 }))).toBe(11n);
+    expect(atLeastOneWays(createDiceSet({ count: 4, faces: 6 }))).toBe(671n);
   });
 
   it('特定の目の個数の分布で 1 個以上になる通り数と等しい', () => {
-    const dice = createDiceSet(7, 5);
+    const dice = createDiceSet({ count: 7, faces: 5 });
     expect(atLeastOneWays(dice)).toBe(faceCountDistribution(dice)[1]?.atLeastWays);
   });
 });

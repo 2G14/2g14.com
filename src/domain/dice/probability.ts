@@ -1,5 +1,5 @@
 import { type DiceSet, totalOutcomes } from '#src/domain/dice/dice-set.js';
-import { accumulate, type DistributionRow } from '#src/domain/dice/distribution.js';
+import { toDistributionRows, type DistributionRow } from '#src/domain/dice/distribution.js';
 
 /**
  * 合計ごとの通り数を、サイコロを 1 個ずつ足しながら数える。
@@ -22,7 +22,7 @@ export function sumDistribution(dice: DiceSet): DistributionRow[] {
     );
     waysByOffset = [...firstHalf, ...firstHalf.slice(0, Math.floor(length / 2)).toReversed()];
   }
-  return accumulate(dice.count, waysByOffset, totalOutcomes(dice));
+  return toDistributionRows(dice.count, waysByOffset, totalOutcomes(dice));
 }
 
 /** 合計の期待値（平均） */
@@ -47,7 +47,7 @@ export function faceCountDistribution(dice: DiceSet): DistributionRow[] {
     exact.push(binomial * others ** BigInt(dice.count - k));
     binomial = (binomial * BigInt(dice.count - k)) / BigInt(k + 1);
   }
-  return accumulate(0, exact, totalOutcomes(dice));
+  return toDistributionRows(0, exact, totalOutcomes(dice));
 }
 
 /** 特定の目（たとえば 6 の目）が 1 個以上出る通り数。1 個も出ない通り数を全体から引く */

@@ -20,6 +20,6 @@ describe('initialDiceInput', () => {
 
 describe('diceQueryString', () => {
   it('面数と個数のクエリにする', () => {
-    expect(diceQueryString(createDiceSet(3, 8))).toBe('faces=8&count=3');
+    expect(diceQueryString(createDiceSet({ count: 3, faces: 8 }))).toBe('faces=8&count=3');
   });
 });

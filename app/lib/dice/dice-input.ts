@@ -2,6 +2,7 @@ import type { NoResult } from '#app/lib/result.js';
 import {
   createDiceSet,
   type DiceSet,
+  type DiceSetSpec,
   isValidDiceCount,
   isValidDiceFaces,
   MAX_DICE_COUNT,
@@ -13,10 +14,7 @@ import {
 export type ParsedDiceInput = NoResult | { kind: 'ok'; dice: DiceSet };
 
 /** 入力欄の値。空欄は null */
-export interface DiceInputValues {
-  readonly faces: number | null;
-  readonly count: number | null;
-}
+export type DiceInputValues = { readonly [K in keyof DiceSetSpec]: DiceSetSpec[K] | null };
 
 /** 面数と個数はどちらも数なので取り違えないよう、名前付きで受け取る */
 export function parseDiceInput({ faces, count }: DiceInputValues): ParsedDiceInput {
@@ -33,5 +31,5 @@ export function parseDiceInput({ faces, count }: DiceInputValues): ParsedDiceInp
       message: `個数は ${MIN_DICE_COUNT}〜${MAX_DICE_COUNT} の整数で入力してください。`,
     };
   }
-  return { kind: 'ok', dice: createDiceSet(count, faces) };
+  return { kind: 'ok', dice: createDiceSet({ count, faces }) };
 }

@@ -1,10 +1,10 @@
 import { describe, expect, it } from 'vitest';
 
-import { accumulate, mostLikely, probabilityOf } from '#src/domain/dice/distribution.js';
+import { toDistributionRows, mostLikely, probabilityOf } from '#src/domain/dice/distribution.js';
 
-describe('accumulate', () => {
+describe('toDistributionRows', () => {
   it('値ごとの通り数に、以上・以下の通り数を積み上げて添える', () => {
-    expect(accumulate(2, [1n, 2n, 1n], 4n)).toEqual([
+    expect(toDistributionRows(2, [1n, 2n, 1n], 4n)).toEqual([
       { value: 2, ways: 1n, atLeastWays: 4n, atMostWays: 1n },
       { value: 3, ways: 2n, atLeastWays: 3n, atMostWays: 3n },
       { value: 4, ways: 1n, atLeastWays: 1n, atMostWays: 4n },
@@ -14,11 +14,14 @@ describe('accumulate', () => {
 
 describe('mostLikely', () => {
   it('通り数が最も多い値と、その通り数', () => {
-    expect(mostLikely(accumulate(2, [1n, 2n, 1n], 4n))).toEqual({ values: [3], ways: 2n });
+    expect(mostLikely(toDistributionRows(2, [1n, 2n, 1n], 4n))).toEqual({ values: [3], ways: 2n });
   });
 
   it('同数なら全ての値', () => {
-    expect(mostLikely(accumulate(1, [1n, 1n, 1n], 3n))).toEqual({ values: [1, 2, 3], ways: 1n });
+    expect(mostLikely(toDistributionRows(1, [1n, 1n, 1n], 3n))).toEqual({
+      values: [1, 2, 3],
+      ways: 1n,
+    });
   });
 });
 

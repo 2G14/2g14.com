@@ -1,5 +1,5 @@
 import { type DiceSet, totalOutcomes } from '#src/domain/dice/dice-set.js';
-import { accumulate, type DistributionRow } from '#src/domain/dice/distribution.js';
+import { toDistributionRows, type DistributionRow } from '#src/domain/dice/distribution.js';
 
 /** C(m, j)（0 ≤ j ≤ m ≤ n）の表 */
 function binomialTable(n: number): bigint[][] {
@@ -70,5 +70,5 @@ export function sameFaceDistribution(dice: DiceSet): DistributionRow[] {
 
   const atMostByK = Array.from({ length: n + 1 }, (_, k) => (k === 0 ? 0n : atMost(k)));
   const exact = atMostByK.slice(1).map((ways, i) => ways - (atMostByK[i] ?? 0n));
-  return accumulate(1, exact, total);
+  return toDistributionRows(1, exact, total);
 }

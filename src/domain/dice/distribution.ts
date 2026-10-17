@@ -12,7 +12,7 @@ export interface MostLikely {
 }
 
 /** firstValue から 1 ずつ増える値ごとの通り数に、以上・以下の通り数を積み上げて添える */
-export function accumulate(
+export function toDistributionRows(
   firstValue: number,
   waysByOffset: readonly bigint[],
   total: bigint,
