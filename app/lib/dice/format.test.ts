@@ -1,6 +1,11 @@
 import { describe, expect, it } from 'vitest';
 
-import { formatFraction, formatPercent, formatWays } from '#app/lib/dice/format.js';
+import {
+  formatFraction,
+  formatPercent,
+  formatProbability,
+  formatWays,
+} from '#app/lib/dice/format.js';
 
 describe('formatPercent', () => {
   it('小数第 2 位までのパーセントにする', () => {
@@ -64,5 +69,15 @@ describe('formatWays', () => {
   it('桁数の上限を指定できる', () => {
     expect(formatWays(12_345_678n, 8)).toBe('12,345,678');
     expect(formatWays(123_456_789n, 8)).toBe('1.2×10⁸');
+  });
+});
+
+describe('formatProbability', () => {
+  it('% に既約分数を添える', () => {
+    expect(formatProbability(6n, 36n)).toBe('16.67%（1/6）');
+  });
+
+  it('分数を書かない大きさなら % だけ', () => {
+    expect(formatProbability(1n, 10n ** 200n)).toBe('1.0×10⁻¹⁹⁸%');
   });
 });

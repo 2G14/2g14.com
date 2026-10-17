@@ -63,6 +63,12 @@ export function formatFraction(ways: bigint, total: bigint): string | null {
   return denominator === 1n ? String(numerator) : `${numerator}/${denominator}`;
 }
 
+/** 「16.67%（1/6）」のように、% に既約分数を添えて書く。分数を書かないときは % だけ */
+export function formatProbability(ways: bigint, total: bigint): string {
+  const fraction = formatFraction(ways, total);
+  return `${formatPercent(ways, total)}${fraction === null ? '' : `（${fraction}）`}`;
+}
+
 /**
  * 通り数を書く。maxDigits 桁を超えると「2.8×10¹⁹⁷」の形にする。
  * 既定の 15 桁は、それを超えると Number で正確に表せず下の桁が変わってしまう境目

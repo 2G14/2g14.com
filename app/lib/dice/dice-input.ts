@@ -12,7 +12,14 @@ import {
 
 export type ParsedDiceInput = NoResult | { kind: 'ok'; dice: DiceSet };
 
-export function parseDiceInput(faces: number | null, count: number | null): ParsedDiceInput {
+/** 入力欄の値。空欄は null */
+export interface DiceInputValues {
+  readonly faces: number | null;
+  readonly count: number | null;
+}
+
+/** 面数と個数はどちらも数なので取り違えないよう、名前付きで受け取る */
+export function parseDiceInput({ faces, count }: DiceInputValues): ParsedDiceInput {
   if (faces === null || count === null) return { kind: 'empty' };
   if (!isValidDiceFaces(faces)) {
     return {

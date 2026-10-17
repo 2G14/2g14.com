@@ -16,10 +16,11 @@ export default function ProbabilityGauge({
   total,
 }: ProbabilityGaugeProps) {
   const percent = probabilityOf(ways, total) * 100;
+  const percentText = formatPercent(ways, total);
   const fraction = formatFraction(ways, total);
   return (
     <div class="flex items-center gap-4 rounded-box bg-base-200 px-4 py-3">
-      <div class="relative size-16 shrink-0" role="img" aria-label={formatPercent(ways, total)}>
+      <div class="relative size-16 shrink-0" role="img" aria-label={percentText}>
         {/* daisyUI の radial-progress は値の弧しか描かないため、1% のような小さい値でも円と分かるよう背景の輪を敷く */}
         <div class="absolute inset-0 rounded-full border-8 border-primary/20" />
         <div
@@ -30,7 +31,7 @@ export default function ProbabilityGauge({
       </div>
       <div class="min-w-0">
         <div class="text-xs text-base-content/60">{title}</div>
-        <div class="text-2xl font-bold tabular-nums">{formatPercent(ways, total)}</div>
+        <div class="text-2xl font-bold tabular-nums">{percentText}</div>
         <div class="text-xs text-base-content/60 tabular-nums">
           {description}
           {fraction !== null && `（${fraction}）`}

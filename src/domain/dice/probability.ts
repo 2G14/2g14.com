@@ -49,3 +49,8 @@ export function faceCountDistribution(dice: DiceSet): DistributionRow[] {
   }
   return accumulate(0, exact, totalOutcomes(dice));
 }
+
+/** 特定の目（たとえば 6 の目）が 1 個以上出る通り数。1 個も出ない通り数を全体から引く */
+export function atLeastOneWays(dice: DiceSet): bigint {
+  return totalOutcomes(dice) - BigInt(dice.faces - 1) ** BigInt(dice.count);
+}

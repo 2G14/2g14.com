@@ -1,73 +1,93 @@
-import { useState } from 'hono/jsx';
+import { useEffect, useMemo, useState } from 'hono/jsx';
 
 import { niceAxis, niceTicks } from '#app/lib/chart-ticks.js';
-import { formatFraction, formatPercent, formatWays } from '#app/lib/dice/format.js';
+import { formatProbability, formatWays } from '#app/lib/dice/format.js';
 import { type DistributionRow, mostLikely, probabilityOf } from '#src/domain/dice/distribution.js';
 
-type ChartMode = 'exact' | 'atLeast' | 'atMost';
+const MODES = ['exact', 'atLeast', 'atMost'] as const;
 
-const MODES = ['exact', 'atLeast', 'atMost'] as const satisfies readonly ChartMode[];
-const MODE_SUFFIX: Readonly<Record<ChartMode, string>> = {
-  exact: '',
-  atLeast: ' 以上',
-  atMost: ' 以下',
+type ChartMode = (typeof MODES)[number];
+
+/** 表示の切り替えごとに、使う通り数と、値に添える言葉 */
+const MODE_CONFIG: Readonly<
+  Record<ChartMode, { key: 'ways' | 'atLeastWays' | 'atMostWays'; suffix: string }>
+> = {
+  exact: { key: 'ways', suffix: '' },
+  atLeast: { key: 'atLeastWays', suffix: ' 以上' },
+  atMost: { key: 'atMostWays', suffix: ' 以下' },
 };
+
+/** 横軸の名前と単位（単位が無ければ空文字） */
+export interface ChartAxis {
+  readonly name: string;
+  readonly unit: string;
+}
 
 interface DistributionChartProps {
   rows: readonly DistributionRow[];
   /** 出目の組み合わせの総数（確率の分母） */
   total: bigint;
-  /** 横軸の値の名前と単位（「合計」と「」、「個数」と「 個」） */
-  xName: string;
-  xUnit: string;
+  axis: ChartAxis;
   /** 切り替えボタンの文言 */
   modeLabels: Readonly<Record<ChartMode, string>>;
 }
 
 function waysOf(row: DistributionRow, mode: ChartMode): bigint {
-  if (mode === 'atLeast') return row.atLeastWays;
-  if (mode === 'atMost') return row.atMostWays;
-  return row.ways;
+  return row[MODE_CONFIG[mode].key];
 }
 
 /**
  * 確率の分布を棒グラフで描き、選んだ棒の通り数と確率をツールチップで出す。棒はポインターのホバー・
  * タップのほか、グラフにフォーカスして矢印キーでも選べ、選んだ値はスライダーとして読み上げられる。
- * 数千本の棒でも重くならないよう、棒は 1 本の path にまとめ、% や分数の整形は選んだ 1 本だけ行う
+ * 数千本の棒でも重くならないよう、棒は 1 本の path にまとめて分布と表示の切り替えが変わったときだけ作り、
+ * % や分数の整形は選んだ 1 本だけ行う
  */
 export default function DistributionChart({
   rows,
   total,
-  xName,
-  xUnit,
+  axis,
   modeLabels,
 }: DistributionChartProps) {
   const [mode, setMode] = useState<ChartMode>('exact');
   const [selected, setSelected] = useState<number | null>(null);
 
-  const peak = mostLikely(rows);
-  // ちょうどその値の確率は最大の棒に合わせて縦軸を伸び縮みさせ、以上・以下は 0〜100% で固定する
-  const y = niceAxis(mode === 'exact' ? probabilityOf(peak.ways, total) * 100 : 100, 5);
-  const heightOf = (percent: number) => (percent / y.top) * 100;
-  const bars = rows
-    .map((row, i) => {
-      const height = heightOf(probabilityOf(waysOf(row, mode), total) * 100);
-      return `M${i} 100V${100 - height}h1V100z`;
-    })
-    .join('');
+  // 個数や面数が変わると棒の数が変わり、前に選んだ位置が無い棒を指してしまう
+  useEffect(() => {
+    setSelected(null);
+  }, [rows]);
+
+  const peak = useMemo(() => mostLikely(rows), [rows]);
+  const peakIndex = Math.max(
+    0,
+    rows.findIndex((row) => row.value === peak.values[0]),
+  );
   const first = rows[0]?.value ?? 0;
-  const ticks = niceTicks(first, rows.at(-1)?.value ?? first, 6);
+  const last = rows.at(-1)?.value ?? first;
+  const ticks = useMemo(() => niceTicks(first, last, 6), [first, last]);
+  // ちょうどその値の確率は最大の棒に合わせて縦軸を伸び縮みさせ、以上・以下は 0〜100% で固定する
+  const y = useMemo(
+    () => niceAxis(mode === 'exact' ? probabilityOf(peak.ways, total) * 100 : 100, 5),
+    [mode, peak, total],
+  );
+  const heightOf = (percent: number) => (percent / y.top) * 100;
+  const bars = useMemo(
+    () =>
+      rows
+        .map((row, i) => {
+          const height = heightOf(probabilityOf(waysOf(row, mode), total) * 100);
+          return `M${i} 100V${100 - height}h1V100z`;
+        })
+        .join(''),
+    [rows, mode, total, y],
+  );
 
   const selectedRow = selected === null ? null : (rows[selected] ?? null);
   const selectedWays = selectedRow === null ? null : waysOf(selectedRow, mode);
-  const selectedFraction = selectedWays === null ? null : formatFraction(selectedWays, total);
+  const unit = axis.unit === '' ? '' : ` ${axis.unit}`;
   const selectedLabel =
-    selectedRow === null ? '' : `${xName} ${selectedRow.value}${xUnit}${MODE_SUFFIX[mode]}`;
-  const selectedPercent = selectedWays === null ? '' : formatPercent(selectedWays, total);
-  const selectedText =
-    selectedWays === null
-      ? ''
-      : `${selectedLabel}：${selectedPercent}${selectedFraction === null ? '' : `（${selectedFraction}）`}、${formatWays(selectedWays)} 通り`;
+    selectedRow === null
+      ? null
+      : `${axis.name} ${selectedRow.value}${unit}${MODE_CONFIG[mode].suffix}`;
 
   const select = (index: number) => setSelected(Math.min(rows.length - 1, Math.max(0, index)));
   const onPointer = (e: PointerEvent) => {
@@ -75,7 +95,7 @@ export default function DistributionChart({
     select(Math.floor(((e.clientX - rect.left) / rect.width) * rows.length));
   };
   const onKeyDown = (e: KeyboardEvent) => {
-    const current = selected ?? rows.findIndex((row) => row.value === peak.values[0]);
+    const current = selected ?? peakIndex;
     const page = Math.max(1, Math.round(rows.length / 10));
     const next: Readonly<Record<string, number>> = {
       ArrowRight: current + 1,
@@ -125,15 +145,12 @@ export default function DistributionChart({
         <div class="relative min-w-0 flex-1 pt-16">
           {/* 選んだときだけ差し込むと、後ろの svg が挿し直されてキーボードのフォーカスが外れるため、常に置いて隠す */}
           <div
-            class={`pointer-events-none absolute top-0 z-10 -translate-x-1/2 rounded-box bg-neutral px-3 py-1.5 text-xs whitespace-nowrap text-neutral-content tabular-nums shadow ${selected === null ? 'hidden' : ''}`}
+            class={`pointer-events-none absolute top-0 z-10 -translate-x-1/2 rounded-box bg-neutral px-3 py-1.5 text-xs whitespace-nowrap text-neutral-content tabular-nums shadow ${selectedRow === null ? 'hidden' : ''}`}
             style={`left: clamp(5rem, ${(((selected ?? 0) + 0.5) / rows.length) * 100}%, calc(100% - 5rem))`}
             aria-hidden="true"
           >
             <div class="font-bold">{selectedLabel}</div>
-            <div>
-              {selectedPercent}
-              {selectedFraction !== null && `（${selectedFraction}）`}
-            </div>
+            <div>{selectedWays !== null && formatProbability(selectedWays, total)}</div>
             <div>{selectedWays !== null && `${formatWays(selectedWays)} 通り`}</div>
           </div>
           <svg
@@ -142,11 +159,19 @@ export default function DistributionChart({
             class="block h-48 w-full touch-pan-y border-b border-base-content/30 text-primary focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
             tabindex={0}
             role="slider"
-            aria-label={`${xName}ごとの確率のグラフ。矢印キーで値を選べます`}
+            aria-label={`${axis.name}ごとの確率のグラフ。矢印キーで値を選べます`}
             aria-valuemin={first}
-            aria-valuemax={rows.at(-1)?.value ?? first}
-            aria-valuenow={selectedRow?.value ?? peak.values[0] ?? first}
-            aria-valuetext={selectedText || undefined}
+            aria-valuemax={last}
+            aria-valuenow={(selectedRow ?? rows[peakIndex])?.value ?? first}
+            aria-valuetext={
+              selectedLabel === null || selectedWays === null
+                ? undefined
+                : `${selectedLabel}：${formatProbability(selectedWays, total)}、${formatWays(selectedWays)} 通り`
+            }
+            // フォーカスした時点で読み上げる値が無いと、確率を聞くにはまずキーを押す必要がある
+            onFocus={() => {
+              if (selected === null) select(peakIndex);
+            }}
             onPointerMove={onPointer}
             onPointerDown={onPointer}
             // タッチでは指を離すと pointerleave が来るため、タップした値が見えるようマウスのときだけ消す
@@ -174,9 +199,9 @@ export default function DistributionChart({
               stroke-width={1}
               vector-effect="non-scaling-stroke"
             />
-            {selected !== null && (
+            {selectedRow !== null && (
               <rect
-                x={selected}
+                x={selected ?? 0}
                 y={0}
                 width={1}
                 height={100}
@@ -198,8 +223,8 @@ export default function DistributionChart({
             ))}
           </div>
           <div class="text-center text-xs text-base-content/60">
-            {xName}
-            {xUnit !== '' && `（${xUnit.trim()}）`}
+            {axis.name}
+            {axis.unit !== '' && `（${axis.unit}）`}
           </div>
         </div>
       </div>

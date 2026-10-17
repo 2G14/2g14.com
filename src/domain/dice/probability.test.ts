@@ -3,6 +3,7 @@ import { describe, expect, it } from 'vitest';
 import { createDiceSet, totalOutcomes } from '#src/domain/dice/dice-set.js';
 import {
   allSameWays,
+  atLeastOneWays,
   expectedSum,
   faceCountDistribution,
   sumDistribution,
@@ -111,5 +112,18 @@ describe('faceCountDistribution', () => {
     expect(rows.reduce((sum, row) => sum + row.ways, 0n)).toBe(totalOutcomes(dice));
     expect(rows[0]?.atLeastWays).toBe(totalOutcomes(dice));
     expect(rows.at(-1)?.atMostWays).toBe(totalOutcomes(dice));
+  });
+});
+
+describe('atLeastOneWays', () => {
+  it('特定の目が 1 個以上出る通り数', () => {
+    expect(atLeastOneWays(createDiceSet(1, 6))).toBe(1n);
+    expect(atLeastOneWays(createDiceSet(2, 6))).toBe(11n);
+    expect(atLeastOneWays(createDiceSet(4, 6))).toBe(671n);
+  });
+
+  it('特定の目の個数の分布で 1 個以上になる通り数と等しい', () => {
+    const dice = createDiceSet(7, 5);
+    expect(atLeastOneWays(dice)).toBe(faceCountDistribution(dice)[1]?.atLeastWays);
   });
 });

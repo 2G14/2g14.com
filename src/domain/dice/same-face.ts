@@ -49,7 +49,7 @@ function allAtMostWays(dice: DiceSet, k: number, binomial: bigint[][]): bigint {
 
 /**
  * 同じ目が最も多く出た個数（3 個がゾロ目なら 3、全部違えば 1）ごとの通り数。
- * k が個数の半分を超えると k 個より多く出る目は 1 つしかありえないため、特定の目が k 個より多く出る
+ * k が個数の半分以上だと k 個より多く出る目は 1 つしかありえないため、特定の目が k 個より多く出る
  * 通り数を面数倍して全体から引くだけで求まる。それ以下の k だけ並べ方の積で数える
  */
 export function sameFaceDistribution(dice: DiceSet): DistributionRow[] {

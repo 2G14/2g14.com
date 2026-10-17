@@ -18,16 +18,18 @@ export interface Axis {
 
 /**
  * first〜last の整数の範囲に、両端と、1・2・5×10^k 刻みのきりのよい目盛りを最大 maxCount 本ほど置く。
- * 両端が無いと範囲が読み取れないため必ず置き、それと近すぎてラベルが重なるきりのよい目盛りは省く
+ * 両端が無いと範囲が読み取れないため必ず置き、それとラベルが重なるほど近いきりのよい目盛りだけ省く。
+ * 省く距離を刻み幅の半分にすると、3〜18 で 5 が消えて 3 の次が 10 になるなど間が空きすぎる
  */
 export function niceTicks(first: number, last: number, maxCount: number): number[] {
   const range = last - first;
   if (range <= 0) return [first];
   // 横軸は整数なので、1 より細かい刻みにはしない
   const step = Math.max(1, niceStep(range, maxCount - 1));
+  const minGap = range * 0.08;
   const inner: number[] = [];
   for (let tick = Math.ceil(first / step) * step; tick <= last; tick += step) {
-    if (tick - first >= step / 2 && last - tick >= step / 2) inner.push(tick);
+    if (tick - first >= minGap && last - tick >= minGap) inner.push(tick);
   }
   return [first, ...inner, last];
 }

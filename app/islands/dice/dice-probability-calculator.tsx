@@ -1,13 +1,13 @@
-import { useEffect, useState } from 'hono/jsx';
+import { useEffect, useMemo, useState } from 'hono/jsx';
 
-import DistributionChart from '#app/components/dice/distribution-chart.js';
+import DistributionChart, { type ChartAxis } from '#app/components/dice/distribution-chart.js';
 import ProbabilityGauge from '#app/components/dice/probability-gauge.js';
 import StatTile from '#app/components/dice/stat-tile.js';
 import NumberField from '#app/components/number-field.js';
 import TocSection from '#app/components/toc-section.js';
 import { parseDiceInput } from '#app/lib/dice/dice-input.js';
 import { diceQueryString, initialDiceInput } from '#app/lib/dice/dice-query.js';
-import { formatFraction, formatPercent, formatWays } from '#app/lib/dice/format.js';
+import { formatProbability, formatWays } from '#app/lib/dice/format.js';
 import { DICE_SECTIONS } from '#app/lib/dice/sections.js';
 import { replaceUrlQuery } from '#app/lib/url.js';
 import {
@@ -22,6 +22,7 @@ import {
 import { mostLikely } from '#src/domain/dice/distribution.js';
 import {
   allSameWays,
+  atLeastOneWays,
   expectedSum,
   faceCountDistribution,
   sumDistribution,
@@ -34,6 +35,22 @@ import { sameFaceDistribution } from '#src/domain/dice/same-face.js';
  */
 const SERVER_RENDER_MAX_SUMS = 200;
 const SERVER_RENDER_MAX_COUNT = 20;
+
+/**
+ * 入力が止まってから計算を始めるまでの時間。「100」と打つと 1・10・100 の 3 回分の計算が走り、
+ * 100 個では 1 回に 0.1 秒以上かかるため、打ち終わるのを待つ
+ */
+const INPUT_SETTLE_MS = 300;
+
+const SUM_AXIS: ChartAxis = { name: '合計', unit: '' };
+const FACE_COUNT_AXIS: ChartAxis = { name: '個数', unit: '個' };
+const SAME_FACE_AXIS: ChartAxis = { name: '同じ目', unit: '個' };
+const SUM_MODE_LABELS = { exact: 'その数', atLeast: 'その数以上', atMost: 'その数以下' } as const;
+const COUNT_MODE_LABELS = {
+  exact: 'ちょうどその個数',
+  atLeast: 'その個数以上',
+  atMost: 'その個数以下',
+} as const;
 
 function canRenderOnServer(dice: DiceSet): boolean {
   const range = sumRange(dice);
@@ -52,13 +69,13 @@ interface DiceResultProps {
 }
 
 function DiceResult({ dice }: DiceResultProps) {
-  const sums = sumDistribution(dice);
-  const faceCounts = faceCountDistribution(dice);
+  // ホバーやトグルで再描画されても、同じサイコロの組なら分布を数え直さない
+  const sums = useMemo(() => sumDistribution(dice), [dice]);
+  const faceCounts = useMemo(() => faceCountDistribution(dice), [dice]);
+  const sameFaces = useMemo(() => (dice.count >= 2 ? sameFaceDistribution(dice) : null), [dice]);
   const total = totalOutcomes(dice);
   const range = sumRange(dice);
   const peak = mostLikely(sums);
-  const peakFraction = formatFraction(peak.ways, total);
-  const atLeastOne = faceCounts[1]?.atLeastWays;
 
   return (
     <>
@@ -70,7 +87,7 @@ function DiceResult({ dice }: DiceResultProps) {
             title="最も出やすい合計"
             // 1 個なら全ての合計が同じ確率で、並べると合計の数だけ値が並んでしまう
             value={peak.values.length === sums.length ? 'すべて同じ' : peak.values.join('・')}
-            description={`${peak.values.length > 1 ? 'それぞれ ' : ''}${formatPercent(peak.ways, total)}${peakFraction === null ? '' : `（${peakFraction}）`}`}
+            description={`${peak.values.length > 1 ? 'それぞれ ' : ''}${formatProbability(peak.ways, total)}`}
           />
           <StatTile
             title="出目の組み合わせ"
@@ -88,25 +105,17 @@ function DiceResult({ dice }: DiceResultProps) {
               total={total}
             />
           )}
-          {atLeastOne !== undefined && (
-            <ProbabilityGauge
-              title="特定の目が 1 個以上出る"
-              description={`たとえば ${dice.faces} の目`}
-              ways={atLeastOne}
-              total={total}
-            />
-          )}
+          <ProbabilityGauge
+            title="特定の目が 1 個以上出る"
+            description={`たとえば ${dice.faces} の目`}
+            ways={atLeastOneWays(dice)}
+            total={total}
+          />
         </div>
       </TocSection>
 
       <TocSection item={DICE_SECTIONS.sum}>
-        <DistributionChart
-          rows={sums}
-          total={total}
-          xName="合計"
-          xUnit=""
-          modeLabels={{ exact: 'その数', atLeast: 'その数以上', atMost: 'その数以下' }}
-        />
+        <DistributionChart rows={sums} total={total} axis={SUM_AXIS} modeLabels={SUM_MODE_LABELS} />
       </TocSection>
 
       <TocSection item={DICE_SECTIONS.faceCount}>
@@ -116,32 +125,25 @@ function DiceResult({ dice }: DiceResultProps) {
         <DistributionChart
           rows={faceCounts}
           total={total}
-          xName="個数"
-          xUnit=" 個"
-          modeLabels={{
-            exact: 'ちょうどその個数',
-            atLeast: 'その個数以上',
-            atMost: 'その個数以下',
-          }}
+          axis={FACE_COUNT_AXIS}
+          modeLabels={COUNT_MODE_LABELS}
         />
       </TocSection>
 
-      <TocSection item={DICE_SECTIONS.sameFace}>
-        <p class="text-sm text-base-content/70">
-          {`${dice.count} 個のうち、同じ目が最も多く出たのが何個かの確率です（目はどれでもよい）。${dice.count} 個ならゾロ目、1 個なら全部違う目です。`}
-        </p>
-        <DistributionChart
-          rows={sameFaceDistribution(dice)}
-          total={total}
-          xName="同じ目"
-          xUnit=" 個"
-          modeLabels={{
-            exact: 'ちょうどその個数',
-            atLeast: 'その個数以上',
-            atMost: 'その個数以下',
-          }}
-        />
-      </TocSection>
+      {/* 1 個では同じ目になりようがないため、ゾロ目のゲージと同じく 2 個以上のときだけ出す */}
+      {sameFaces !== null && (
+        <TocSection item={DICE_SECTIONS.sameFace}>
+          <p class="text-sm text-base-content/70">
+            {`${dice.count} 個のうち、同じ目が最も多く出たのが何個かの確率です（目はどれでもよい）。${dice.count} 個ならゾロ目、1 個なら全部違う目です。`}
+          </p>
+          <DistributionChart
+            rows={sameFaces}
+            total={total}
+            axis={SAME_FACE_AXIS}
+            modeLabels={COUNT_MODE_LABELS}
+          />
+        </TocSection>
+      )}
     </>
   );
 }
@@ -150,20 +152,33 @@ export default function DiceProbabilityCalculator({ initialFaces, initialCount }
   const initial = initialDiceInput(initialFaces, initialCount);
   const [faces, setFaces] = useState<number | null>(initial.faces);
   const [count, setCount] = useState<number | null>(initial.count);
-  const result = parseDiceInput(faces, count);
+  const result = parseDiceInput({ faces, count });
+  // 計算に使うサイコロの組。入力が止まってから更新し、打っている途中は前の結果を薄くして残す
+  const [committed, setCommitted] = useState<DiceSet | null>(
+    result.kind === 'ok' ? result.dice : null,
+  );
   const [hydrated, setHydrated] = useState(false);
 
   useEffect(() => {
     setHydrated(true);
   }, []);
 
-  const dice = result.kind === 'ok' ? result.dice : null;
-  const pending = dice !== null && !hydrated && !canRenderOnServer(dice);
-
   useEffect(() => {
-    // 入力途中の空欄や範囲外の値で URL を書き換えると、再読み込みで結果が消えてしまう
-    if (result.kind === 'ok') replaceUrlQuery(diceQueryString(result.dice));
+    const dice = result.kind === 'ok' ? result.dice : null;
+    const timer = setTimeout(() => {
+      if (dice === null) return;
+      if (committed?.faces === dice.faces && committed.count === dice.count) return;
+      setCommitted(dice);
+      replaceUrlQuery(diceQueryString(dice));
+    }, INPUT_SETTLE_MS);
+    return () => clearTimeout(timer);
   }, [faces, count]);
+
+  const settling =
+    result.kind === 'ok' &&
+    committed !== null &&
+    (committed.faces !== result.dice.faces || committed.count !== result.dice.count);
+  const pending = committed !== null && !hydrated && !canRenderOnServer(committed);
 
   return (
     <>
@@ -204,11 +219,20 @@ export default function DiceProbabilityCalculator({ initialFaces, initialCount }
         </div>
       </div>
 
-      {dice === null && (
+      {result.kind !== 'ok' && (
         <p class="text-center text-base-content/50">面数と個数を入力すると確率を計算します。</p>
       )}
-      {pending && <p class="text-center text-base-content/50">計算しています…</p>}
-      {dice !== null && !pending && <DiceResult dice={dice} />}
+      {result.kind === 'ok' && pending && (
+        <p class="text-center text-base-content/50">計算しています…</p>
+      )}
+      {result.kind === 'ok' && committed !== null && !pending && (
+        <div
+          class={`flex flex-col gap-8 transition-opacity ${settling ? 'opacity-50' : ''}`}
+          aria-busy={String(settling)}
+        >
+          <DiceResult dice={committed} />
+        </div>
+      )}
     </>
   );
 }
