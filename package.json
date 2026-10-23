@@ -37,7 +37,7 @@
     "@typescript/native": "npm:typescript@^7.0.2",
     "@vitest/coverage-v8": "^5.0.5",
     "daisyui": "^5.7.50",
-    "jscpd": "^5.4.1",
+    "jscpd": "^5.4.2",
     "knip": "^6.42.1",
     "lefthook": "^2.2.2",
     "oxfmt": "^0.73.0",
