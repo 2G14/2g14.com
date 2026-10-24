@@ -17,9 +17,11 @@ RUN case "$TARGETARCH" in \
  && chown -R agent:agent /home/agent/.local
 
 # git は mise のレジストリに存在しないため apt で最新化する。
+# ca-certificates も最新化する。kit のビルドが再利用されると、ベースイメージの
+# 証明書の更新が取り込まれないため
 # ベースが apt で入れている gh は消す。残すと PATH 次第で mise の gh と入れ替わるため
 # libatomic1 は node 26 の linux-arm64 バイナリが動的リンクしているが、ベースに無いため入れる
-RUN apt-get update && apt-get install -y --only-upgrade git \
+RUN apt-get update && apt-get install -y --only-upgrade git ca-certificates \
  && apt-get install -y --no-install-recommends libatomic1 && apt-get purge -y gh \
  && rm -rf /var/lib/apt/lists/*
 
