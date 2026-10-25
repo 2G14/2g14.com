@@ -50,11 +50,10 @@ sbx secret set github --command 'gh auth token'
 - 登録しなくても起動はできる。その場合も `GH_TOKEN` にはダミー値が入るので、
   gh は 401 を返す。サンドボックス内で `gh auth login` しても `GH_TOKEN` が優先されて効かない
 
-ホストの SSH エージェントは既定でサンドボックスに転送され、GitHub への SSH(22番)も
-balanced で許可されている。ホストのエージェントに鍵を登録すると、サンドボックスから
-その鍵で push でき、トークンの権限を絞っても迂回される。転送を止めるには
-`sbx settings set ssh.agentForwardingEnabled false` の後に `sbx daemon restart` する
-(全サンドボックスに効く)。
+ホストの SSH エージェントはサンドボックスに転送されない。v3 kit では `ssh-agent@1` を
+宣言した kit にしか渡されず
+([仕様](https://github.com/docker/sandbox-kit-spec/blob/main/docs/spec/capabilities/com.docker.sandbox/ssh-agent@1.md))、
+この kit は宣言していないため。GitHub への git 操作は HTTPS で、上のトークンを使う。
 
 ## 使い方
 
