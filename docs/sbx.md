@@ -18,6 +18,9 @@ Claude が起動する。サンドボックスごとに専用の clone がある
 
 kit と `sbxenv.yaml` は手元のファイルが使われるので、先に master を最新にしておく。
 
+git worktree の中からは起動できない(`--clone is not supported when run from a Git worktree`)。
+clone mode はメインのリポジトリからしか使えないため。
+
 ### 既存のサンドボックスに戻る
 
 名前を渡す。名前を忘れたら `sbx ls` で確認する:
@@ -54,6 +57,9 @@ git fetch sandbox-claude-2g14-1010-153045
 git switch -c <ブランチ名> sandbox-claude-2g14-1010-153045/<ブランチ名>
 ```
 
+fetch できるのはサンドボックスが起動している間だけ。停止中は中の git daemon も止まっている。
+停止したサンドボックスからは、`npm run sbx -- <名前>` で起動してから fetch する。
+
 `.sandbox/` や `sbxenv.yaml` の変更が含まれていたら、取り込む前に必ず中身を確認する。
 
 ## 片付ける
@@ -63,6 +69,19 @@ git switch -c <ブランチ名> sandbox-claude-2g14-1010-153045/<ブランチ名
 ```bash
 sbx ls
 sbx env rm --name claude-2g14-1010-153045
+```
+
+fetch 済みのブランチは `refs/sandboxes/<名前>/` に控えが残り、削除後も戻せる。
+fetch していないコミットとコミットしていない変更は戻せない:
+
+```bash
+git branch <ブランチ名> refs/sandboxes/claude-2g14-1010-153045/<ブランチ名>
+```
+
+控えはサンドボックスを作るたびに増える。不要になったら削除する:
+
+```bash
+git for-each-ref --format='delete %(refname)' refs/sandboxes/claude-2g14-1010-153045 | git update-ref --stdin
 ```
 
 ## kit を変更したとき
