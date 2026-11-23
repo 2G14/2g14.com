@@ -2,5 +2,5 @@
 # mise が別の版をダウンロードし直す(kit のビルドからは mise.toml を参照できない)
 [tools]
 node = "26.13.1"
-npm = "12.2.2"
+npm = "12.2.3"
 gh = "latest"
